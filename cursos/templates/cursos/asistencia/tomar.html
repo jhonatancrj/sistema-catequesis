@@ -1,0 +1,147 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+            Tomar Asistencia
+        </h2>
+
+        <p>
+
+            {{ clase.curso.nombre }}
+            -
+            {{ clase.titulo }}
+
+        </p>
+
+    </div>
+
+    <div class="custom-table">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead>
+
+                    <tr>
+
+                        <th>Participante</th>
+                        <th>Estado</th>
+                        <th>Observación</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for asistencia in asistencias %}
+
+                    <tr>
+
+                        <!-- USER -->
+                        <td>
+
+                            <div class="user-info">
+
+                                <img src="https://ui-avatars.com/api/?name={{ asistencia.participante.user.username }}">
+
+                                <div>
+
+                                    <h6>
+
+                                        {{ asistencia.participante.user.first_name }}
+                                        {{ asistencia.participante.user.last_name }}
+
+                                    </h6>
+
+                                    <p>
+
+                                        {{ asistencia.participante.user.username }}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <!-- ESTADO -->
+                        <td>
+
+                            <select
+                                name="estado_{{ asistencia.id }}"
+                                class="form-select">
+
+                                <option value="PRESENTE"
+                                {% if asistencia.estado == 'PRESENTE' %}
+                                selected
+                                {% endif %}>
+                                    Presente
+                                </option>
+
+                                <option value="AUSENTE"
+                                {% if asistencia.estado == 'AUSENTE' %}
+                                selected
+                                {% endif %}>
+                                    Ausente
+                                </option>
+
+                                <option value="PERMISO"
+                                {% if asistencia.estado == 'PERMISO' %}
+                                selected
+                                {% endif %}>
+                                    Permiso
+                                </option>
+
+                            </select>
+
+                        </td>
+
+                        <!-- OBS -->
+                        <td>
+
+                            <input type="text"
+                                   name="observacion_{{ asistencia.id }}"
+                                   value="{{ asistencia.observacion }}"
+                                   class="form-control">
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="mt-4">
+
+                <button class="btn btn-primary">
+
+                    Guardar Asistencia
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,211 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+
+            Estadísticas
+
+        </h2>
+
+        <p>
+
+            {{ cuestionario.titulo }}
+
+        </p>
+
+    </div>
+
+    <!-- GRAFICO -->
+    <div class="custom-table mb-4">
+
+        <div style="height: 400px;">
+
+            <canvas id="graficoPreguntas"></canvas>
+
+        </div>
+
+    </div>
+
+    <!-- CARDS -->
+    {% for e in estadisticas %}
+
+    <div class="custom-table mb-4">
+
+        <h5 class="mb-3">
+
+            {{ e.pregunta.enunciado }}
+
+        </h5>
+
+        <hr>
+
+        <div class="row text-center">
+
+            <!-- TOTAL -->
+            <div class="col-md-3 mb-3">
+
+                <div class="stats-card">
+
+                    <h3>
+
+                        {{ e.total }}
+
+                    </h3>
+
+                    <p>
+
+                        Total Respuestas
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- CORRECTAS -->
+            <div class="col-md-3 mb-3">
+
+                <div class="stats-card success-card">
+
+                    <h3>
+
+                        {{ e.correctas }}
+
+                    </h3>
+
+                    <p>
+
+                        Correctas
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- INCORRECTAS -->
+            <div class="col-md-3 mb-3">
+
+                <div class="stats-card danger-card">
+
+                    <h3>
+
+                        {{ e.incorrectas }}
+
+                    </h3>
+
+                    <p>
+
+                        Incorrectas
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- PORCENTAJE -->
+            <div class="col-md-3 mb-3">
+
+                <div class="stats-card primary-card">
+
+                    <h3>
+
+                        {{ e.porcentaje }}%
+
+                    </h3>
+
+                    <p>
+
+                        Acierto
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <div class="alert alert-warning">
+
+        No existen estadísticas registradas todavía.
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const ctx = document.getElementById(
+    'graficoPreguntas'
+)
+
+new Chart(ctx, {
+
+    type: 'bar',
+
+    data: {
+
+        labels: {{ labels|safe }},
+
+        datasets: [
+
+            {
+
+                label: 'Correctas',
+
+                data: {{ correctas_data|safe }},
+
+                borderWidth: 1
+
+            },
+
+            {
+
+                label: 'Incorrectas',
+
+                data: {{ incorrectas_data|safe }},
+
+                borderWidth: 1
+
+            }
+
+        ]
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true
+
+            }
+
+        }
+    }
+})
+
+</script>
+
+{% endblock %}

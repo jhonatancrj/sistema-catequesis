@@ -1,0 +1,488 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <!-- TITLE -->
+    <div class="page-title">
+
+        <h2>
+            Crear Cuestionario
+        </h2>
+
+        <p>
+            Panel administrativo de cuestionarios.
+        </p>
+
+    </div>
+
+    <!-- CARD -->
+    <div class="custom-table">
+
+        <!-- TITULO -->
+        <div class="mb-4">
+
+            <label class="form-label">
+
+                Título
+
+            </label>
+
+            <input type="text"
+                   id="titulo"
+                   class="form-control">
+
+        </div>
+
+        <!-- DESCRIPCION -->
+        <div class="mb-4">
+
+            <label class="form-label">
+
+                Descripción
+
+            </label>
+
+            <textarea id="descripcion"
+                      rows="4"
+                      class="form-control"></textarea>
+
+        </div>
+
+        <!-- CLASE -->
+        <div class="mb-4">
+
+            <label class="form-label">
+
+                Clase
+
+            </label>
+
+            <select id="clase"
+                    class="form-select">
+
+                {% for clase in clases %}
+
+                <option value="{{ clase.id }}">
+
+                    {{ clase.curso.nombre }}
+                    -
+                    {{ clase.titulo }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+        <!-- CONFIG -->
+        <div class="row">
+
+            <!-- TIEMPO -->
+            <div class="col-md-4 mb-4">
+
+                <label class="form-label">
+
+                    Tiempo límite (minutos)
+
+                </label>
+
+                <input type="number"
+                       id="tiempo"
+                       class="form-control">
+
+            </div>
+
+            <!-- FECHA -->
+            <div class="col-md-4 mb-4">
+
+                <label class="form-label">
+
+                    Fecha límite
+
+                </label>
+
+                <input type="datetime-local"
+                       id="fecha_limite"
+                       class="form-control">
+
+            </div>
+
+            <!-- UNICO -->
+            <div class="col-md-4 mb-4 d-flex align-items-center">
+
+                <div class="form-check mt-4">
+
+                    <input type="checkbox"
+                           id="unico"
+                           class="form-check-input">
+
+                    <label class="form-check-label ms-2">
+
+                        Un solo intento
+
+                    </label>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PREGUNTAS -->
+    <div id="contenedorPreguntas">
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="d-flex gap-3 mt-4">
+
+        <button class="btn btn-primary"
+                onclick="agregarPregunta()">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Agregar Pregunta
+
+        </button>
+
+        <button class="btn btn-success"
+                onclick="guardarCuestionario()">
+
+            <i class="bi bi-save"></i>
+
+            Guardar Cuestionario
+
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+let contadorPreguntas = 0
+
+function agregarPregunta(){
+
+    contadorPreguntas++
+
+    const html = `
+
+    <div class="custom-table mt-4 pregunta-card">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h5>
+                Pregunta ${contadorPreguntas}
+            </h5>
+
+            <button class="btn btn-danger btn-sm"
+                    onclick="eliminarPregunta(this)">
+
+                <i class="bi bi-trash"></i>
+
+            </button>
+
+        </div>
+
+        <!-- ENUNCIADO -->
+        <div class="mb-3">
+
+            <label class="form-label">
+
+                Enunciado
+
+            </label>
+
+            <textarea class="form-control pregunta-texto"
+                      rows="3"></textarea>
+
+        </div>
+
+        <!-- CONFIG -->
+        <div class="row">
+
+            <!-- TIPO -->
+            <div class="col-md-4 mb-3">
+
+                <label class="form-label">
+
+                    Tipo
+
+                </label>
+
+                <select class="form-select pregunta-tipo"
+                        onchange="cambiarTipo(this)">
+
+                    <option value="multiple">
+
+                        Opción única
+
+                    </option>
+
+                    <option value="checkbox">
+
+                        Casillas
+
+                    </option>
+
+                    <option value="texto">
+
+                        Texto
+
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- PUNTAJE -->
+            <div class="col-md-4 mb-3">
+
+                <label class="form-label">
+
+                    Puntaje
+
+                </label>
+
+                <input type="number"
+                       value="1"
+                       class="form-control pregunta-puntaje">
+
+            </div>
+
+        </div>
+
+        <!-- RETRO -->
+        <div class="mb-3">
+
+            <label class="form-label">
+
+                Retroalimentación
+
+            </label>
+
+            <textarea class="form-control pregunta-retro"
+                      rows="2"></textarea>
+
+        </div>
+
+        <!-- OPCIONES -->
+        <div class="opciones-container">
+
+        </div>
+
+        <button class="btn btn-light"
+                onclick="agregarOpcion(this)">
+
+            <i class="bi bi-plus"></i>
+
+            Agregar opción
+
+        </button>
+
+    </div>
+    `
+
+    document.getElementById(
+        'contenedorPreguntas'
+    ).insertAdjacentHTML(
+        'beforeend',
+        html
+    )
+}
+
+function eliminarPregunta(btn){
+
+    btn.closest('.pregunta-card').remove()
+}
+
+function agregarOpcion(btn){
+
+    const container = btn.parentElement.querySelector(
+        '.opciones-container'
+    )
+
+    const html = `
+
+    <div class="d-flex gap-2 mb-2 opcion-item">
+
+        <input type="text"
+               placeholder="Opción"
+               class="form-control opcion-texto">
+
+        <div class="form-check d-flex align-items-center">
+
+            <input type="checkbox"
+                   class="form-check-input opcion-correcta">
+
+        </div>
+
+        <button class="btn btn-danger"
+                onclick="eliminarOpcion(this)">
+
+            <i class="bi bi-x"></i>
+
+        </button>
+
+    </div>
+    `
+
+    container.insertAdjacentHTML(
+        'beforeend',
+        html
+    )
+}
+
+function eliminarOpcion(btn){
+
+    btn.closest('.opcion-item').remove()
+}
+
+function cambiarTipo(select){
+
+    const card = select.closest('.pregunta-card')
+
+    const btn = card.querySelector('.btn-light')
+
+    if(select.value === 'texto'){
+
+        btn.style.display = 'none'
+
+    }else{
+
+        btn.style.display = 'inline-block'
+    }
+}
+
+function guardarCuestionario(){
+
+    // VALIDAR FECHA
+    let fechaLimite = document.getElementById('fecha_limite').value;
+    if (fechaLimite) {
+        let fechaSeleccionada = new Date(fechaLimite);
+        let ahora = new Date();
+        if (fechaSeleccionada < ahora) {
+            alert('❌ La fecha de límite no puede ser anterior a la fecha actual');
+            return;
+        }
+    }
+
+    const preguntas = []
+
+    document.querySelectorAll(
+        '.pregunta-card'
+    ).forEach(card => {
+
+        const opciones = []
+
+        card.querySelectorAll(
+            '.opcion-item'
+        ).forEach(op => {
+
+            opciones.push({
+
+                texto: op.querySelector(
+                    '.opcion-texto'
+                ).value,
+
+                correcta: op.querySelector(
+                    '.opcion-correcta'
+                ).checked
+
+            })
+        })
+
+        preguntas.push({
+
+            texto: card.querySelector(
+                '.pregunta-texto'
+            ).value,
+
+            tipo: card.querySelector(
+                '.pregunta-tipo'
+            ).value,
+
+            puntaje: card.querySelector(
+                '.pregunta-puntaje'
+            ).value,
+
+            retroalimentacion: card.querySelector(
+                '.pregunta-retro'
+            ).value,
+
+            opciones: opciones
+
+        })
+
+    })
+
+    fetch(
+        "{% url 'guardar_cuestionario_admin' %}",
+        {
+
+            method: 'POST',
+
+            headers: {
+
+                'Content-Type': 'application/json',
+
+                'X-CSRFToken': '{{ csrf_token }}'
+
+            },
+
+            body: JSON.stringify({
+
+                titulo: document.getElementById(
+                    'titulo'
+                ).value,
+
+                descripcion: document.getElementById(
+                    'descripcion'
+                ).value,
+
+                clase_id: document.getElementById(
+                    'clase'
+                ).value,
+
+                tiempo: document.getElementById(
+                    'tiempo'
+                ).value,
+
+                fecha_limite: document.getElementById(
+                    'fecha_limite'
+                ).value,
+
+                unico: document.getElementById(
+                    'unico'
+                ).checked,
+
+                preguntas: preguntas
+
+            })
+
+        }
+
+    )
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        if(data.ok){
+
+            window.location.href =
+            "{% url 'lista_cuestionarios' %}"
+        }
+    })
+}
+
+</script>
+
+{% endblock %}

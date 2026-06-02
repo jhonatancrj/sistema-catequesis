@@ -1,0 +1,184 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Reporte de Participantes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .report-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-table table {
+        margin-bottom: 0;
+    }
+
+    .report-table thead {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    .report-table tbody tr:hover {
+        background-color: #f0fdf4;
+    }
+
+    .metric-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #f3f4f6;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    .search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="report-header">
+        <div>
+            <h1 class="h3 mb-0">👥 Reporte de Participantes</h1>
+            <p class="text-muted mb-0">Desempeño de todos los participantes</p>
+        </div>
+        <a href="{% url 'pdf_participantes' %}" class="btn btn-danger">
+            <i class="bi bi-file-pdf"></i> Descargar PDF
+        </a>
+    </div>
+
+    <!-- Búsqueda y Filtros -->
+    <div class="search-bar">
+        <form method="get" class="d-flex gap-2 w-100">
+            <input type="text" name="nombre" class="form-control form-control-sm" 
+                   placeholder="Buscar por nombre..." value="{{ request.GET.nombre }}">
+            
+            <select name="ordenar" class="form-select form-select-sm" style="width: auto;">
+                <option value="nombre">Ordenar por Nombre</option>
+                <option value="asistencia" {% if request.GET.ordenar == 'asistencia' %}selected{% endif %}>
+                    Mejor Asistencia
+                </option>
+                <option value="aprobacion" {% if request.GET.ordenar == 'aprobacion' %}selected{% endif %}>
+                    Más Aprobaciones
+                </option>
+            </select>
+            
+            <button type="submit" class="btn btn-primary btn-sm">Buscar</button>
+            <a href="{% url 'reportes_participantes' %}" class="btn btn-secondary btn-sm">Limpiar</a>
+        </form>
+    </div>
+
+    <!-- Tabla de Participantes -->
+    <div class="report-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Cursos</th>
+                    <th>Asistencia</th>
+                    <th>Tareas Entregadas</th>
+                    <th>Promedio Cuestionarios</th>
+                    <th>Aprobados / Reprobados</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for participante in datos %}
+                <tr>
+                    <td>
+                        <strong>{{ participante.nombre }}</strong>
+                    </td>
+                    <td>
+                        <small>{{ participante.email }}</small>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            <i class="bi bi-book"></i> {{ participante.cursos_inscritos }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="progress" style="width: 100px; height: 6px;">
+                                <div class="progress-bar" style="width: {{ participante.asistencia.porcentaje }}%"></div>
+                            </div>
+                            <small>{{ participante.asistencia.porcentaje }}%</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            <i class="bi bi-check"></i> {{ participante.tareas.entregadas }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            {% if participante.cuestionarios.promedio >= 70 %}
+                                <span style="color: #10b981;">
+                                    <i class="bi bi-star-fill"></i> {{ participante.cuestionarios.promedio }}
+                                </span>
+                            {% elif participante.cuestionarios.promedio >= 50 %}
+                                <span style="color: #f59e0b;">
+                                    {{ participante.cuestionarios.promedio }}
+                                </span>
+                            {% else %}
+                                <span style="color: #ef4444;">
+                                    {{ participante.cuestionarios.promedio }}
+                                </span>
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-success">{{ participante.resultados.aprobados }}</span>
+                        <span class="badge bg-danger">{{ participante.resultados.reprobados }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox"></i> No hay participantes para mostrar
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Resumen -->
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Participantes</h5>
+                    <h3 class="text-success">{{ datos|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Promedio Asistencia</h5>
+                    <h3 class="text-primary">
+                        {% if datos.0 %}{{ datos.0.asistencia.porcentaje }}%{% else %}N/A{% endif %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

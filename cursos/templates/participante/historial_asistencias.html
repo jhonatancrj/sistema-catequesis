@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block title %}Historial de Asistencias{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .historial-page {
+        background: #0f172a;
+        padding: 40px 20px;
+        min-height: calc(100vh - 90px);
+    }
+
+    .historial-page h2 {
+        text-align: center;
+        margin-bottom: 40px;
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    .curso-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 4px solid #3b82f6;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .curso-nombre {
+        font-size: 1.3em;
+        color: #ffffff;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .estadisticas {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .stat-box {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .stat-label {
+        color: #cbd5e1;
+        font-size: 0.85em;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        color: #ffffff;
+        font-size: 1.8em;
+        font-weight: 700;
+    }
+
+    .stat-value.presente {
+        color: #22c55e;
+    }
+
+    .stat-value.ausente {
+        color: #ef4444;
+    }
+
+    .stat-value.permiso {
+        color: #f59e0b;
+    }
+
+    .porcentaje-bar {
+        background: rgba(255, 255, 255, 0.1);
+        height: 30px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 15px;
+    }
+
+    .porcentaje-fill {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.85em;
+    }
+
+    .fill-verde {
+        background: linear-gradient(90deg, #22c55e, #16a34a);
+    }
+
+    .fill-naranja {
+        background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    .fill-rojo {
+        background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .tabla-asistencia {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .tabla-asistencia th {
+        background: rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .tabla-asistencia td {
+        color: #e2e8f0;
+        padding: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .tabla-asistencia tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .estado-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.85em;
+        font-weight: 600;
+    }
+
+    .estado-presente {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+    }
+
+    .estado-ausente {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+
+    .estado-permiso {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+    }
+
+    .sin-registros {
+        text-align: center;
+        color: #94a3b8;
+        padding: 40px 20px;
+        font-style: italic;
+    }
+
+    .boton-volver {
+        display: inline-block;
+        margin-top: 30px;
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .boton-volver:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .contenedor-botones {
+        text-align: center;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="historial-page">
+    <h2>📋 Historial de Asistencias</h2>
+
+    {% if historial %}
+        {% for curso, datos in historial.items %}
+            <div class="curso-section">
+                <div class="curso-nombre">{{ curso.nombre }}</div>
+                
+                <div class="estadisticas">
+                    <div class="stat-box">
+                        <div class="stat-label">Total de Clases</div>
+                        <div class="stat-value">{{ datos.total_clases }}</div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-label">Presentes</div>
+                        <div class="stat-value presente">{{ datos.presentes }}</div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-label">Ausentes</div>
+                        <div class="stat-value ausente">{{ datos.ausentes }}</div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-label">Con Permiso</div>
+                        <div class="stat-value permiso">{{ datos.permisos }}</div>
+                    </div>
+                </div>
+
+                <!-- Barra de porcentaje -->
+                <div class="porcentaje-bar">
+                    {% if datos.porcentaje >= 80 %}
+                        <div class="porcentaje-fill fill-verde" style="width: {{ datos.porcentaje }}%;">
+                            {{ datos.porcentaje }}%
+                        </div>
+                    {% elif datos.porcentaje >= 50 %}
+                        <div class="porcentaje-fill fill-naranja" style="width: {{ datos.porcentaje }}%;">
+                            {{ datos.porcentaje }}%
+                        </div>
+                    {% else %}
+                        <div class="porcentaje-fill fill-rojo" style="width: {{ datos.porcentaje }}%;">
+                            {{ datos.porcentaje }}%
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Tabla de asistencias detalladas -->
+                {% if datos.asistencias %}
+                    <table class="tabla-asistencia">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Clase</th>
+                                <th>Estado</th>
+                                <th>Observación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for asistencia in datos.asistencias %}
+                                <tr>
+                                    <td>{{ asistencia.clase.fecha|date:"d/m/Y" }}</td>
+                                    <td>{{ asistencia.clase.titulo }}</td>
+                                    <td>
+                                        {% if asistencia.estado == 'PRESENTE' %}
+                                            <span class="estado-badge estado-presente">✓ Presente</span>
+                                        {% elif asistencia.estado == 'AUSENTE' %}
+                                            <span class="estado-badge estado-ausente">✗ Ausente</span>
+                                        {% elif asistencia.estado == 'PERMISO' %}
+                                            <span class="estado-badge estado-permiso">⊗ Permiso</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ asistencia.observacion|default:"—" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="sin-registros">
+                        No hay registros de asistencia para este curso.
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="sin-registros" style="max-width: 1000px; margin: 0 auto; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
+            <p>No estás inscrito en ningún curso actualmente o no tienes registros de asistencia.</p>
+        </div>
+    {% endif %}
+
+    <div class="contenedor-botones">
+        <a href="{% url 'mis_cursos' %}" class="boton-volver">← Volver a Mis Cursos</a>
+    </div>
+</div>
+
+{% endblock %}

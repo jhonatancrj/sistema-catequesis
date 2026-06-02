@@ -1,0 +1,135 @@
+/* ===== HERO ===== */
+
+.hero {
+    position: relative;
+    min-height: 90vh;
+    background: url("../img/bg-iglesia.jpg") center/cover no-repeat;
+    display: flex;
+    align-items: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(13, 40, 80, 0.7);
+}
+
+.hero-content {
+    position: relative;
+    color: white;
+}
+
+.hero-title {
+    font-size: 3.2rem;
+    font-weight: 700;
+}
+
+.hero-title span {
+    color: #00b4d8;
+}
+
+.hero-text {
+    font-size: 1.2rem;
+}
+
+.hero-img {
+    max-height: 400px;
+}
+
+/* ===== SECCIONES ===== */
+.section {
+    padding: 80px 0;
+}
+
+.section-title {
+    font-weight: 700;
+    color: #012970;
+}
+
+.section-text {
+    max-width: 700px;
+    margin: auto;
+    color: #555;
+}
+
+/* ===== CARDS ===== */
+.service-card {
+    border-radius: 15px;
+    border: none;
+    padding: 20px;
+    transition: 0.3s;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.icon-img {
+    width: 60px;
+}
+
+/* ===== GLASS CARD ===== */
+.glass-card {
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+/* ===== CTA ===== */
+.cta {
+    background: linear-gradient(120deg, #1d3557, #457b9d);
+    color: white;
+    padding: 80px 0;
+}
+
+/* ===== IMAGEN HORARIO ===== */
+.horario-img {
+    max-height: 300px;
+}
+
+/* ===== CONTADORES ===== */
+.counter {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #1d3557;
+}
+
+/* ===== TESTIMONIOS ===== */
+.testimonial {
+    font-size: 1.3rem;
+    font-style: italic;
+    max-width: 600px;
+    margin: auto;
+}
+
+/* ===== GALERÍA ===== */
+.gallery-img {
+    width: 100%;
+    border-radius: 15px;
+    transition: 0.3s;
+}
+
+.gallery-img:hover {
+    transform: scale(1.05);
+}
+
+/* ===== ANIMACIONES ===== */
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== SCROLL SUAVE ===== */
+html {
+    scroll-behavior: smooth;
+}
+

@@ -1,0 +1,197 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<style>
+
+.contenedor-sacramento{
+
+    max-width: 700px;
+
+    margin: 40px auto;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 15px;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.titulo-sacramento{
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+    margin-bottom: 25px;
+
+    color: #333;
+}
+
+.info-participante{
+
+    background: #f5f5f5;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    margin-bottom: 25px;
+}
+
+.info-participante p{
+
+    margin: 8px 0;
+
+    font-size: 16px;
+}
+
+.form-group{
+
+    margin-bottom: 20px;
+}
+
+.form-group label{
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+
+    color: #444;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+}
+
+.btn-guardar{
+
+    background: #198754;
+
+    color: white;
+
+    border: none;
+
+    padding: 12px 25px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.btn-guardar:hover{
+
+    background: #146c43;
+}
+
+.btn-volver{
+
+    background: #6c757d;
+
+    color: white;
+
+    padding: 12px 25px;
+
+    border-radius: 10px;
+
+    text-decoration: none;
+
+    margin-left: 10px;
+}
+
+.errorlist{
+
+    color: red;
+
+    list-style: none;
+
+    padding: 0;
+
+    margin-top: 5px;
+}
+
+</style>
+
+<div class="contenedor-sacramento">
+
+    <h2 class="titulo-sacramento">
+        Registrar Sacramento
+    </h2>
+
+    <div class="info-participante">
+
+        <p>
+            <strong>Participante:</strong>
+            {{ resultado.participante }}
+        </p>
+
+        <p>
+            <strong>Sacramento:</strong>
+            {{ resultado.sacramento }}
+        </p>
+
+        <p>
+            <strong>Curso:</strong>
+            {{ resultado.curso }}
+        </p>
+
+    </div>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {% for field in form %}
+
+            <div class="form-group">
+
+                <label>
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {{ field.errors }}
+
+            </div>
+
+        {% endfor %}
+
+        <button
+            type="submit"
+            class="btn-guardar"
+        >
+            Guardar Registro
+        </button>
+
+        <a
+            href="{% url 'lista_aprobados' %}"
+            class="btn-volver"
+        >
+            Volver
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

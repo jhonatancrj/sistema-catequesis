@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de respuestas{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* CONTENEDOR */
+.detalle-page {
+    background: #0f172a;
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+}
+
+/* TARJETA PRINCIPAL */
+.detalle-card {
+    max-width: 800px;
+    margin: auto;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* HEADER */
+.detalle-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+/* INFO */
+.info-box {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* RESPUESTAS */
+.respuesta-box {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    border-left: 5px solid #6366f1;
+}
+
+/* TEXTO */
+.respuesta-box p {
+    margin: 5px 0;
+}
+
+/* ESTADOS */
+.correcto {
+    color: #22c55e;
+    font-weight: bold;
+}
+
+.incorrecto {
+    color: #ef4444;
+    font-weight: bold;
+}
+
+/* DIVISOR */
+hr {
+    border: none;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 20px 0;
+}
+
+/* BOTON */
+.btn-volver {
+    display: block;
+    width: fit-content;
+    margin: 25px auto 0;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-volver:hover {
+    transform: scale(1.05);
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="detalle-page">
+
+```
+<div class="detalle-card">
+
+    <h2>📋 Detalle de respuestas</h2>
+
+    <!-- INFO -->
+    <div class="info-box">
+        <div class="info-item">
+            👤 Usuario <br>
+            <strong>{{ intento.usuario.first_name|default:intento.usuario.username }}</strong>
+        </div>
+
+        <div class="info-item">
+            📊 Puntaje <br>
+            <strong>{{ intento.puntaje|floatformat:1 }}</strong>
+        </div>
+
+        <div class="info-item">
+            📅 Fecha <br>
+            <strong>{{ intento.fecha|date:"d/m/Y H:i" }}</strong>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- RESPUESTAS -->
+    <h3>📝 Tus respuestas</h3>
+
+    <div style="background: rgba(99, 102, 241, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #6366f1;">
+        <p style="margin: 0; color: #cbd5e1; font-size: 14px;">
+            Revisa aquí todas tus respuestas y las explicaciones de cada pregunta.
+        </p>
+    </div>
+
+    {% for r in respuestas %}
+        <div class="respuesta-box">
+
+            <p><strong>{{ r.pregunta.enunciado }}</strong></p>
+
+            {% if r.opcion %}
+                <p>Tu respuesta: <em>{{ r.opcion.texto }}</em></p>
+
+                {% if r.opcion.es_correcta %}
+                    <span class="correcto">✔ Correcta</span>
+                {% else %}
+                    <span class="incorrecto">✘ Incorrecta</span>
+                {% endif %}
+            {% endif %}
+
+            {% if r.texto %}
+                <p>Tu respuesta: <em>{{ r.texto }}</em></p>
+            {% endif %}
+
+            {% if r.pregunta.retroalimentacion %}
+                <div style="margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; border-left: 3px solid #f59e0b;">
+                    <p style="margin: 0; color: #fbbf24; font-size: 13px;">
+                        <strong>💡 Explicación:</strong> {{ r.pregunta.retroalimentacion }}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <a href="/" class="btn-volver">⬅ Volver al inicio</a>
+
+</div>
+```
+
+</div>
+
+{% endblock %}

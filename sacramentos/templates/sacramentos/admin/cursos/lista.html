@@ -1,0 +1,145 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <!-- TITULO -->
+    <div class="page-title">
+
+        <h2>
+
+            Cursos finalizados
+
+        </h2>
+
+        <p>
+
+            Cursos con listas enviadas por catequistas
+
+        </p>
+
+    </div>
+
+    <!-- TABLA -->
+    <div class="custom-table">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Curso</th>
+
+                        <th>Sacramento</th>
+
+                        <th>Fecha envío</th>
+
+                        <th>Aprobados</th>
+
+                        <th>Reprobados</th>
+
+                        <th>Registrados</th>
+
+                        <th>Acciones</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in data %}
+
+                    <tr>
+
+                        <td>
+
+                            {{ item.curso.nombre }}
+
+                        </td>
+
+                        <td>
+
+                            {{ item.curso.tipo_sacramento }}
+
+                        </td>
+
+                        <td>
+
+                            {{ item.curso.fecha_envio_lista }}
+
+                        </td>
+
+                        <td>
+
+                            <span class="badge bg-success">
+
+                                {{ item.aprobados }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <span class="badge bg-danger">
+
+                                {{ item.reprobados }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <span class="badge bg-primary">
+
+                                {{ item.registrados }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <a href="{% url 'detalle_curso_finalizado' item.curso.id %}"
+                               class="btn btn-primary btn-sm">
+
+                                <i class="bi bi-eye"></i>
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="7"
+                            class="text-center">
+
+                            No existen cursos enviados
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

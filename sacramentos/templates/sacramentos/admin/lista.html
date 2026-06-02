@@ -1,0 +1,259 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <!-- TITULO -->
+    <div class="page-title">
+
+        <h2>
+
+            Registros Sacramentales
+
+        </h2>
+
+        <p>
+
+            Administración sacramental parroquial
+
+        </p>
+
+    </div>
+
+    <!-- FILTROS -->
+    <div class="custom-table mb-4">
+
+        <form method="GET">
+
+            <div class="row">
+
+                <!-- BUSCADOR -->
+                <div class="col-md-5">
+
+                    <input type="text"
+                           name="busqueda"
+                           class="form-control"
+                           placeholder="Buscar participante...">
+
+                </div>
+
+                <!-- SACRAMENTO -->
+                <div class="col-md-4">
+
+                    <select name="sacramento"
+                            class="form-select">
+
+                        <option value="">
+
+                            Todos los sacramentos
+
+                        </option>
+
+                        {% for s in sacramentos %}
+
+                        <option value="{{ s.id }}">
+
+                            {{ s.nombre }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <!-- BOTON -->
+                <div class="col-md-3">
+
+                    <button class="btn btn-primary w-100">
+
+                        <i class="bi bi-search"></i>
+
+                        Buscar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="mb-4 d-flex gap-3">
+
+        <a href="{% url 'crear_registro_sacramental' %}"
+           class="btn btn-success">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Nuevo Registro
+
+        </a>
+
+        <a href="{% url 'libros_historicos' %}"
+           class="btn btn-dark">
+
+            <i class="bi bi-journal-bookmark"></i>
+
+            Libros Históricos
+
+        </a>
+
+    </div>
+
+    <!-- TABLA -->
+    <div class="custom-table">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Participante</th>
+
+                        <th>Sacramento</th>
+
+                        <th>Fecha</th>
+
+                        <th>Parroquia</th>
+
+                        <th>Tipo</th>
+
+                        <th>Acciones</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for r in registros %}
+
+                    <tr>
+
+                        <!-- NOMBRE -->
+                        <td>
+
+                            {% if r.participante %}
+
+                                {{ r.participante.user.first_name }}
+                                {{ r.participante.user.last_name }}
+
+                            {% else %}
+
+                                {{ r.nombre_manual }}
+                                {{ r.apellido_manual }}
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- SACRAMENTO -->
+                        <td>
+
+                            {{ r.sacramento.nombre }}
+
+                        </td>
+
+                        <!-- FECHA -->
+                        <td>
+
+                            {{ r.fecha_sacramento }}
+
+                        </td>
+
+                        <!-- PARROQUIA -->
+                        <td>
+
+                            {{ r.lugar_sacramento }}
+
+                        </td>
+
+                        <!-- TIPO -->
+                        <td>
+
+                            {% if r.participante %}
+
+                                <span class="status active">
+
+                                    Sistema
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="status pending">
+
+                                    Histórico
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- ACCIONES -->
+                        <td>
+
+                            <div class="d-flex gap-2">
+
+                                <a href="{% url 'detalle_registro_sacramental' r.id %}"
+                                   class="btn btn-primary btn-sm">
+
+                                    <i class="bi bi-eye"></i>
+
+                                </a>
+
+                                <a href="{% url 'editar_registro_sacramental' r.id %}"
+                                   class="btn btn-warning btn-sm">
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+
+                                <a href="{% url 'certificado_sacramental_pdf' r.id %}"
+                                   class="btn btn-danger btn-sm">
+
+                                    <i class="bi bi-file-earmark-pdf"></i>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="6">
+
+                            No existen registros sacramentales
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

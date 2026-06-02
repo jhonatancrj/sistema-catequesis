@@ -1,0 +1,64 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+
+            Nuevo sacramento
+
+        </h2>
+
+    </div>
+
+    <div class="custom-table">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Nombre
+
+                </label>
+
+                <input type="text"
+                       name="nombre"
+                       class="form-control"
+                       required>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Descripción
+
+                </label>
+
+                <textarea name="descripcion"
+                          rows="5"
+                          class="form-control"></textarea>
+
+            </div>
+
+            <button class="btn btn-primary">
+
+                Guardar
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

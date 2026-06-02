@@ -1,0 +1,228 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Reporte de Aprobaciones{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .report-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-table table {
+        margin-bottom: 0;
+    }
+
+    .report-table thead {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+    }
+
+    .report-table tbody tr:hover {
+        background-color: #f5f3ff;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .status-aprobado {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .status-reprobado {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .metric-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #f3f4f6;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    .report-filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card h3 {
+        font-size: 2rem;
+        margin: 10px 0;
+    }
+
+    .stat-card p {
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .stat-card.success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .stat-card.danger {
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="report-header">
+        <div>
+            <h1 class="h3 mb-0">✅ Reporte de Aprobaciones</h1>
+            <p class="text-muted mb-0">Estado final de participantes por curso</p>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="report-filters">
+        <form method="get" class="d-flex gap-2 w-100 flex-wrap">
+            <select name="estado" class="form-select form-select-sm" style="width: auto;">
+                <option value="">Todos los estados</option>
+                {% for estado in estados %}
+                    <option value="{{ estado }}" {% if request.GET.estado == estado %}selected{% endif %}>
+                        {{ estado }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+            <a href="{% url 'reportes_aprobaciones' %}" class="btn btn-secondary btn-sm">Limpiar</a>
+        </form>
+    </div>
+
+    <!-- Resumen -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card success">
+                <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
+                <h3>
+                    {% widthratio datos|length 1 1 as total %}{{ total }}
+                </h3>
+                <p>Aprobados</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card danger">
+                <i class="bi bi-x-circle" style="font-size: 2rem;"></i>
+                <h3>0</h3>
+                <p>Reprobados</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <i class="bi bi-graph-up" style="font-size: 2rem;"></i>
+                <h3>N/A</h3>
+                <p>% Aprobación</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Aprobaciones -->
+    <div class="report-table">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Participante</th>
+                    <th>Curso</th>
+                    <th>Sacramento</th>
+                    <th>Gestión</th>
+                    <th>Promedio Tareas</th>
+                    <th>Promedio Cuestionarios</th>
+                    <th>Faltas</th>
+                    <th>Estado Final</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resultado in datos %}
+                <tr>
+                    <td>
+                        <strong>{{ resultado.participante }}</strong>
+                    </td>
+                    <td>
+                        <small>{{ resultado.curso }}</small>
+                    </td>
+                    <td>
+                        <small>{{ resultado.sacramento }}</small>
+                    </td>
+                    <td>
+                        <span class="badge bg-info">{{ resultado.gestion }}</span>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            {% if resultado.promedio_tareas >= 70 %}
+                                <span style="color: #10b981;">{{ resultado.promedio_tareas }}</span>
+                            {% elif resultado.promedio_tareas >= 50 %}
+                                <span style="color: #f59e0b;">{{ resultado.promedio_tareas }}</span>
+                            {% else %}
+                                <span style="color: #ef4444;">{{ resultado.promedio_tareas }}</span>
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            {% if resultado.promedio_cuestionarios >= 70 %}
+                                <span style="color: #10b981;">{{ resultado.promedio_cuestionarios }}</span>
+                            {% elif resultado.promedio_cuestionarios >= 50 %}
+                                <span style="color: #f59e0b;">{{ resultado.promedio_cuestionarios }}</span>
+                            {% else %}
+                                <span style="color: #ef4444;">{{ resultado.promedio_cuestionarios }}</span>
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-warning">{{ resultado.faltas }}</span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ resultado.estado_final|lower }}">
+                            {{ resultado.estado_final }}
+                        </span>
+                    </td>
+                    <td>
+                        <small>{{ resultado.fecha_resultado|date:"d/m/Y" }}</small>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox"></i> No hay resultados para mostrar
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

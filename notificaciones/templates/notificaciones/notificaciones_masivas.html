@@ -1,0 +1,179 @@
+{% extends "base_admin.html" %}
+{% load static %}
+
+{% block title %}Notificaciones Masivas{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">
+        <i class="bi bi-megaphone"></i> Centro de Notificaciones Masivas
+    </h1>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearNotificacion">
+                <i class="bi bi-plus-circle"></i> Crear Nueva Notificación
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla de Notificaciones Masivas -->
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Título</th>
+                    <th>Tipo</th>
+                    <th>Destinatarios</th>
+                    <th>Estado</th>
+                    <th>Enviadas</th>
+                    <th>Fallidas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notif in notificaciones %}
+                <tr>
+                    <td>
+                        <strong>{{ notif.titulo }}</strong>
+                        <br>
+                        <small class="text-muted">{{ notif.fecha_creacion|date:"d/m/Y H:i" }}</small>
+                    </td>
+                    <td>
+                        <span class="badge bg-info">{{ notif.get_tipo_display }}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary">{{ notif.get_destinatarios_tipo_display }}</span>
+                    </td>
+                    <td>
+                        {% if notif.estado == 'borrador' %}
+                            <span class="badge bg-secondary">Borrador</span>
+                        {% elif notif.estado == 'programada' %}
+                            <span class="badge bg-warning">Programada</span>
+                        {% elif notif.estado == 'enviando' %}
+                            <span class="badge bg-info">Enviando</span>
+                        {% elif notif.estado == 'completada' %}
+                            <span class="badge bg-success">Completada</span>
+                        {% elif notif.estado == 'cancelada' %}
+                            <span class="badge bg-danger">Cancelada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-success">{{ notif.enviadas }}</span>
+                    </td>
+                    <td>
+                        {% if notif.fallidas > 0 %}
+                            <span class="badge bg-danger">{{ notif.fallidas }}</span>
+                        {% else %}
+                            <span class="text-muted">0</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-info" title="Ver detalles">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        {% if notif.estado == 'borrador' %}
+                        <button class="btn btn-sm btn-warning" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox"></i> No hay notificaciones masivas
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Crear Notificación -->
+<div class="modal fade" id="modalCrearNotificacion" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Notificación Masiva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNotificacion">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="mensaje" class="form-label">Mensaje</label>
+                        <textarea class="form-control" id="mensaje" name="mensaje" rows="4" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tipo" class="form-label">Tipo de Notificación</label>
+                        <select class="form-select" id="tipo" name="tipo" required>
+                            <option value="">--- Seleccionar ---</option>
+                            <option value="curso_creado">Nuevo Curso</option>
+                            <option value="calificacion_cambio">Cambio en Calificación</option>
+                            <option value="tarea_recordatorio">Recordatorio de Tarea</option>
+                            <option value="cuestionario_disponible">Cuestionario Disponible</option>
+                            <option value="clase_programada">Clase Programada</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="destinatarios" class="form-label">Destinatarios</label>
+                        <select class="form-select" id="destinatarios" name="destinatarios" required>
+                            <option value="">--- Seleccionar ---</option>
+                            <option value="admin">Administradores</option>
+                            <option value="catequista">Catequistas</option>
+                            <option value="participante">Participantes</option>
+                            <option value="todos">Todos</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Canales</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="canal_app" name="canal_app" checked>
+                            <label class="form-check-label" for="canal_app">En la aplicación</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="canal_email" name="canal_email">
+                            <label class="form-check-label" for="canal_email">Email</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="canal_whatsapp" name="canal_whatsapp">
+                            <label class="form-check-label" for="canal_whatsapp">WhatsApp</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="fecha_envio" class="form-label">Programar Envío (Opcional)</label>
+                        <input type="datetime-local" class="form-control" id="fecha_envio" name="fecha_envio">
+                        <small class="text-muted">Dejar en blanco para enviar inmediatamente</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="crearNotificacion()">Crear y Enviar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function crearNotificacion() {
+    // Implementar lógica para crear notificación masiva
+    alert('Esta funcionalidad estará disponible pronto');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    color: #1e293b;
+}
+
+h1{
+    text-align:center;
+    color:#2563eb;
+    margin-bottom:5px;
+}
+
+.subtitulo{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#2563eb;
+    color:white;
+    padding:10px;
+    border:1px solid #cbd5e1;
+}
+
+td{
+    padding:8px;
+    border:1px solid #cbd5e1;
+    text-align:center;
+}
+
+.aprobando{
+    color:green;
+    font-weight:bold;
+}
+
+.riesgo{
+    color:orange;
+    font-weight:bold;
+}
+
+.reprobando{
+    color:red;
+    font-weight:bold;
+}
+
+.info{
+    margin-bottom:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>
+Reporte Académico del Curso
+</h1>
+
+<div class="subtitulo">
+Sistema Web de Cursos Catequéticos
+</div>
+
+<div class="info">
+
+<p>
+<strong>Curso:</strong>
+{{ curso.nombre }}
+</p>
+
+<p>
+<strong>Fecha de generación:</strong>
+{{ fecha }}
+</p>
+
+<p>
+<strong>Total participantes:</strong>
+{{ datos_participantes|length }}
+</p>
+
+</div>
+
+<table>
+
+<tr>
+
+<th>Participante</th>
+<th>Asistencia</th>
+<th>Tareas</th>
+<th>Cuestionarios</th>
+<th>Estado</th>
+
+</tr>
+
+{% for p in datos_participantes %}
+
+<tr>
+
+<td>
+{{ p.usuario.first_name }}
+{{ p.usuario.last_name }}
+</td>
+
+<td>
+{{ p.asistencias }}/{{ p.total_clases }}
+<br>
+{{ p.porcentaje_asistencia }}%
+</td>
+
+<td>
+{{ p.promedio_tareas }}%
+</td>
+
+<td>
+{{ p.promedio_cuestionarios }}%
+</td>
+
+<td>
+
+{% if p.estado == 'APROBANDO' %}
+
+<span class="aprobando">
+APROBANDO
+</span>
+
+{% elif p.estado == 'EN RIESGO' %}
+
+<span class="riesgo">
+EN RIESGO
+</span>
+
+{% else %}
+
+<span class="reprobando">
+REPROBANDO
+</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>

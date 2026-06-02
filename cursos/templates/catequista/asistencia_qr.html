@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+
+{% block title %}Escanear QR{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* NAV */
+.franja-nav {
+    width: 100%;
+    height: 90px;
+    background:
+        linear-gradient(rgba(13, 40, 80, 0.7), rgba(66, 100, 148, 0.7)),
+        url("/static/img/nav.png");
+    background-size: cover;
+    background-position: center;
+}
+
+/* FONDO */
+body{
+    background: linear-gradient(135deg,#0f172a 40%,#1e293b 100%);
+    min-height:100vh;
+    color:#e2e8f0;
+}
+
+/* CONTENEDOR */
+.contenedor{
+    max-width:700px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+/* TARJETA */
+.tarjeta{
+    background: rgba(255,255,255,0.05);
+    border-radius:16px;
+    padding:30px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.4);
+    text-align:center;
+    backdrop-filter: blur(10px);
+}
+
+/* QR */
+#reader{
+    margin:auto;
+    width:320px;
+    border-radius:12px;
+    overflow:hidden;
+}
+
+/* PROGRESO */
+.progreso-box {
+    margin-bottom: 15px;
+}
+
+.progreso-texto {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.barra {
+    width: 100%;
+    height: 18px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.barra-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+    width: 0%;
+    transition: 0.4s;
+}
+
+/* MODAL */
+.modal-asistencia {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s;
+}
+
+.modal-asistencia.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-box {
+    background: white;
+    color: #111;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    min-width: 280px;
+    animation: pop 0.3s ease;
+}
+
+.modal-box.ok {
+    border-top: 6px solid #22c55e;
+}
+
+.modal-box.error {
+    border-top: 6px solid #ef4444;
+}
+
+@keyframes pop {
+    0% {transform: scale(0.7); opacity: 0;}
+    100% {transform: scale(1); opacity: 1;}
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="contenedor">
+<div class="tarjeta">
+
+<h2>📷 Escanear QR</h2>
+
+<!-- 🔥 PROGRESO -->
+<div class="progreso-box">
+    <div class="progreso-texto">
+        👥 <span id="textoProgreso">
+            {{ total_presentes }} / {{ total_inscritos }}
+        </span>
+    </div>
+
+    <div class="barra">
+        <div id="barraProgreso" class="barra-fill"></div>
+    </div>
+</div>
+
+<div id="reader"></div>
+
+<p style="margin-top:10px;">
+Escanea el QR del participante
+</p>
+
+</div>
+</div>
+
+<!-- 🔥 MODAL -->
+<div id="modal" class="modal-asistencia">
+    <div id="modalBox" class="modal-box">
+        <h3 id="modalTitulo"></h3>
+        <p id="modalNombre"></p>
+    </div>
+</div>
+
+<!-- 🔊 SONIDO -->
+<audio id="beep" preload="auto">
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
+
+let escaneando = false;
+
+/* 🔥 ACTIVAR AUDIO (necesario en Chrome) */
+document.body.addEventListener("click", () => {
+    const audio = document.getElementById("beep");
+    audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+    }).catch(()=>{});
+}, { once: true });
+
+function sonar() {
+    const audio = document.getElementById("beep");
+    audio.currentTime = 0;
+    audio.play().catch(()=>{});
+}
+
+/* MODAL */
+function mostrarModal(nombre, tipo="ok") {
+    const modal = document.getElementById("modal");
+    const box = document.getElementById("modalBox");
+
+    document.getElementById("modalTitulo").innerText =
+        tipo === "ok" ? "✅ Asistencia registrada" : "❌ Error";
+
+    document.getElementById("modalNombre").innerText = nombre;
+
+    box.className = "modal-box " + tipo;
+
+    modal.classList.add("active");
+
+    setTimeout(() => {
+        modal.classList.remove("active");
+        escaneando = false;
+    }, 3000);
+}
+
+/* PROGRESO */
+function actualizarProgreso(total, inscritos) {
+    let porcentaje = inscritos ? (total / inscritos) * 100 : 0;
+
+    document.getElementById("textoProgreso").innerText =
+        total + " / " + inscritos;
+
+    document.getElementById("barraProgreso").style.width =
+        porcentaje + "%";
+}
+
+/* CSRF REAL */
+function getCSRF() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
+/* SCAN */
+function onScanSuccess(decodedText) {
+
+    if (escaneando) return;
+    escaneando = true;
+
+    fetch("", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": getCSRF()
+        },
+        body: "qr_data=" + encodeURIComponent(decodedText)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.status === "ok") {
+
+            sonar();
+
+            mostrarModal(data.nombre, "ok");
+
+            actualizarProgreso(data.total, data.inscritos);
+
+        } else {
+            mostrarModal("Error: " + data.msg, "error");
+        }
+
+    })
+    .catch(() => {
+        mostrarModal("Error de conexión", "error");
+    });
+}
+
+/* INICIAR */
+let html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader",
+    { fps: 10, qrbox: 250 }
+);
+
+html5QrcodeScanner.render(onScanSuccess);
+
+/* CARGA INICIAL */
+actualizarProgreso({{ total_presentes }}, {{ total_inscritos }});
+
+</script>
+
+<!-- 🔥 CSRF (OBLIGATORIO) -->
+<form style="display:none;">
+    {% csrf_token %}
+</form>
+
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Crear Inscripción
+{% endblock %}
+
+{% block content %}
+
+<div class="form-page">
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h2>
+                Crear Inscripción
+            </h2>
+
+            <p>
+                Registrar un participante en un curso.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="form-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <!-- ALERTA GENERAL -->
+            {% if form.errors %}
+
+            <div class="alert alert-danger mb-4">
+
+                <strong>
+                    Existen errores en el formulario.
+                </strong>
+
+                Por favor revise los campos marcados.
+
+            </div>
+
+            {% endif %}
+
+            <div class="row">
+
+                <!-- PARTICIPANTE -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Participante
+                    </label>
+
+                    {{ form.participante }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.participante.errors }}
+                    </div>
+
+                </div>
+
+                <!-- CURSO -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Curso
+                    </label>
+
+                    {{ form.curso }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.curso.errors }}
+                    </div>
+
+                </div>
+
+                <!-- ESTADO -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Estado
+                    </label>
+
+                    {{ form.estado }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.estado.errors }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ERRORES GENERALES -->
+            {% if form.non_field_errors %}
+
+            <div class="alert alert-danger mt-3">
+
+                {% for error in form.non_field_errors %}
+
+                    <div>
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+            <!-- BOTONES -->
+            <div class="form-buttons">
+
+                <a href="{% url 'lista_inscripciones' %}"
+                   class="btn btn-light">
+
+                    Cancelar
+
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <i class="bi bi-check-circle"></i>
+
+                    Crear Inscripción
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,327 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Editar Curso
+{% endblock %}
+
+{% block content %}
+
+<div class="form-page">
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h2>
+                Editar Curso
+            </h2>
+
+            <p>
+                Actualizar información del curso y regenerar clases automáticamente.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="form-card">
+
+        <form method="POST"
+              enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <!-- ALERTA GENERAL -->
+            {% if form.errors %}
+
+            <div class="alert alert-danger mb-4">
+
+                <strong>
+                    Existen errores en el formulario.
+                </strong>
+
+                Por favor revise los campos marcados.
+
+            </div>
+
+            {% endif %}
+
+            <div class="row">
+
+                <!-- NOMBRE -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Nombre del Curso
+                    </label>
+
+                    {{ form.nombre }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.nombre.errors }}
+                    </div>
+
+                </div>
+
+                <!-- SACRAMENTO -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Sacramento
+                    </label>
+
+                    {{ form.sacramento }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.sacramento.errors }}
+                    </div>
+
+                </div>
+
+                <!-- DESCRIPCION -->
+                <div class="col-md-12 mb-4">
+
+                    <label class="form-label">
+                        Descripción del Curso
+                    </label>
+
+                    {{ form.descripcion }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.descripcion.errors }}
+                    </div>
+
+                </div>
+
+                <!-- IMAGEN -->
+                <div class="col-md-12 mb-4">
+
+                    <label class="form-label">
+                        Imagen del Curso
+                    </label>
+
+                    {{ form.imagen }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.imagen.errors }}
+                    </div>
+
+                    {% if curso.imagen %}
+
+                    <div class="mt-3">
+
+                        <img src="{{ curso.imagen.url }}"
+                             width="180"
+                             class="rounded">
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- FECHA INICIO -->
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        Fecha Inicio
+                    </label>
+
+                    {{ form.fecha_inicio }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.fecha_inicio.errors }}
+                    </div>
+
+                </div>
+
+                <!-- FECHA FIN -->
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        Fecha Fin
+                    </label>
+
+                    {{ form.fecha_fin }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.fecha_fin.errors }}
+                    </div>
+
+                </div>
+
+                <!-- LIMITE -->
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        Fecha Límite Inscripción
+                    </label>
+
+                    {{ form.fecha_limite_inscripcion }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.fecha_limite_inscripcion.errors }}
+                    </div>
+
+                </div>
+
+                <!-- ESTADO -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Estado
+                    </label>
+
+                    {{ form.estado }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.estado.errors }}
+                    </div>
+
+                </div>
+
+                <!-- CATEQUISTAS -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label d-block mb-3">
+                        Catequistas
+                    </label>
+
+                    {{ form.catequistas }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.catequistas.errors }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- SEPARADOR -->
+            <hr class="my-4">
+
+            <div class="dashboard-header mb-4">
+
+                <div>
+
+                    <h4>
+                        Configuración de Clases
+                    </h4>
+
+                    <p>
+                        Al guardar cambios, todas las clases serán regeneradas automáticamente.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <!-- DIAS -->
+                <div class="col-md-12 mb-4">
+
+                    <label class="form-label d-block mb-3">
+                        Días de Clases
+                    </label>
+
+                    {{ form.dias_clase }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.dias_clase.errors }}
+                    </div>
+
+                </div>
+
+                <!-- HORA INICIO -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Hora Inicio
+                    </label>
+
+                    {{ form.hora_inicio_clase }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.hora_inicio_clase.errors }}
+                    </div>
+
+                </div>
+
+                <!-- HORA FIN -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Hora Fin
+                    </label>
+
+                    {{ form.hora_fin_clase }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.hora_fin_clase.errors }}
+                    </div>
+
+                </div>
+
+                <!-- DESCRIPCION -->
+                <div class="col-md-12 mb-4">
+
+                    <label class="form-label">
+                        Descripción General de Clases
+                    </label>
+
+                    {{ form.descripcion_clase }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.descripcion_clase.errors }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ERRORES GENERALES -->
+            {% if form.non_field_errors %}
+
+            <div class="alert alert-danger mt-3">
+
+                {% for error in form.non_field_errors %}
+
+                    <div>
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+            <!-- BOTONES -->
+            <div class="form-buttons">
+
+                <a href="{% url 'lista_cursos' %}"
+                   class="btn btn-light">
+
+                    Cancelar
+
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <i class="bi bi-check-circle"></i>
+
+                    Guardar Cambios
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,548 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Calendario - Panel Administrativo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .calendario-admin-page {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        padding: 40px 20px;
+        min-height: calc(100vh - 90px);
+    }
+
+    .calendario-admin-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .calendario-admin-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .calendario-admin-header h1 {
+        font-size: 2.5em;
+        font-weight: 700;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #ec4899, #f43f5e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .calendario-admin-header p {
+        font-size: 1.05em;
+        color: #cbd5e1;
+    }
+
+    .calendario-admin-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    @media (max-width: 1024px) {
+        .calendario-admin-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* CALENDARIO VISUAL */
+    .calendario-visual {
+        background: rgba(236, 72, 153, 0.1);
+        border: 1px solid rgba(236, 72, 153, 0.3);
+        padding: 25px;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+    }
+
+    .controles-mes {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .mes-ano {
+        color: #f472b6;
+        font-weight: 700;
+        font-size: 1.3em;
+    }
+
+    .boton-mes {
+        background: rgba(255, 255, 255, 0.1);
+        color: #cbd5e1;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 8px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .boton-mes:hover {
+        background: rgba(236, 72, 153, 0.3);
+        border-color: rgba(236, 72, 153, 0.8);
+        color: #f472b6;
+    }
+
+    .dias-semana {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+
+    .dia-semana {
+        text-align: center;
+        color: #f472b6;
+        font-weight: 700;
+        padding: 10px;
+        font-size: 0.9em;
+    }
+
+    .dias-mes {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+    }
+
+    .dia {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        position: relative;
+    }
+
+    .dia:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .dia.otro-mes {
+        color: #64748b;
+        opacity: 0.5;
+    }
+
+    .dia.con-clase {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(244, 63, 94, 0.3));
+        border: 1px solid rgba(236, 72, 153, 0.5);
+        color: #f472b6;
+    }
+
+    .dia.con-clase:hover {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.5), rgba(244, 63, 94, 0.5));
+    }
+
+    .dia.hoy {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.4), rgba(244, 63, 94, 0.4));
+        border: 2px solid rgba(236, 72, 153, 0.8);
+        color: #f472b6;
+    }
+
+    .punto-clase {
+        position: absolute;
+        bottom: 2px;
+        width: 4px;
+        height: 4px;
+        background: #f472b6;
+        border-radius: 50%;
+    }
+
+    /* PANEL DE EVENTOS */
+    .panel-eventos {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 25px;
+        border-radius: 12px;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .panel-eventos h2 {
+        color: #f472b6;
+        margin-bottom: 20px;
+        font-size: 1.3em;
+    }
+
+    .evento-item {
+        background: rgba(236, 72, 153, 0.1);
+        border-left: 3px solid #ec4899;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .evento-item:hover {
+        background: rgba(236, 72, 153, 0.2);
+        transform: translateX(5px);
+    }
+
+    .evento-fecha {
+        color: #f472b6;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .evento-titulo {
+        color: #e2e8f0;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .evento-curso {
+        color: #cbd5e1;
+        font-size: 0.9em;
+    }
+
+    .evento-catequista {
+        color: #a0aec0;
+        font-size: 0.85em;
+        margin-top: 4px;
+    }
+
+    .evento-hora {
+        color: #94a3b8;
+        font-size: 0.85em;
+        margin-top: 8px;
+    }
+
+    .sin-eventos-seleccionado {
+        color: #94a3b8;
+        text-align: center;
+        padding: 40px 20px;
+        font-style: italic;
+    }
+
+    .leyenda {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 30px;
+    }
+
+    .leyenda h3 {
+        color: #f472b6;
+        margin-bottom: 15px;
+    }
+
+    .leyenda-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        color: #cbd5e1;
+    }
+
+    .leyenda-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+    }
+
+    .color-clase {
+        background: linear-gradient(135deg, #ec4899, #f43f5e);
+    }
+
+    .color-hoy {
+        background: linear-gradient(135deg, #ec4899, #f43f5e);
+    }
+
+    .color-normal {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ESTADÍSTICAS */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: rgba(236, 72, 153, 0.1);
+        border: 1px solid rgba(236, 72, 153, 0.3);
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 2em;
+        font-weight: 700;
+        color: #f472b6;
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        color: #cbd5e1;
+        font-size: 0.95em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="calendario-admin-page">
+    <div class="calendario-admin-container">
+        <div class="calendario-admin-header">
+            <h1>📅 Calendario Administrativo</h1>
+            <p>Gestión completa de todas las clases del sistema</p>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value" id="totalClases">0</div>
+                <div class="stat-label">Clases Totales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="clasesHoy">0</div>
+                <div class="stat-label">Clases Hoy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="clasesProximos7">0</div>
+                <div class="stat-label">Próximos 7 Días</div>
+            </div>
+        </div>
+
+        <div class="calendario-admin-grid">
+            <!-- Calendario Visual -->
+            <div class="calendario-visual">
+                <div class="controles-mes">
+                    <button class="boton-mes" onclick="mesAnterior()">← Anterior</button>
+                    <div class="mes-ano" id="mesAnoActual"></div>
+                    <button class="boton-mes" onclick="mesSiguiente()">Siguiente →</button>
+                </div>
+
+                <div class="dias-semana">
+                    <div class="dia-semana">Dom</div>
+                    <div class="dia-semana">Lun</div>
+                    <div class="dia-semana">Mar</div>
+                    <div class="dia-semana">Mié</div>
+                    <div class="dia-semana">Jue</div>
+                    <div class="dia-semana">Vie</div>
+                    <div class="dia-semana">Sáb</div>
+                </div>
+
+                <div class="dias-mes" id="diasMes"></div>
+            </div>
+
+            <!-- Panel de Eventos -->
+            <div class="panel-eventos">
+                <h2>📌 Clases del Día</h2>
+                <div id="listaClases">
+                    <div class="sin-eventos-seleccionado">
+                        Selecciona una fecha para ver las clases
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leyenda -->
+        <div class="leyenda">
+            <h3>📖 Leyenda</h3>
+            <div class="leyenda-item">
+                <div class="leyenda-color color-clase"></div>
+                <span>Días con clases programadas</span>
+            </div>
+            <div class="leyenda-item">
+                <div class="leyenda-color color-hoy"></div>
+                <span>Hoy</span>
+            </div>
+            <div class="leyenda-item">
+                <div class="leyenda-color color-normal"></div>
+                <span>Otros días</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let mesActual = new Date().getMonth();
+    let anoActual = new Date().getFullYear();
+    let clasesAdmin = {};
+    let todasLasClases = {};
+
+    // Cargar clases desde el backend
+    function cargarClases() {
+        const url = `{% url 'calendario_admin_api' %}?mes=${mesActual + 1}&ano=${anoActual}`;
+        console.log('Cargando clases desde:', url);
+        
+        fetch(url)
+            .then(response => {
+                console.log('Respuesta recibida:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Datos recibidos:', data);
+                if (data.error) {
+                    console.error('Error de la API:', data.error);
+                    clasesAdmin = {};
+                } else {
+                    clasesAdmin = data;
+                }
+                console.log('clasesAdmin después de asignación:', clasesAdmin);
+                renderizarCalendario();
+                actualizarEstadisticas();
+            })
+            .catch(error => {
+                console.error('Error al cargar clases:', error);
+                clasesAdmin = {};
+                renderizarCalendario();
+            });
+    }
+
+    function renderizarCalendario() {
+        const meses = [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ];
+
+        document.getElementById('mesAnoActual').textContent = 
+            `${meses[mesActual]} ${anoActual}`;
+
+        const primerDia = new Date(anoActual, mesActual, 1).getDay();
+        const diasMes = new Date(anoActual, mesActual + 1, 0).getDate();
+        const diasMesAnterior = new Date(anoActual, mesActual, 0).getDate();
+
+        let diasHTML = '';
+
+        // Días del mes anterior
+        for (let i = primerDia - 1; i >= 0; i--) {
+            diasHTML += `<div class="dia otro-mes">${diasMesAnterior - i}</div>`;
+        }
+
+        // Días del mes actual
+        const hoy = new Date();
+        for (let i = 1; i <= diasMes; i++) {
+            const fecha = new Date(anoActual, mesActual, i);
+            const fechaStr = fecha.toISOString().split('T')[0];
+            const tieneClases = clasesAdmin.hasOwnProperty(fechaStr);
+            const esHoy = fecha.toDateString() === hoy.toDateString();
+
+            let claseHTML = '';
+            if (tieneClases) {
+                claseHTML += `<span class="punto-clase"></span>`;
+            }
+
+            let clases = `
+                <div class="dia ${tieneClases ? 'con-clase' : ''} ${esHoy ? 'hoy' : ''}"
+                     onclick="mostrarClases('${fechaStr}')">
+                    ${i}
+                    ${claseHTML}
+                </div>
+            `;
+            diasHTML += clases;
+        }
+
+        // Días del mes siguiente
+        const diasFaltantes = 42 - (primerDia + diasMes);
+        for (let i = 1; i <= diasFaltantes; i++) {
+            diasHTML += `<div class="dia otro-mes">${i}</div>`;
+        }
+
+        document.getElementById('diasMes').innerHTML = diasHTML;
+    }
+
+    function mostrarClases(fecha) {
+        if (clasesAdmin[fecha]) {
+            const clases = clasesAdmin[fecha];
+            let html = '';
+
+            clases.forEach(clase => {
+                html += `
+                    <div class="evento-item">
+                        <div class="evento-fecha">${fecha}</div>
+                        <div class="evento-titulo">${clase.titulo}</div>
+                        <div class="evento-curso">📚 ${clase.curso}</div>
+                        <div class="evento-catequista">👨‍🏫 ${clase.catequista}</div>
+                        <div class="evento-hora">⏰ ${clase.hora}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('listaClases').innerHTML = html;
+        } else {
+            document.getElementById('listaClases').innerHTML = `
+                <div class="sin-eventos-seleccionado">
+                    No hay clases programadas para este día
+                </div>
+            `;
+        }
+    }
+
+    function mesAnterior() {
+        mesActual--;
+        if (mesActual < 0) {
+            mesActual = 11;
+            anoActual--;
+        }
+        cargarClases();
+    }
+
+    function mesSiguiente() {
+        mesActual++;
+        if (mesActual > 11) {
+            mesActual = 0;
+            anoActual++;
+        }
+        cargarClases();
+    }
+
+    function actualizarEstadisticas() {
+        let totalClases = 0;
+        let clasesHoy = 0;
+        let clasesProximos7 = 0;
+
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        const hace7Dias = new Date();
+        hace7Dias.setDate(hace7Dias.getDate() - 7);
+        hace7Dias.setHours(0, 0, 0, 0);
+
+        const en7Dias = new Date();
+        en7Dias.setDate(en7Dias.getDate() + 7);
+        en7Dias.setHours(23, 59, 59, 999);
+
+        for (const fecha in clasesAdmin) {
+            const clasesDelDia = clasesAdmin[fecha];
+            totalClases += clasesDelDia.length;
+
+            const fechaObj = new Date(fecha);
+            if (fechaObj.getTime() === hoy.getTime()) {
+                clasesHoy += clasesDelDia.length;
+            }
+
+            if (fechaObj >= hace7Dias && fechaObj <= en7Dias) {
+                clasesProximos7 += clasesDelDia.length;
+            }
+        }
+
+        document.getElementById('totalClases').textContent = totalClases;
+        document.getElementById('clasesHoy').textContent = clasesHoy;
+        document.getElementById('clasesProximos7').textContent = clasesProximos7;
+    }
+
+    // Inicializar - Mostrar hoy por defecto
+    cargarClases();
+    const hoy = new Date().toISOString().split('T')[0];
+    setTimeout(() => mostrarClases(hoy), 500);
+</script>
+
+{% endblock %}

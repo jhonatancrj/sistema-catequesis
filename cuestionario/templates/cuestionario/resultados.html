@@ -1,0 +1,9 @@
+<h2>Resultados</h2>
+
+{% for i in intentos %}
+    <p>
+        {{ i.usuario.username }} -
+        Puntaje: {{ i.puntaje }} -
+        Fecha: {{ i.fecha }}
+    </p>
+{% endfor %}

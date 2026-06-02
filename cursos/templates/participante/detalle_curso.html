@@ -1,0 +1,422 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+/* CONTENEDOR GENERAL */
+.curso-page {
+    background: #0f172a;
+    padding: 40px 20px;
+    min-height: calc(100vh - 90px);
+    color: #e2e8f0;
+}
+
+/* TEXTOS GENERALES (🔥 FIX VISIBILIDAD) */
+.curso-page p {
+    color: #cbd5e1;
+}
+
+.curso-page small {
+    color: #94a3b8;
+}
+
+.curso-page h2,
+.curso-page h4,
+.curso-page h6 {
+    color: #ffffff;
+}
+
+.curso-page strong {
+    color: #ffffff;
+}
+
+/* LINKS (ANTES CASI NO SE VEÍAN) */
+.curso-page a {
+    color: #38bdf8;
+    text-decoration: none;
+}
+
+.curso-page a:hover {
+    text-decoration: underline;
+}
+
+/* HEADER */
+.curso-page .header-curso {
+    position: relative;
+    height: 240px;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+.curso-page .header-curso img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.curso-page .header-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.85));
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.curso-page .header-azul {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    padding: 30px;
+    border-radius: 16px;
+}
+
+/* DASHBOARD */
+.curso-page .dashboard {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.curso-page .dashboard .card-mini {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    color: #ffffff;
+}
+
+/* PROGRESO */
+.curso-page .progress {
+    height: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.curso-page .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+}
+
+/* TABS */
+.curso-page .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.curso-page .tab {
+    padding: 10px 18px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: 0.3s;
+    color: #cbd5e1;
+}
+
+.curso-page .tab.active {
+    background: #22c55e;
+    color: white;
+}
+
+/* SECCIONES */
+.curso-page .seccion {
+    display: none;
+}
+
+.curso-page .seccion.active {
+    display: block;
+}
+
+/* CARDS */
+.curso-page .card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 15px;
+    margin-bottom: 15px;
+    backdrop-filter: blur(10px);
+    color: #e2e8f0;
+}
+
+/* TAREAS */
+.curso-page .tarea-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.curso-page .tarea-badges {
+    display: flex;
+    gap: 8px;
+}
+
+.curso-page .badge {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: white;
+}
+
+.curso-page .estado-entregado {
+    background: #22c55e;
+}
+
+.curso-page .estado-pendiente {
+    background: #ef4444;
+}
+
+.curso-page .nota {
+    background: #3b82f6;
+}
+
+/* VENCIDO */
+.curso-page .vencido {
+    border-left: 4px solid red;
+}
+
+/* CONTADOR */
+.curso-page .contador {
+    font-size: 13px;
+    color: #facc15; /* 🔥 amarillo visible */
+}
+
+/* BOTONES */
+.curso-page .btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    font-size: 13px;
+}
+
+.curso-page .btn-success {
+    background: #22c55e;
+}
+
+.curso-page .btn-danger {
+    background: #ef4444;
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="curso-page">
+
+<div class="container">
+
+<!-- HEADER -->
+
+{% if curso.imagen %} <div class="header-curso"> <img src="{{ curso.imagen.url }}"> <div class="header-overlay"> <h2>{{ curso.nombre }}</h2> <p>{{ curso.descripcion }}</p> </div> </div>
+{% else %} <div class="header-curso header-azul"> <h2>{{ curso.nombre }}</h2> <p>{{ curso.descripcion }}</p> </div>
+{% endif %}
+
+<!-- DASHBOARD -->
+
+<div class="dashboard">
+    <div class="card-mini">📚 Total tareas: {{ tareas|length }}</div>
+    <div class="card-mini">📊 Progreso: {{ progreso }}%</div>
+</div>
+
+<!-- PROGRESO -->
+
+<div class="progress">
+    <div class="progress-bar" style="width: {{ progreso }}%;">
+        {{ progreso }}%
+    </div>
+</div>
+
+<!-- TABS -->
+
+<div class="tabs">
+    <div class="tab active" onclick="mostrar('clases', this)">📚 Clases</div>
+    <div class="tab" onclick="mostrar('tareas', this)">📝 Tareas</div>
+    <div class="tab" onclick="mostrar('cuestionarios', this)">🧠 Cuestionarios</div>
+</div>
+
+<!-- CLASES -->
+
+<div id="clases" class="seccion active">
+    {% for clase in clases %}
+        <div class="card">
+            <strong>{{ clase.titulo }}</strong>
+            <p>{{ clase.descripcion }}</p>
+            <small>{{ clase.fecha_clase }}</small>
+        </div>
+    {% empty %}
+        <p>No hay clases</p>
+    {% endfor %}
+</div>
+
+<!-- TAREAS -->
+
+<div id="tareas" class="seccion">
+    {% for item in tareas %}
+    <div class="card tarea-card">
+
+```
+    <div class="tarea-header">
+        <strong>{{ item.tarea.titulo }}</strong>
+
+        <div class="tarea-badges">
+            {% if item.estado == "Entregado" %}
+                <span class="badge estado-entregado">✔</span>
+            {% else %}
+                <span class="badge estado-pendiente">✖</span>
+            {% endif %}
+
+            {% if item.nota %}
+                <span class="badge nota">Nota: {{ item.nota }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <p>{{ item.tarea.descripcion }}</p>
+    <small>Entrega: {{ item.tarea.fecha_entrega }}</small>
+
+    <div class="contador" data-fecha="{{ item.tarea.fecha_entrega|date:'c' }}"></div>
+
+    <div class="mt-2">
+        <h6>📂 Material:</h6>
+        {% for mat in item.tarea.materiales.all %}
+            <a href="{{ mat.archivo_url }}" target="_blank">📄 {{ mat.nombre }}</a><br>
+        {% empty %}
+            <small>No hay material</small>
+        {% endfor %}
+    </div>
+
+    <div class="acciones mt-2">
+        {% if item.estado == "Pendiente" %}
+            <a href="{% url 'entregar_tarea' item.tarea.id %}" class="btn btn-success">Entregar</a>
+        {% endif %}
+
+        {% if item.estado == "Entregado" %}
+            <a href="{% url 'cancelar_entrega' item.tarea.id %}" class="btn btn-danger">Cancelar</a>
+        {% endif %}
+    </div>
+
+</div>
+{% empty %}
+    <p>No hay tareas</p>
+{% endfor %}
+```
+
+</div>
+
+<!-- CUESTIONARIOS -->
+
+<div id="cuestionarios" class="seccion">
+    {% for item in cuestionarios %}
+        <div class="card {% if item.fecha_pasada %}vencido{% endif %}">
+            <div class="tarea-header">
+                <strong>{{ item.cuestionario.titulo }}</strong>
+                <div class="tarea-badges">
+                    {% if item.estado == "Resuelto" %}
+                        <span class="badge" style="background: #22c55e;">✔ Resuelto</span>
+                    {% elif item.estado == "Resuelto (Múltiples)" %}
+                        <span class="badge" style="background: #3b82f6;">🔁 Resuelto</span>
+                    {% endif %}
+                    
+                    {% if item.mejor %}
+                        <span class="badge" style="background: #f59e0b;">📊 {{ item.mejor.puntaje|floatformat:1 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <p>Clase: {{ item.cuestionario.clase.titulo }}</p>
+            
+            {% if item.cuestionario.fecha_limite %}
+                <small>⏰ Vencimiento: {{ item.cuestionario.fecha_limite|date:"d/m/Y H:i" }}</small>
+            {% else %}
+                <small>⏰ Sin fecha límite</small>
+            {% endif %}
+            <br>
+            
+            <small>
+                {% if item.es_unico %}
+                    🔒 Un intento
+                {% else %}
+                    🔁 Múltiples intentos
+                {% endif %}
+            </small>
+
+            <div class="contador" data-fecha="{% if item.cuestionario.fecha_limite %}{{ item.cuestionario.fecha_limite|date:'c' }}{% endif %}" style="margin-top: 10px; font-size: 13px; color: #facc15;"></div>
+
+            <div class="acciones mt-2">
+                {% if item.fecha_pasada %}
+                    <button class="btn btn-danger" disabled title="La fecha de entrega ha pasado">
+                        ⛔ Pasó la fecha de entrega
+                    </button>
+                {% elif item.estado == "Resuelto" %}
+                    <button class="btn btn-danger" disabled>
+                        ✔ Resuelto
+                    </button>
+                {% elif item.estado == "Resuelto (Múltiples)" %}
+                    <a href="{% url 'resolver_cuestionario' item.cuestionario.id %}" class="btn btn-success">
+                        🔁 Volver a resolver
+                    </a>
+                {% else %}
+                    <a href="{% url 'resolver_cuestionario' item.cuestionario.id %}" class="btn btn-success">
+                        📝 Resolver
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>No hay cuestionarios</p>
+    {% endfor %}
+</div>
+
+</div>
+</div>
+
+<script>
+function mostrar(seccion, elemento) {
+    document.querySelectorAll('.curso-page .seccion').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.curso-page .tab').forEach(t => t.classList.remove('active'));
+
+    document.getElementById(seccion).classList.add('active');
+    elemento.classList.add('active');
+}
+
+/* CONTADOR */
+function actualizarContador() {
+    document.querySelectorAll('.curso-page .contador').forEach(el => {
+        let fechaStr = el.dataset.fecha;
+        
+        // Si no hay fecha, ignorar
+        if (!fechaStr) return;
+        
+        let fecha = new Date(fechaStr);
+        let ahora = new Date();
+
+        let diff = fecha - ahora;
+
+        if (diff <= 0) {
+            el.innerHTML = "⛔ Cuestionario vencido";
+            el.closest('.card').classList.add('vencido');
+            return;
+        }
+
+        let horas = Math.floor(diff / (1000 * 60 * 60));
+        let minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+        el.innerHTML = "⏰ " + horas + "h " + minutos + "m restantes";
+    });
+}
+
+setInterval(actualizarContador, 60000);
+actualizarContador();
+</script>
+
+{% endblock %}

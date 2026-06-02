@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}Sistema de Cursos{% endblock %}</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- TU CSS -->
+    <link href="{% static 'css/navbar.css' %}" rel="stylesheet">
+    <!-- iconos de redes -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- enlaces a los css de los html -->
+    <link href="{% static 'css/home.css' %}" rel="stylesheet">
+    
+</head>
+
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<header class="header" id="header">
+    <div class="container-navbar">
+        <!-- HAMBURGUESA IZQUIERDA -->
+        <div class="menu-toggle" id="menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- LOGO CENTRO -->
+        <a href="{% url 'home' %}" class="logo">
+            <img src="{% static 'img/logo1.png' %}" alt="Logo">
+            <span>PARROQUIA NUESTRA SEÑORA DE EL ROSARIO</span>
+        </a>
+
+        <!-- USUARIO Y LOGOUT DERECHA -->
+        <div class="navbar-right">
+
+            {% if user.is_authenticated %}
+
+            <div class="profile-dropdown">
+
+                <button class="profile-btn" id="profile-btn">
+
+                    <div class="profile-avatar">
+
+                        {% if user.first_name and user.last_name %}
+
+                            {{ user.first_name|slice:":1"|upper }}
+                            {{ user.last_name|slice:":1"|upper }}
+
+                        {% elif user.first_name %}
+
+                            {{ user.first_name|slice:":1"|upper }}
+
+                        {% else %}
+
+                            {{ user.username|slice:":1"|upper }}
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="profile-text">
+
+                        <span class="profile-username">
+                            {{ user.username }}
+                        </span>
+
+                        <span class="profile-role">
+
+                            {% if user.perfil.rol == 'ADMIN' %}
+                                Administrador
+
+                            {% elif user.perfil.rol == 'CATEQUISTA' %}
+                                Catequista
+
+                            {% else %}
+                                Participante
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+                </button>
+
+                <div class="profile-menu" id="profile-menu">
+
+                    <div class="profile-info">
+
+                        <strong>
+                            {{ user.first_name }} {{ user.last_name }}
+                        </strong>
+
+                        <small>
+                            {{ user.email }}
+                        </small>
+
+                    </div>
+
+                    <a href="{% url 'editar_mi_perfil' %}">
+                        ✏️ Editar perfil
+                    </a>
+
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit">
+                            🚪 Cerrar sesión
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <a href="{% url 'login' %}" class="btn-login">
+                Login
+            </a>
+
+            {% endif %}
+
+        </div>
+    </div>
+</header>
+
+<!-- SIDEBAR DESLIZABLE -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <button class="sidebar-close" id="sidebar-close">✕</button>
+    </div>
+    
+    <ul class="sidebar-menu">
+        <li><a href="{% url 'home' %}">🏠 Inicio</a></li>
+        <li><a href="{% url 'nosotros' %}">ℹ️ Nosotros</a></li>
+        <li><a href="{% url 'eventos' %}">📅 Eventos</a></li>
+        <li><a href="{% url 'calendario' %}">📆 Calendario</a></li>
+        <li><a href="{% url 'contacto' %}">📧 Contacto</a></li>
+
+        {% if user.is_authenticated %}
+            <li class="sidebar-divider"></li>
+            
+            {% if user.perfil.rol == 'ADMIN' %}
+                <li><a href="{% url 'panel_admin' %}">⚙️ Panel Admin</a></li>
+                <li><a href="/admin/">🔧 Django Admin</a></li>
+                <li><a href="{% url 'lista_cursos' %}">📚 Cursos</a></li>
+
+            {% elif user.perfil.rol == 'CATEQUISTA' %}
+                <li><a href="{% url 'panel_catequista' %}">📊 Mi Panel</a></li>
+                <li><a href="{% url 'cursos_catequista' %}">👨‍🏫 Mis Cursos</a></li>
+                <li><a href="{% url 'notificaciones:lista' %}">🔔 Notificaciones</a></li>
+
+            {% elif user.perfil.rol == 'PARTICIPANTE' %}
+                <li><a href="{% url 'panel_participante' %}">👤 Mi Panel</a></li>
+                <li><a href="{% url 'mis_cursos' %}">📖 Mis Cursos</a></li>
+                <li><a href="{% url 'cursos_disponibles' %}">🔍 Cursos Disponibles</a></li>
+                <li><a href="{% url 'historial_asistencias' %}">📋 Historial</a></li>
+                <li><a href="{% url 'mi_qr' %}">📱 Mi QR</a></li>
+                <li><a href="{% url 'notificaciones:lista' %}">🔔 Notificaciones</a></li>
+            {% endif %}
+        {% endif %}
+    </ul>
+</nav>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- ===== CONTENIDO ===== -->
+<main>
+    {% block content %}
+    {% endblock %}
+    <!-- ===== REDES FLOTANTES ===== -->
+    <div class="social-float">
+
+        <a href="https://www.facebook.com/profile.php?id=100069814027277" class="facebook" target="_blank">
+            <i class="bi bi-facebook"></i>
+        </a>
+
+        <a href="#" class="whatsapp" target="_blank">
+            <i class="bi bi-whatsapp"></i>
+        </a>
+
+        <a href="#" class="instagram" target="_blank">
+            <i class="bi bi-instagram"></i>
+        </a>
+
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/animaciones.js' %}"></script>
+<script src="{% static 'js/navbar.js' %}"></script>
+</body>
+</html>

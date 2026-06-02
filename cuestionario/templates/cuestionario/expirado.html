@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Cuestionario Vencido{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* 🚫 NO TOCAR franja-nav */
+.franja-nav {
+    width: 100%;
+    height: 90px;
+    background:
+        linear-gradient(rgba(13, 40, 80, 0.7), rgba(66, 100, 148, 0.7)),
+        url("/static/img/nav.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* CONTENEDOR */
+.expirado-page {
+    background: #0f172a;
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+}
+
+/* TARJETA */
+.expirado-card {
+    max-width: 600px;
+    margin: auto;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    border-left: 5px solid #ef4444;
+}
+
+/* TITULO */
+.expirado-card h2 {
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+/* ICONO */
+.icono {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+/* INFO BOX */
+.info-box {
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 3px solid #ef4444;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.info-box p {
+    color: #cbd5e1;
+    margin: 0;
+}
+
+/* BOTON */
+.btn-volver {
+    display: inline-block;
+    margin-top: 25px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-volver:hover {
+    transform: scale(1.05);
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="expirado-page">
+
+<div class="expirado-card">
+
+    <div class="icono">⛔</div>
+
+    <h2>Cuestionario Vencido</h2>
+
+    <div class="info-box">
+        <p>
+            La fecha límite para resolver este cuestionario ha pasado. Ya no es posible enviar respuestas.
+        </p>
+    </div>
+
+    <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.08); border-radius: 10px;">
+        <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 5px;">
+            <strong>Cuestionario:</strong>
+        </p>
+        <p style="color: #fff; font-size: 15px; margin: 0;">
+            {{ cuestionario.titulo }}
+        </p>
+    </div>
+
+    <a href="/" class="btn-volver">
+        ⬅ Volver al inicio
+    </a>
+
+</div>
+
+</div>
+
+{% endblock %}

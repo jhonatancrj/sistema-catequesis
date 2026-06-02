@@ -1,0 +1,336 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Cuestionarios
+{% endblock %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="dashboard-header">
+
+    <div>
+
+        <h2>
+            Cuestionarios
+        </h2>
+
+        <p>
+            Gestión completa de Cuestionarios del sistema.
+        </p>
+
+    </div>
+
+    <div>
+
+        <a href="{% url 'crear_cuestionario_admin'%}"
+            class="btn btn-primary">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Crear Cuestionario
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- TABLE CARD -->
+<div class="table-card">
+
+    <!-- TOP -->
+    <div class="table-top">
+
+        <div class="table-search">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                placeholder="Buscar administrador..."
+            >
+
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+
+        <table class="table admin-table align-middle">
+
+            <thead>
+
+            <tr>
+
+                <th>Título</th>
+                <th>Curso</th>
+                <th>Clase</th>
+                <th>Límite</th>
+                <th>Tiempo</th>
+                <th>Acciones</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for cuestionario in cuestionarios %}
+
+            <tr>
+
+                <!-- TITULO -->
+                <td>
+
+                    <h6>
+
+                        {{ cuestionario.titulo }}
+
+                    </h6>
+
+                    <small class="text-muted">
+
+                        {{ cuestionario.descripcion|truncatewords:10 }}
+
+                    </small>
+
+                </td>
+
+                <!-- CURSO -->
+                <td>
+
+                    {{ cuestionario.clase.curso.nombre }}
+
+                </td>
+
+                <!-- CLASE -->
+                <td>
+
+                    {{ cuestionario.clase.titulo }}
+
+                </td>
+
+                <!-- LIMITE -->
+                <td>
+
+                    {{ cuestionario.fecha_limite }}
+
+                </td>
+
+                <!-- TIEMPO -->
+                <td>
+
+                    {% if cuestionario.tiempo_limite %}
+
+                        {{ cuestionario.tiempo_limite }} min
+
+                    {% else %}
+
+                        Sin límite
+
+                    {% endif %}
+
+                </td>
+
+                <!-- ACTIONS -->
+                <td>
+
+                    <div class="actions">
+
+                        <a href="{% url 'editar_cuestionario_admin' cuestionario.id %}"
+                        class="action-btn edit-btn">
+
+                            <i class="bi bi-pencil-square"></i>
+
+                        </a>
+                        <a href="{% url 'resultados_cuestionario_admin' cuestionario.id %}"
+                        class="action-btn view-btn">
+
+                            <i class="bi bi-bar-chart"></i>
+
+                        </a>
+
+                        <a href="{% url 'estadisticas_cuestionario_admin' cuestionario.id %}"
+                        class="action-btn success-btn">
+
+                            <i class="bi bi-graph-up"></i>
+
+                        </a>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+<!-- MODAL -->
+<div class="modal fade"
+     id="adminModal"
+     tabindex="-1">
+
+    <div class="modal-dialog modal-xl">
+
+        <div class="modal-content custom-modal">
+
+            <!-- HEADER -->
+            <div class="modal-header border-0">
+
+                <h4>
+                    Nuevo Curso
+                </h4>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body">
+
+                <!-- SEARCH -->
+                <div class="table-search mb-4">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           id="searchAdmin"
+                           placeholder="Buscar usuario...">
+
+                </div>
+
+                <!-- USERS -->
+                <div class="table-responsive">
+
+                    <table class="table admin-table align-middle">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Usuario</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Rol Actual</th>
+                                <th>Acción</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="adminTableBody">
+
+                            {% for perfil in administradores %}
+
+                            {% endfor %}
+
+                            {% for perfil in perfiles %}
+
+                            {% if perfil.rol != 'ADMIN' %}
+
+                            <tr class="search-row">
+
+                                <!-- USER -->
+                                <td>
+
+                                    <div class="user-info">
+
+                                        <img src="https://ui-avatars.com/api/?name={{ perfil.user.username }}">
+
+                                        <div>
+
+                                            <h6>
+                                                {{ perfil.user.username }}
+                                            </h6>
+
+                                            <p>
+                                                ID: {{ perfil.id }}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <!-- NAME -->
+                                <td>
+
+                                    {{ perfil.user.first_name }}
+                                    {{ perfil.user.last_name }}
+
+                                </td>
+
+                                <!-- EMAIL -->
+                                <td>
+
+                                    {{ perfil.user.email }}
+
+                                </td>
+
+                                <!-- ROLE -->
+                                <td>
+
+                                    <span class="table-badge inactive-badge">
+
+                                        {{ perfil.get_rol_display }}
+
+                                    </span>
+
+                                </td>
+
+                                <!-- ACTION -->
+                                <td>
+
+                                    <form method="POST"
+                                          action="{% url 'crear_administrador' %}">
+
+                                        {% csrf_token %}
+
+                                        <input type="hidden"
+                                               name="perfil_id"
+                                               value="{{ perfil.id }}">
+
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm">
+
+                                            Convertir en Admin
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                            {% endif %}
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

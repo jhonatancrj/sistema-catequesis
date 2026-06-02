@@ -1,0 +1,48 @@
+<style>
+body {
+    background: #f0ebf8;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    border-radius: 10px;
+}
+
+input, textarea, select {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+}
+
+button {
+    background: #673ab7;
+    color: white;
+    padding: 10px;
+    border: none;
+}
+</style>
+
+<div class="card">
+    <h3>{{ cuestionario.titulo }}</h3>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <textarea name="enunciado" placeholder="Pregunta"></textarea>
+
+        <select name="tipo">
+            <option value="opcion_multiple">Opción múltiple</option>
+        </select>
+
+        <input type="text" name="opciones" placeholder="Opción 1">
+        <input type="radio" name="correcta" value="0"> Correcta
+
+        <input type="text" name="opciones" placeholder="Opción 2">
+        <input type="radio" name="correcta" value="1"> Correcta
+
+        <button type="submit">Guardar Pregunta</button>
+    </form>
+</div>

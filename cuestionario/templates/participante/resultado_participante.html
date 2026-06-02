@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Resultado{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* CONTENEDOR */
+.resultado-page {
+    background: #0f172a;
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+}
+
+/* TARJETA PRINCIPAL */
+.resultado-card {
+    max-width: 800px;
+    margin: auto;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* TITULOS */
+.resultado-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.resultado-card h3,
+.resultado-card h4 {
+    margin-top: 25px;
+    color: #fff;
+}
+
+/* PUNTAJE */
+.puntaje-box {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* INFO */
+.info-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* RESPUESTAS */
+.respuesta-box {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border-left: 5px solid #6366f1;
+}
+
+/* ESTADOS */
+.correcto {
+    color: #22c55e;
+    font-weight: bold;
+}
+
+.incorrecto {
+    color: #ef4444;
+    font-weight: bold;
+}
+
+/* BOTON */
+.btn-volver {
+    display: block;
+    width: fit-content;
+    margin: 30px auto 0;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.btn-volver:hover {
+    transform: scale(1.05);
+}
+
+hr {
+    border: none;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 20px 0;
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="resultado-page">
+
+<div class="resultado-card">
+
+    <h2>📊 Resultado del cuestionario</h2>
+
+    <!-- PUNTAJE -->
+    <div class="puntaje-box">
+        Puntaje: {{ puntaje }} / {{ maximo }}
+    </div>
+
+    <!-- INFO -->
+    <div class="info-box">
+        <div class="info-item">
+            🏆 Mejor intento <br>
+            <strong>{{ mejor.puntaje }}</strong>
+        </div>
+
+        <div class="info-item">
+            🔁 Intentos <br>
+            <strong>{{ intentos }}</strong>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- 🔥 RESPUESTAS DEL USUARIO -->
+    <h3>📝 Tus respuestas</h3>
+
+    <div style="background: rgba(99, 102, 241, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #6366f1;">
+        <p style="margin: 0; color: #cbd5e1; font-size: 14px;">
+            Aquí puedes revisar todas tus respuestas y ver cuáles fueron correctas o incorrectas.
+        </p>
+    </div>
+
+    {% for r in respuestas %}
+        <div class="respuesta-box">
+            <p><strong>{{ r.pregunta.enunciado }}</strong></p>
+
+            {% if r.opcion %}
+                <p>Tu respuesta: <em>{{ r.opcion.texto }}</em></p>
+
+                {% if r.opcion.es_correcta %}
+                    <span class="correcto">✔ Correcta</span>
+                {% else %}
+                    <span class="incorrecto">✘ Incorrecta</span>
+                {% endif %}
+            {% endif %}
+
+            {% if r.texto %}
+                <p>Tu respuesta: <em>{{ r.texto }}</em></p>
+            {% endif %}
+
+            {% if r.pregunta.retroalimentacion %}
+                <div style="margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; border-left: 3px solid #f59e0b;">
+                    <p style="margin: 0; color: #fbbf24; font-size: 13px;">
+                        <strong>💡 Explicación:</strong> {{ r.pregunta.retroalimentacion }}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>No se encontraron respuestas.</p>
+    {% endfor %}
+
+    <hr>
+
+    <!-- RETRO -->
+    <h3>🧠 Retroalimentación General</h3>
+
+    {% if retro %}
+        {% for r in retro %}
+            <div class="respuesta-box">
+                <p><strong>{{ r.pregunta }}</strong></p>
+                <p>{{ r.mensaje }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No hay retroalimentación adicional disponible.</p>
+    {% endif %}
+
+    <div style="margin-top: 40px; padding: 20px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; text-align: center;">
+        <p style="color: #cbd5e1; margin-bottom: 15px;">
+            ✅ ¡Cuestionario completado! Tu respuesta ha sido guardada.
+        </p>
+        <div>
+            <a href="/" style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; margin-right: 10px;">
+                ⬅ Volver al inicio
+            </a>
+            {% if cuestionario.es_unico == False %}
+                <a href="{% url 'resolver_cuestionario' cuestionario.id %}" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">
+                    🔁 Intentar de nuevo
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}

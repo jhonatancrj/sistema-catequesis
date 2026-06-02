@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Cuestionario - Ya Respondido{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* CONTENEDOR */
+.bloqueado-page {
+    background: #0f172a;
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+}
+
+/* TARJETA */
+.bloqueado-card {
+    max-width: 600px;
+    margin: auto;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* TITULO */
+.bloqueado-card h2 {
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+/* ICONO */
+.icono {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+/* INFO */
+.info-box {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.info-item {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 12px;
+    min-width: 150px;
+}
+
+/* BOTON */
+.btn-volver {
+    display: inline-block;
+    margin-top: 25px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-volver:hover {
+    transform: scale(1.05);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="bloqueado-page">
+
+<div class="bloqueado-card">
+
+    <div class="icono">
+        {% if es_unico %}
+            ✔️
+        {% else %}
+            🔁
+        {% endif %}
+    </div>
+
+    <h2>
+        {% if es_unico %}
+            Ya respondiste este cuestionario
+        {% else %}
+            Ya respondiste este cuestionario
+        {% endif %}
+    </h2>
+
+    <p style="color: #cbd5e1; margin: 15px 0;">
+        {% if es_unico %}
+            Este cuestionario es de un solo intento. Tu respuesta ha sido guardada y no puedes modificarla.
+        {% else %}
+            Este cuestionario permite múltiples intentos. Puedes volver a resolver cuando quieras.
+        {% endif %}
+    </p>
+
+    <div class="info-box">
+        <div class="info-item">
+            🏆 Mejor puntaje <br>
+            <strong>{{ mejor.puntaje|floatformat:1 }}</strong>
+        </div>
+
+        <div class="info-item">
+            🔁 Total intentos <br>
+            <strong>{{ intentos }}</strong>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.08); border-radius: 10px;">
+        <p style="color: #cbd5e1; font-size: 13px;">
+            Cuestionario: <strong>{{ cuestionario.titulo }}</strong>
+        </p>
+    </div>
+
+    <a href="{% url 'detalle_intento' mejor.id %}" class="btn-volver" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+        👁 Revisar mis respuestas
+    </a>
+
+    {% if not es_unico %}
+        <a href="{% url 'resolver_cuestionario' cuestionario.id %}" class="btn-volver" style="background: linear-gradient(135deg, #22c55e, #16a34a); margin-left: 10px;">
+            🔁 Volver a resolver
+        </a>
+    {% endif %}
+
+    <a href="/" class="btn-volver btn-danger" style="margin-left: 10px;">
+        ⬅ Volver al inicio
+    </a>
+
+</div>
+
+</div>
+
+{% endblock %}

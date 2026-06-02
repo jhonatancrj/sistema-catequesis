@@ -1,0 +1,198 @@
+{% extends "base_admin.html" %}
+{% load static %}
+
+{% block title %}Notificaciones - Sistema de Catequesis{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-0">
+                <i class="bi bi-bell"></i> Mis Notificaciones
+                {% if total_no_leidas > 0 %}
+                    <span class="badge bg-danger">{{ total_no_leidas }}</span>
+                {% endif %}
+            </h1>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if total_no_leidas > 0 %}
+            <button class="btn btn-outline-primary" onclick="marcarTodasComoLeidas()">
+                <i class="bi bi-check2-all"></i> Marcar todas como leídas
+            </button>
+            {% endif %}
+            <a href="{% url 'notificaciones:preferencias' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-gear"></i> Preferencias
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="mb-3">
+        <div class="btn-group" role="group">
+            <a href="?filtro=todas" class="btn btn-sm {% if filtro == 'todas' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                Todas
+            </a>
+            {% for tipo_value, tipo_label in tipos_disponibles %}
+            <a href="?filtro={{ tipo_value }}" class="btn btn-sm {% if filtro == tipo_value %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                {{ tipo_label }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Lista de Notificaciones -->
+    {% if notificaciones %}
+    <div class="row">
+        {% for notif in notificaciones %}
+        <div class="col-12 mb-3">
+            <div class="card border-left-4" style="border-left: 4px solid #0d6efd;">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="pt-1">
+                                    <i class="bi {{ notif.icono }} fs-5 text-{{ notif.color }}"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-1">
+                                        {{ notif.titulo }}
+                                        {% if not notif.leida %}
+                                            <span class="badge bg-primary">Nuevo</span>
+                                        {% endif %}
+                                    </h5>
+                                    <p class="card-text text-muted mb-1">{{ notif.mensaje }}</p>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i>
+                                        {{ notif.fecha_creacion|date:"d/m/Y H:i" }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <div class="btn-group" role="group">
+                                {% if not notif.leida %}
+                                <button class="btn btn-sm btn-outline-primary" onclick="marcarComoLeida({{ notif.id }})">
+                                    <i class="bi bi-check"></i>
+                                </button>
+                                {% endif %}
+                                <button class="btn btn-sm btn-outline-danger" onclick="eliminarNotificacion({{ notif.id }})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if total_paginas > 1 %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if pagina > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="?filtro={{ filtro }}&pagina=1">« Primera</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?filtro={{ filtro }}&pagina={{ pagina|add:'-1' }}">Anterior</a>
+            </li>
+            {% endif %}
+
+            {% for p in total_paginas %}
+                {% if p|add:'0'|stringformat:'d' == pagina|stringformat:'d' %}
+                <li class="page-item active">
+                    <span class="page-link">{{ p }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?filtro={{ filtro }}&pagina={{ p }}">{{ p }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagina < total_paginas %}
+            <li class="page-item">
+                <a class="page-link" href="?filtro={{ filtro }}&pagina={{ pagina|add:'1' }}">Siguiente</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?filtro={{ filtro }}&pagina={{ total_paginas }}">Última »</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info text-center py-5">
+        <i class="bi bi-inbox fs-1"></i>
+        <p class="mt-3">No tienes notificaciones</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function marcarComoLeida(id) {
+    fetch(`/notificaciones/marcar-como-leida/${id}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function marcarTodasComoLeidas() {
+    fetch('/notificaciones/marcar-todas-como-leidas/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function eliminarNotificacion(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta notificación?')) {
+        fetch(`/notificaciones/eliminar/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

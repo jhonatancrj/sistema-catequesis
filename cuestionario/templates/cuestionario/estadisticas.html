@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+.chart-page {
+    background: #0f172a;
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.chart-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.chart-title {
+    color: #fff;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+canvas {
+    width: 100% !important;
+    max-height: 280px;
+}
+
+</style>
+
+<div class="chart-page">
+
+<div class="container">
+
+<h2>📊 Resultados del Cuestionario</h2>
+
+<div class="chart-grid">
+
+{% for p in data %}
+    <div class="chart-card">
+        <div class="chart-title">❓ {{ p.pregunta }}</div>
+        <canvas id="chart{{ forloop.counter }}"></canvas>
+    </div>
+{% endfor %}
+
+</div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    {% for p in data %}
+
+    new Chart(document.getElementById("chart{{ forloop.counter }}"), {
+        type: 'pie',
+        data: {
+            labels: [
+                {% for s in p.stats %}
+                    "{{ s.texto }}",
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for s in p.stats %}
+                        {{ s.cantidad }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    '#38bdf8',
+                    '#22c55e',
+                    '#facc15',
+                    '#ef4444',
+                    '#a78bfa'
+                ]
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#e2e8f0'
+                    }
+                }
+            }
+        }
+    });
+
+    {% endfor %}
+
+});
+</script>
+
+{% endblock %}

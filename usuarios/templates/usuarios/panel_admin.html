@@ -1,0 +1,595 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Dashboard Administrativo
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================= -->
+<!-- HEADER -->
+<!-- ========================= -->
+
+<div class="dashboard-header">
+
+    <div>
+
+        <h2>
+            Dashboard Administrativo
+        </h2>
+
+        <p>
+            Bienvenido al sistema de administración parroquial.
+        </p>
+
+    </div>
+
+    <div class="dashboard-actions">
+
+        <a href="#"
+           class="btn btn-primary">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Nuevo Curso
+
+        </a>
+
+        <a href="#"
+           class="btn btn-dark">
+
+            <i class="bi bi-file-earmark-bar-graph"></i>
+
+            Reportes
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- STATS -->
+<!-- ========================= -->
+
+<div class="stats-grid">
+
+    <!-- PARTICIPANTES -->
+
+    <div class="stats-card">
+
+        <div class="stats-info">
+
+            <p>
+                Participantes
+            </p>
+
+            <h3>
+
+                {{ total_participantes }}
+
+            </h3>
+
+            <span class="stats-success">
+
+                Registrados en el sistema
+
+            </span>
+
+        </div>
+
+        <div class="stats-icon blue">
+
+            <i class="bi bi-people-fill"></i>
+
+        </div>
+
+    </div>
+
+    <!-- CATEQUISTAS -->
+
+    <div class="stats-card">
+
+        <div class="stats-info">
+
+            <p>
+                Catequistas
+            </p>
+
+            <h3>
+
+                {{ total_catequistas }}
+
+            </h3>
+
+            <span class="stats-success">
+
+                Activos
+
+            </span>
+
+        </div>
+
+        <div class="stats-icon green">
+
+            <i class="bi bi-person-video3"></i>
+
+        </div>
+
+    </div>
+
+    <!-- CURSOS -->
+
+    <div class="stats-card">
+
+        <div class="stats-info">
+
+            <p>
+                Cursos
+            </p>
+
+            <h3>
+
+                {{ total_cursos }}
+
+            </h3>
+
+            <span class="stats-warning">
+
+                Cursos registrados
+
+            </span>
+
+        </div>
+
+        <div class="stats-icon orange">
+
+            <i class="bi bi-journal-bookmark-fill"></i>
+
+        </div>
+
+    </div>
+
+    <!-- TAREAS -->
+
+    <div class="stats-card">
+
+        <div class="stats-info">
+
+            <p>
+                Tareas
+            </p>
+
+            <h3>
+
+                {{ total_tareas }}
+
+            </h3>
+
+            <span class="stats-success">
+
+                Actividades creadas
+
+            </span>
+
+        </div>
+
+        <div class="stats-icon purple">
+
+            <i class="bi bi-file-earmark-text-fill"></i>
+
+        </div>
+
+    </div>
+
+    <!-- CUESTIONARIOS -->
+
+    <div class="stats-card">
+
+        <div class="stats-info">
+
+            <p>
+                Cuestionarios
+            </p>
+
+            <h3>
+
+                {{ total_cuestionarios }}
+
+            </h3>
+
+            <span class="stats-success">
+
+                Evaluaciones registradas
+
+            </span>
+
+        </div>
+
+        <div class="stats-icon blue">
+
+            <i class="bi bi-ui-checks-grid"></i>
+
+        </div>
+
+    </div>
+
+    <!-- APROBADOS -->
+
+    <div class="stats-card">
+
+        <div class="stats-info">
+
+            <p>
+                Sacramentos
+            </p>
+
+            <h3>
+
+                {{ total_aprobados }}
+
+            </h3>
+
+            <span class="stats-warning">
+
+                Registros sacramentales
+
+            </span>
+
+        </div>
+
+        <div class="stats-icon green">
+
+            <i class="bi bi-patch-check-fill"></i>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- CHARTS -->
+<!-- ========================= -->
+
+<div class="charts-grid">
+
+    <!-- PARTICIPANTES -->
+
+    <div class="chart-card">
+
+        <div class="card-header-custom">
+
+            <h4>
+                Participantes por Mes
+            </h4>
+
+        </div>
+
+        <canvas id="usuariosChart"></canvas>
+
+    </div>
+
+    <!-- SACRAMENTOS -->
+
+    <div class="chart-card">
+
+        <div class="card-header-custom">
+
+            <h4>
+                Distribución de Sacramentos
+            </h4>
+
+        </div>
+
+        <canvas id="cursosChart"></canvas>
+
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- CONTENT GRID -->
+<!-- ========================= -->
+
+<div class="content-grid">
+
+    <!-- ========================= -->
+    <!-- ACTIVIDAD -->
+    <!-- ========================= -->
+
+    <div class="content-card">
+
+        <div class="card-header-custom">
+
+            <h4>
+                Actividad Reciente
+            </h4>
+
+        </div>
+
+        <div class="activity-list">
+
+            {% for actividad in actividades %}
+
+            <div class="activity-item">
+
+                <div class="activity-icon {{ actividad.color }}">
+
+                    <i class="bi {{ actividad.icono }}"></i>
+
+                </div>
+
+                <div>
+
+                    <h6>
+
+                        {{ actividad.texto }}
+
+                    </h6>
+
+                    <p>
+
+                        Hace
+
+                        {{ actividad.fecha|timesince }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <p>
+                No existe actividad reciente.
+            </p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- CURSOS ACTIVOS -->
+    <!-- ========================= -->
+
+    <div class="content-card">
+
+        <div class="card-header-custom">
+
+            <h4>
+                Cursos Activos
+            </h4>
+
+        </div>
+
+        {% for curso in cursos_activos %}
+
+        <div class="course-item">
+
+            <div>
+
+                <h6>
+
+                    {{ curso.nombre }}
+
+                </h6>
+
+                <p>
+
+                    {{ curso.inscripcion_set.count }}
+
+                    participantes
+
+                </p>
+
+            </div>
+
+            <span class="badge bg-success">
+
+                {{ curso.estado }}
+
+            </span>
+
+        </div>
+
+        {% empty %}
+
+        <p>
+
+            No existen cursos activos
+
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- ÚLTIMOS PARTICIPANTES -->
+<!-- ========================= -->
+
+<div class="content-card mt-4">
+
+    <div class="card-header-custom">
+
+        <h4>
+            Últimos Participantes Registrados
+        </h4>
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Nombre
+                    </th>
+
+                    <th>
+                        Usuario
+                    </th>
+
+                    <th>
+                        Ciudad
+                    </th>
+
+                    <th>
+                        Fecha Registro
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for participante in ultimos_participantes %}
+
+                <tr>
+
+                    <td>
+
+                        {{ participante.user.first_name }}
+
+                        {{ participante.user.last_name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ participante.user.username }}
+
+                    </td>
+
+                    <td>
+
+                        {{ participante.ciudad }}
+
+                    </td>
+
+                    <td>
+
+                        {{ participante.fecha_registro|date:"d/m/Y" }}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="4">
+
+                        No existen participantes registrados
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+const usuariosChart = document.getElementById(
+    'usuariosChart'
+);
+
+new Chart(usuariosChart, {
+
+    type: 'line',
+
+    data: {
+
+        labels: {{ meses|safe }},
+
+        datasets: [{
+
+            label: 'Participantes',
+
+            data: {{ participantes_por_mes|safe }},
+
+            borderWidth: 3,
+
+            tension: 0.4,
+
+            fill: true
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            }
+
+        }
+
+    }
+
+});
+
+const cursosChart = document.getElementById(
+    'cursosChart'
+);
+
+new Chart(cursosChart, {
+
+    type: 'doughnut',
+
+    data: {
+
+        labels: {{ labels_sacramentos|safe }},
+
+        datasets: [{
+
+            data: {{ datos_sacramentos|safe }},
+
+            borderWidth: 2
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

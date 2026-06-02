@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+
+{% block title %}Eventos - Parroquia{% endblock %}
+
+{% block content %}
+
+<style>
+    .eventos-page {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        padding: 60px 20px;
+        min-height: calc(100vh - 90px);
+    }
+
+    .eventos-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .eventos-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .eventos-header h1 {
+        font-size: 3em;
+        font-weight: 700;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .eventos-header p {
+        font-size: 1.1em;
+        color: #cbd5e1;
+    }
+
+    .eventos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 50px;
+    }
+
+    .evento-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .evento-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(59, 130, 246, 0.5);
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+    }
+
+    .evento-imagen {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4em;
+    }
+
+    .evento-contenido {
+        padding: 20px;
+        color: #e2e8f0;
+    }
+
+    .evento-fecha {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #93c5fd;
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 0.9em;
+    }
+
+    .evento-titulo {
+        font-size: 1.3em;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 10px;
+    }
+
+    .evento-descripcion {
+        color: #cbd5e1;
+        font-size: 0.95em;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .evento-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .evento-tag {
+        background: rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+
+    .evento-ubicacion {
+        color: #cbd5e1;
+        font-size: 0.9em;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .boton-evento {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .boton-evento:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .sin-eventos {
+        text-align: center;
+        color: #94a3b8;
+        padding: 60px 20px;
+        font-style: italic;
+    }
+
+    .proximamente {
+        background: rgba(139, 92, 246, 0.1);
+        border: 2px dashed rgba(139, 92, 246, 0.3);
+        padding: 40px;
+        text-align: center;
+        border-radius: 12px;
+        color: #cbd5e1;
+    }
+
+    .proximamente h3 {
+        color: #c4b5fd;
+        font-size: 1.3em;
+        margin-bottom: 10px;
+    }
+
+    .filtro-eventos {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .boton-filtro {
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #cbd5e1;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .boton-filtro:hover,
+    .boton-filtro.activo {
+        background: rgba(59, 130, 246, 0.3);
+        border-color: rgba(59, 130, 246, 0.8);
+        color: #93c5fd;
+    }
+</style>
+
+<div class="eventos-page">
+    <div class="eventos-container">
+        <div class="eventos-header">
+            <h1>🎉 Eventos de la Parroquia</h1>
+            <p>Únete a nuestras actividades y celebraciones</p>
+        </div>
+
+        <div class="filtro-eventos">
+            <button class="boton-filtro activo" onclick="filtrarEventos('todos')">Todos</button>
+            <button class="boton-filtro" onclick="filtrarEventos('misas')">Misas</button>
+            <button class="boton-filtro" onclick="filtrarEventos('catequesis')">Catequesis</button>
+            <button class="boton-filtro" onclick="filtrarEventos('festividades')">Festividades</button>
+            <button class="boton-filtro" onclick="filtrarEventos('retiros')">Retiros</button>
+        </div>
+
+        <div class="eventos-grid">
+            <!-- Evento 1 -->
+            <div class="evento-card" data-categoria="misas">
+                <div class="evento-imagen">🙏</div>
+                <div class="evento-contenido">
+                    <div class="evento-fecha">📅 Domingos - 10:00 AM</div>
+                    <div class="evento-titulo">Misa Dominical</div>
+                    <div class="evento-descripcion">
+                        Acompáñanos en nuestra celebración eucarística semanal donde nos reunimos como comunidad 
+                        para fortalecer nuestra fe.
+                    </div>
+                    <div class="evento-tags">
+                        <span class="evento-tag">Semanal</span>
+                        <span class="evento-tag">Abierto a todos</span>
+                    </div>
+                    <div class="evento-ubicacion">📍 Templo Principal</div>
+                </div>
+            </div>
+
+            <!-- Evento 2 -->
+            <div class="evento-card" data-categoria="catequesis">
+                <div class="evento-imagen">📚</div>
+                <div class="evento-contenido">
+                    <div class="evento-fecha">📅 Martes a Viernes</div>
+                    <div class="evento-titulo">Clases de Catequesis</div>
+                    <div class="evento-descripcion">
+                        Programas de formación religiosa para niños, jóvenes y adultos. Aprende los fundamentos 
+                        de la fe católica.
+                    </div>
+                    <div class="evento-tags">
+                        <span class="evento-tag">Formación</span>
+                        <span class="evento-tag">Por inscripción</span>
+                    </div>
+                    <div class="evento-ubicacion">📍 Aulas Parroquiales</div>
+                </div>
+            </div>
+
+            <!-- Evento 3 -->
+            <div class="evento-card" data-categoria="festividades">
+                <div class="evento-imagen">✨</div>
+                <div class="evento-contenido">
+                    <div class="evento-fecha">📅 Próximamente</div>
+                    <div class="evento-titulo">Festividad de María</div>
+                    <div class="evento-descripcion">
+                        Celebración especial dedicada a la Virgen María con procesión, oración comunitaria 
+                        y convivencia fraterna.
+                    </div>
+                    <div class="evento-tags">
+                        <span class="evento-tag">Celebración</span>
+                        <span class="evento-tag">Festivo</span>
+                    </div>
+                    <div class="evento-ubicacion">📍 Templo y alrededores</div>
+                </div>
+            </div>
+
+            <!-- Evento 4 -->
+            <div class="evento-card" data-categoria="retiros">
+                <div class="evento-imagen">🏔️</div>
+                <div class="evento-contenido">
+                    <div class="evento-fecha">📅 Próximamente</div>
+                    <div class="evento-titulo">Retiro Espiritual</div>
+                    <div class="evento-descripcion">
+                        Un encuentro de profunda reflexión y oración. Ideal para jóvenes y adultos que buscan 
+                        renovar su fe.
+                    </div>
+                    <div class="evento-tags">
+                        <span class="evento-tag">Retiro</span>
+                        <span class="evento-tag">Por inscripción</span>
+                    </div>
+                    <div class="evento-ubicacion">📍 Lugar a confirmar</div>
+                </div>
+            </div>
+
+            <!-- Evento 5 -->
+            <div class="evento-card" data-categoria="misas">
+                <div class="evento-imagen">🙏</div>
+                <div class="evento-contenido">
+                    <div class="evento-fecha">📅 Sábado - 6:00 PM</div>
+                    <div class="evento-titulo">Misa Vespertina</div>
+                    <div class="evento-descripcion">
+                        Celebración eucarística para aquellos que no pueden asistir a la misa dominical. 
+                        Te esperamos.
+                    </div>
+                    <div class="evento-tags">
+                        <span class="evento-tag">Semanal</span>
+                        <span class="evento-tag">Abierto a todos</span>
+                    </div>
+                    <div class="evento-ubicacion">📍 Templo Principal</div>
+                </div>
+            </div>
+
+            <!-- Evento 6 -->
+            <div class="evento-card" data-categoria="catequesis">
+                <div class="evento-imagen">💒</div>
+                <div class="evento-contenido">
+                    <div class="evento-fecha">📅 Próximamente</div>
+                    <div class="evento-titulo">Preparación para Sacramentos</div>
+                    <div class="evento-descripcion">
+                        Programas especiales de preparación para Primera Comunión, Confirmación y Matrimonio. 
+                        Consulta disponibilidad.
+                    </div>
+                    <div class="evento-tags">
+                        <span class="evento-tag">Preparación</span>
+                        <span class="evento-tag">Por edad</span>
+                    </div>
+                    <div class="evento-ubicacion">📍 Aulas Parroquiales</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="proximamente">
+            <h3>🔔 ¡Más eventos próximamente!</h3>
+            <p>Suscríbete a nuestras redes sociales para recibir notificaciones sobre nuevos eventos 
+            y celebraciones especiales.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filtrarEventos(categoria) {
+        const eventos = document.querySelectorAll('.evento-card');
+        const botones = document.querySelectorAll('.boton-filtro');
+
+        botones.forEach(btn => btn.classList.remove('activo'));
+        event.target.classList.add('activo');
+
+        eventos.forEach(evento => {
+            if (categoria === 'todos') {
+                evento.style.display = 'block';
+            } else {
+                evento.style.display = evento.dataset.categoria === categoria ? 'block' : 'none';
+            }
+        });
+    }
+</script>
+
+{% endblock %}

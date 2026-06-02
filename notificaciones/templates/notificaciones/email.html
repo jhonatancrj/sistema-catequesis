@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #f9f9f9;
+        }
+        .header {
+            background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            background: white;
+            padding: 30px;
+        }
+        .footer {
+            background: #f1f1f1;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        .titulo {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .mensaje {
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background: #0d6efd;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .info-box {
+            background: #f0f8ff;
+            border-left: 4px solid #0d6efd;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🔔 {{ nombre_sistema }}</h2>
+        </div>
+
+        <div class="content">
+            <div class="titulo">{{ notificacion.titulo }}</div>
+
+            <div class="mensaje">
+                {{ notificacion.mensaje }}
+            </div>
+
+            <div class="info-box">
+                <strong>Tipo:</strong> {{ notificacion.get_tipo_display }}<br>
+                <strong>Fecha:</strong> {{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}
+            </div>
+
+            <p>Para ver más detalles, puedes acceder a tu cuenta:</p>
+            <a href="{{ url_base }}/notificaciones/" class="btn">Ver Notificaciones</a>
+
+            <hr style="margin-top: 30px; border: none; border-top: 1px solid #ddd;">
+
+            <p style="font-size: 12px; color: #999;">
+                ¿No quieres recibir estos emails? Puedes cambiar tus preferencias de notificaciones 
+                <a href="{{ url_base }}/notificaciones/preferencias/" style="color: #0d6efd;">aquí</a>.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>{{ nombre_sistema }} - Centro de Catequesis Parroquial</p>
+            <p>Este es un email automático. Por favor, no responda a este mensaje.</p>
+        </div>
+    </div>
+</body>
+</html>

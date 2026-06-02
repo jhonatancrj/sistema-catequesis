@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+
+<style>
+
+body{
+
+    font-family: Arial;
+    padding:40px;
+}
+
+h1{
+
+    text-align:center;
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+table th,
+table td{
+
+    border:1px solid #ccc;
+    padding:10px;
+}
+
+table th{
+
+    background:#f2f2f2;
+}
+
+.info{
+
+    margin-top:20px;
+}
+
+</style>
+
+</head>
+<body>
+
+<h1>
+
+Reporte de Resultados
+
+</h1>
+
+<div class="info">
+
+<p>
+
+<strong>Cuestionario:</strong>
+
+{{ cuestionario.titulo }}
+
+</p>
+
+<p>
+
+<strong>Promedio:</strong>
+
+{{ promedio|floatformat:2 }}
+
+</p>
+
+<p>
+
+<strong>Fecha:</strong>
+
+{{ fecha }}
+
+</p>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Participante</th>
+<th>Puntaje</th>
+<th>Fecha</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for intento in intentos %}
+
+<tr>
+
+<td>
+
+{{ intento.usuario.first_name }}
+{{ intento.usuario.last_name }}
+
+</td>
+
+<td>
+
+{{ intento.puntaje }}
+
+</td>
+
+<td>
+
+{{ intento.fecha }}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</body>
+</html>

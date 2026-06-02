@@ -1,0 +1,670 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Administradores
+{% endblock %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="dashboard-header">
+
+    <div>
+
+        <h2>
+            Administradores
+        </h2>
+
+        <p>
+            Gestión completa de administradores del sistema.
+        </p>
+
+    </div>
+
+    <div>
+
+        <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#adminModal">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Agregar Administrador
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- TABLE CARD -->
+<div class="table-card">
+
+    <!-- TOP -->
+    <div class="table-top">
+
+        <div class="table-search">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                placeholder="Buscar administrador..."
+            >
+
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+
+        <table class="table admin-table align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Usuario
+                    </th>
+
+                    <th>
+                        Nombre
+                    </th>
+
+                    <th>
+                        Email
+                    </th>
+
+                    <th>
+                        Teléfono
+                    </th>
+
+                    <th>
+                        País
+                    </th>
+
+                    <th>
+                        Estado
+                    </th>
+
+                    <th>
+                        Acciones
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for admin in administradores %}
+
+                <tr>
+
+                    <!-- USER -->
+                    <td>
+
+                        <div class="user-info">
+
+                            <img
+                                src="https://ui-avatars.com/api/?name={{ admin.user.username }}"
+                            >
+
+                            <div>
+
+                                <h6>
+                                    {{ admin.user.username }}
+                                </h6>
+
+                                <p>
+                                    ID: {{ admin.id }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                    <!-- NAME -->
+                    <td>
+
+                        {{ admin.user.first_name }}
+                        {{ admin.user.last_name }}
+
+                    </td>
+
+                    <!-- EMAIL -->
+                    <td>
+
+                        {{ admin.user.email }}
+
+                    </td>
+
+                    <!-- PHONE -->
+                    <td>
+
+                        {{ admin.telefono }}
+
+                    </td>
+
+                    <!-- COUNTRY -->
+                    <td>
+
+                        {{ admin.pais }}
+
+                    </td>
+
+                    <!-- STATUS -->
+                    <td>
+
+                        {% if admin.user.is_active %}
+
+                            <span class="table-badge active-badge">
+
+                                Activado
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="table-badge inactive-badge">
+
+                                Desactivado
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <!-- ACTIONS -->
+                    <td>
+
+                        <div class="table-actions">
+
+                            <button
+                                class="action-btn view-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#viewModal{{ admin.id }}">
+
+                                <i class="bi bi-eye"></i>
+
+                            </button>
+
+                            <a href="{% url 'editar_administrador' admin.id %}"
+                            class="action-btn edit-btn">
+
+                                <i class="bi bi-pencil-square"></i>
+
+                            </a>
+
+                            <button
+                                class="action-btn delete-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ admin.id }}">
+
+                                <i class="bi bi-trash"></i>
+
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                <!-- DELETE MODAL -->
+                <div class="modal fade"
+                    id="deleteModal{{ admin.id }}"
+                    tabindex="-1">
+
+                    <div class="modal-dialog">
+
+                        <div class="modal-content custom-modal">
+
+                            <div class="modal-header border-0">
+
+                                <h5>
+                                    Confirmar Acción
+                                </h5>
+
+                                <button type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal">
+                                </button>
+
+                            </div>
+
+                            <div class="modal-body text-center">
+
+                                <div class="delete-icon">
+
+                                    <i class="bi bi-exclamation-triangle"></i>
+
+                                </div>
+
+                                <h4 class="mb-3">
+
+                                    ¿Remover administrador?
+
+                                </h4>
+
+                                <p class="text-muted">
+
+                                    El usuario volverá a ser participante
+                                    del sistema.
+
+                                </p>
+
+                                <div class="mt-4 d-flex justify-content-center gap-3">
+
+                                    <button type="button"
+                                            class="btn btn-light"
+                                            data-bs-dismiss="modal">
+
+                                        Cancelar
+
+                                    </button>
+
+                                    <a href="{% url 'eliminar_administrador' admin.id %}"
+                                    class="btn btn-danger">
+
+                                        Sí, Remover
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <!-- VIEW MODAL -->
+                <div class="modal fade"
+                    id="viewModal{{ admin.id }}"
+                    tabindex="-1">
+
+                    <div class="modal-dialog modal-lg">
+
+                        <div class="modal-content custom-modal">
+
+                            <!-- HEADER -->
+                            <div class="modal-header border-0">
+
+                                <h4>
+                                    Información del Administrador
+                                </h4>
+
+                                <button type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal">
+                                </button>
+
+                            </div>
+
+                            <!-- BODY -->
+                            <div class="modal-body">
+
+                                <!-- PROFILE -->
+                                <div class="profile-view">
+
+                                    <!-- IMAGE -->
+                                    <div class="profile-avatar">
+
+                                        <img src="https://ui-avatars.com/api/?name={{ admin.user.username }}">
+
+                                    </div>
+
+                                    <!-- INFO -->
+                                    <div class="profile-info">
+
+                                        <h3>
+
+                                            {{ admin.user.first_name }}
+                                            {{ admin.user.last_name }}
+
+                                        </h3>
+
+                                        <span class="table-badge active-badge">
+
+                                            {{ admin.get_rol_display }}
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- DETAILS -->
+                                <div class="profile-details">
+
+                                    <div class="detail-card">
+
+                                        <h6>
+                                            Usuario
+                                        </h6>
+
+                                        <p>
+                                            {{ admin.user.username }}
+                                        </p>
+
+                                    </div>
+
+                                    <div class="detail-card">
+
+                                        <h6>
+                                            Correo Electrónico
+                                        </h6>
+
+                                        <p>
+                                            {{ admin.user.email }}
+                                        </p>
+
+                                    </div>
+
+                                    <div class="detail-card">
+
+                                        <h6>
+                                            Teléfono
+                                        </h6>
+
+                                        <p>
+                                            {{ admin.telefono|default:"No registrado" }}
+                                        </p>
+
+                                    </div>
+
+                                    <div class="detail-card">
+
+                                        <h6>
+                                            País
+                                        </h6>
+
+                                        <p>
+                                            {{ admin.pais|default:"No registrado" }}
+                                        </p>
+
+                                    </div>
+
+                                    <div class="detail-card">
+
+                                        <h6>
+                                            Departamento
+                                        </h6>
+
+                                        <p>
+                                            {{ admin.departamento|default:"No registrado" }}
+                                        </p>
+
+                                    </div>
+
+                                    <div class="detail-card">
+
+                                        <h6>
+                                            Ciudad
+                                        </h6>
+
+                                        <p>
+                                            {{ admin.ciudad|default:"No registrado" }}
+                                        </p>
+
+                                    </div>
+
+                                    <div class="detail-card">
+
+                                        <h6>
+                                            Género
+                                        </h6>
+
+                                        <p>
+                                            {{ admin.get_genero_display|default:"No registrado" }}
+                                        </p>
+
+                                    </div>
+
+                                    <div class="detail-card">
+
+                                        <h6>
+                                            Fecha Nacimiento
+                                        </h6>
+
+                                        <p>
+                                            {{ admin.fecha_nacimiento|default:"No registrada" }}
+                                        </p>
+
+                                    </div>
+
+                                    <div class="detail-card">
+
+                                        <h6>
+                                            Fecha Registro
+                                        </h6>
+
+                                        <p>
+                                            {{ admin.fecha_registro }}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- QR -->
+                                {% if admin.qr %}
+
+                                <div class="qr-section">
+
+                                    <h5>
+                                        Código QR
+                                    </h5>
+
+                                    <img src="{{ admin.qr.url }}"
+                                        class="qr-image">
+
+                                </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="7">
+
+                        <div class="empty-data">
+
+                            <i class="bi bi-database"></i>
+
+                            <p>
+                                No existen administradores registrados.
+                            </p>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+<!-- MODAL -->
+<div class="modal fade"
+     id="adminModal"
+     tabindex="-1">
+
+    <div class="modal-dialog modal-xl">
+
+        <div class="modal-content custom-modal">
+
+            <!-- HEADER -->
+            <div class="modal-header border-0">
+
+                <h4>
+                    Agregar Administrador
+                </h4>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body">
+
+                <!-- SEARCH -->
+                <div class="table-search mb-4">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           id="searchAdmin"
+                           placeholder="Buscar usuario...">
+
+                </div>
+
+                <!-- USERS -->
+                <div class="table-responsive">
+
+                    <table class="table admin-table align-middle">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Usuario</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Rol Actual</th>
+                                <th>Acción</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="adminTableBody">
+
+                            {% for perfil in administradores %}
+
+                            {% endfor %}
+
+                            {% for perfil in perfiles %}
+
+                            {% if perfil.rol != 'ADMIN' %}
+
+                            <tr class="search-row">
+
+                                <!-- USER -->
+                                <td>
+
+                                    <div class="user-info">
+
+                                        <img src="https://ui-avatars.com/api/?name={{ perfil.user.username }}">
+
+                                        <div>
+
+                                            <h6>
+                                                {{ perfil.user.username }}
+                                            </h6>
+
+                                            <p>
+                                                ID: {{ perfil.id }}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <!-- NAME -->
+                                <td>
+
+                                    {{ perfil.user.first_name }}
+                                    {{ perfil.user.last_name }}
+
+                                </td>
+
+                                <!-- EMAIL -->
+                                <td>
+
+                                    {{ perfil.user.email }}
+
+                                </td>
+
+                                <!-- ROLE -->
+                                <td>
+
+                                    <span class="table-badge inactive-badge">
+
+                                        {{ perfil.get_rol_display }}
+
+                                    </span>
+
+                                </td>
+
+                                <!-- ACTION -->
+                                <td>
+
+                                    <form method="POST"
+                                          action="{% url 'crear_administrador' %}">
+
+                                        {% csrf_token %}
+
+                                        <input type="hidden"
+                                               name="perfil_id"
+                                               value="{{ perfil.id }}">
+
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm">
+
+                                            Convertir en Admin
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                            {% endif %}
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

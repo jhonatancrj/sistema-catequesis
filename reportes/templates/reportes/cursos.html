@@ -1,0 +1,344 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Reporte de Cursos{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<style>
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .report-filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .report-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-table table {
+        margin-bottom: 0;
+    }
+
+    .report-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .report-table tbody tr:hover {
+        background-color: #f0f9ff;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-activo {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .status-inactivo {
+        background-color: #fecaca;
+        color: #991b1b;
+    }
+
+    .status-finalizado {
+        background-color: #bfdbfe;
+        color: #1e40af;
+    }
+
+    .progress-bar-small {
+        height: 6px;
+        border-radius: 3px;
+    }
+
+    .metric-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: #f3f4f6;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        position: relative;
+        height: 300px;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        margin: 2px;
+    }
+
+    .export-btn {
+        margin-left: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="report-header">
+        <div>
+            <h1 class="h3 mb-0">📚 Reporte de Cursos</h1>
+            <p class="text-muted mb-0">Análisis detallado de todos los cursos</p>
+        </div>
+        <a href="{% url 'pdf_cursos' %}" class="btn btn-danger export-btn">
+            <i class="bi bi-file-pdf"></i> Descargar PDF
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="report-filters mb-4">
+        <form method="get" class="d-flex gap-2 flex-wrap">
+            <select name="estado" class="form-select form-select-sm" style="width: auto;">
+                <option value="">Todos los estados</option>
+                {% for estado in estados %}
+                    <option value="{{ estado }}" {% if request.GET.estado == estado %}selected{% endif %}>
+                        {{ estado }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+            <a href="{% url 'reportes_cursos' %}" class="btn btn-secondary btn-sm">Limpiar</a>
+        </form>
+    </div>
+
+    <!-- Gráficas -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5>Participantes por Curso</h5>
+                <canvas id="chartInscripciones"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5>Asistencia por Curso</h5>
+                <canvas id="chartAsistencia"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Cursos -->
+    <div class="report-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Estado</th>
+                    <th>Fechas</th>
+                    <th>Participantes</th>
+                    <th>Asistencia</th>
+                    <th>Tareas</th>
+                    <th>Cuestionarios</th>
+                    <th>Aprobación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for curso in datos %}
+                <tr>
+                    <td>
+                        <strong>{{ curso.nombre }}</strong>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ curso.estado|lower }}">
+                            {{ curso.estado }}
+                        </span>
+                    </td>
+                    <td>
+                        <small>{{ curso.fecha_inicio|date:"d/m/Y" }} - {{ curso.fecha_fin|date:"d/m/Y" }}</small>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            <i class="bi bi-people"></i>
+                            {{ curso.inscripciones }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="progress" style="width: 100px; height: 6px;">
+                                <div class="progress-bar" style="width: {{ curso.asistencia.porcentaje }}%"></div>
+                            </div>
+                            <small>{{ curso.asistencia.porcentaje }}%</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            {% if curso.tareas.total > 0 %}
+                                <i class="bi bi-check" style="color: #10b981;"></i> {{ curso.tareas.entregadas }}/{{ curso.tareas.total }}
+                            {% else %}
+                                <span style="color: #999;">—</span>
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            {% if curso.cuestionarios.total > 0 %}
+                                <i class="bi bi-pencil-square"></i> {{ curso.cuestionarios.promedio }}
+                            {% else %}
+                                <span style="color: #999;">—</span>
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if curso.resultados.total > 0 %}
+                            {% widthratio curso.resultados.aprobados curso.resultados.total 100 as aprobacion_pct %}
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress" style="width: 80px; height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: {{ aprobacion_pct }}%"></div>
+                                </div>
+                                <small>{{ aprobacion_pct }}%</small>
+                            </div>
+                        {% else %}
+                            <span style="color: #999;">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'reporte_curso_detallado' curso.id %}" class="btn btn-info btn-action">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox"></i> No hay cursos para mostrar
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Estadísticas Resumidas -->
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">{{ datos|length }}</h3>
+                    <p class="text-muted mb-0">Total de Cursos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="text-success">
+                        {% if datos.0 %}{{ datos.0.asistencia.porcentaje }}%{% else %}N/A{% endif %}
+                    </h3>
+                    <p class="text-muted mb-0">Asistencia Promedio</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="text-warning">{{ datos|length }} Activos</h3>
+                    <p class="text-muted mb-0">Cursos Abiertos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    async function cargarGraficas() {
+        try {
+            const response = await fetch('{% url "api_graficas_cursos" %}');
+            const datos = await response.json();
+
+            // Gráfica de Inscripciones
+            const ctxInscripciones = document.getElementById('chartInscripciones').getContext('2d');
+            new Chart(ctxInscripciones, {
+                type: 'bar',
+                data: {
+                    labels: datos.labels,
+                    datasets: [{
+                        label: 'Inscripciones',
+                        data: datos.datasets[0].data,
+                        backgroundColor: '#667eea',
+                        borderColor: '#5568d3',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Gráfica de Asistencia
+            const ctxAsistencia = document.getElementById('chartAsistencia').getContext('2d');
+            new Chart(ctxAsistencia, {
+                type: 'line',
+                data: {
+                    labels: datos.labels,
+                    datasets: [{
+                        label: 'Asistencia %',
+                        data: datos.datasets[1].data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'top' }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error al cargar gráficas:', error);
+        }
+    }
+
+    cargarGraficas();
+</script>
+{% endblock %}

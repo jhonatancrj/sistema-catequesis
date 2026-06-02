@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+{% load dict_extras %}
+
+{% block title %}Asistencia{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* 🚫 NO TOCAR NAV */
+.franja-nav {
+    width: 100%;
+    height: 90px;
+    background:
+        linear-gradient(rgba(13, 40, 80, 0.7), rgba(66, 100, 148, 0.7)),
+        url("/static/img/nav.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* FONDO */
+.page-asistencia {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+}
+
+/* CONTENEDOR */
+.contenedor-principal {
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* HEADER */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    margin: 0;
+}
+
+/* BUSCADOR */
+.buscador {
+    margin-bottom: 15px;
+}
+
+.buscador input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+}
+
+/* TABLA */
+.tabla-contenedor {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #3b82f6;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+tr:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+/* INPUTS */
+select, input {
+    width: 100%;
+    padding: 6px;
+    border-radius: 6px;
+    border: none;
+}
+
+/* ESTADOS VISUALES */
+.estado-AUSENTE { background: rgba(239,68,68,0.2); }
+.estado-PRESENTE { background: rgba(34,197,94,0.2); }
+.estado-PERMISO { background: rgba(251,191,36,0.2); }
+
+/* BOTÓN */
+.btn-guardar {
+    margin-top: 20px;
+    padding: 10px 18px;
+    background: #22c55e;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: block;
+    margin-left: auto;
+}
+
+.btn-guardar:hover {
+    background: #16a34a;
+}
+.resumen {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.card-resumen {
+    flex: 1;
+    min-width: 150px;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.verde { background: rgba(34,197,94,0.2); }
+.rojo { background: rgba(239,68,68,0.2); }
+.amarillo { background: rgba(251,191,36,0.2); }
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="page-asistencia">
+
+<div class="contenedor-principal">
+
+<!-- HEADER -->
+<div class="header-top">
+    <h2>📋 Asistencia - {{ clase.titulo }}</h2>
+</div>
+<!-- resumen de asistencias -->
+<div class="resumen">
+    <div class="card-resumen verde">
+        ✅ Presentes: <span id="totalPresentes">0</span>
+    </div>
+    <div class="card-resumen rojo">
+        ❌ Ausentes: <span id="totalAusentes">0</span>
+    </div>
+    <div class="card-resumen amarillo">
+        ⚠ Permisos: <span id="totalPermisos">0</span>
+    </div>
+    
+</div>
+<!-- BUSCADOR -->
+<div class="buscador">
+    <input type="text" id="buscador" placeholder="🔍 Buscar participante...">
+</div>
+
+<!-- TABLA -->
+<div class="tabla-contenedor">
+
+<form method="POST">
+{% csrf_token %}
+
+<table id="tablaAsistencia">
+
+<tr>
+<th>Participante</th>
+<th>Estado</th>
+<th>Observación</th>
+</tr>
+
+{% for inscripcion in inscripciones %}
+{% with asistencia=asistencia_dict|dict_get:inscripcion.participante.id %}
+
+<tr class="fila">
+
+<td>
+{{ inscripcion.participante.user.first_name }}
+{{ inscripcion.participante.user.last_name }}
+</td>
+
+<td>
+<select name="estado_{{ inscripcion.participante.id }}" onchange="cambiarColor(this)">
+
+<option value="AUSENTE"
+{% if asistencia and asistencia.estado == "AUSENTE" %}selected{% endif %}>
+Ausente
+</option>
+
+<option value="PRESENTE"
+{% if asistencia and asistencia.estado == "PRESENTE" %}selected{% endif %}>
+Presente
+</option>
+
+<option value="PERMISO"
+{% if asistencia and asistencia.estado == "PERMISO" %}selected{% endif %}>
+Permiso
+</option>
+
+</select>
+</td>
+
+<td>
+<input type="text"
+name="obs_{{ inscripcion.participante.id }}"
+value="{% if asistencia %}{{ asistencia.observacion }}{% endif %}"
+placeholder="Opcional">
+</td>
+
+</tr>
+
+{% endwith %}
+{% empty %}
+
+<tr>
+<td colspan="3">No hay participantes inscritos</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<button class="btn-guardar">💾 Guardar Asistencia</button>
+
+</form>
+
+</div>
+
+</div>
+</div>
+
+<!-- 🔍 BUSCADOR -->
+<script>
+document.getElementById("buscador").addEventListener("keyup", function() {
+    let filtro = this.value.toLowerCase();
+    let filas = document.querySelectorAll("#tablaAsistencia .fila");
+
+    filas.forEach(fila => {
+        let texto = fila.innerText.toLowerCase();
+        fila.style.display = texto.includes(filtro) ? "" : "none";
+    });
+});
+</script>
+
+<!-- 🎨 COLOR POR ESTADO -->
+<script>
+function cambiarColor(select) {
+    let fila = select.closest("tr");
+
+    fila.classList.remove("estado-AUSENTE", "estado-PRESENTE", "estado-PERMISO");
+    fila.classList.add("estado-" + select.value);
+}
+
+/* aplicar al cargar */
+document.querySelectorAll("select").forEach(select => {
+    cambiarColor(select);
+});
+</script>
+<script>
+function actualizarResumen() {
+    let presentes = 0;
+    let ausentes = 0;
+    let permisos = 0;
+
+    document.querySelectorAll("select").forEach(select => {
+        if (select.value === "PRESENTE") presentes++;
+        if (select.value === "AUSENTE") ausentes++;
+        if (select.value === "PERMISO") permisos++;
+    });
+
+    document.getElementById("totalPresentes").innerText = presentes;
+    document.getElementById("totalAusentes").innerText = ausentes;
+    document.getElementById("totalPermisos").innerText = permisos;
+}
+
+document.querySelectorAll("select").forEach(select => {
+    select.addEventListener("change", actualizarResumen);
+});
+
+actualizarResumen();
+</script>
+{% endblock %}

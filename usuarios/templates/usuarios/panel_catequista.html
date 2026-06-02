@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Panel Administrativo</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
+}
+
+body{
+    background:#f1f5f9;
+    display:flex;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+    width:270px;
+    height:100vh;
+    background:#0f172a;
+    color:white;
+    position:fixed;
+    left:0;
+    top:0;
+    overflow-y:auto;
+    padding-bottom:30px;
+}
+
+.logo{
+    padding:25px;
+    font-size:24px;
+    font-weight:700;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    text-align:center;
+    background:#111827;
+}
+
+.logo span{
+    color:#38bdf8;
+}
+
+.menu{
+    padding:20px;
+}
+
+.menu-title{
+    font-size:12px;
+    color:#94a3b8;
+    margin:25px 0 10px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.menu a{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+    color:#e2e8f0;
+    padding:14px 16px;
+    border-radius:12px;
+    margin-bottom:8px;
+    transition:0.3s;
+    font-size:15px;
+}
+
+.menu a:hover{
+    background:#1e293b;
+    transform:translateX(4px);
+}
+
+.menu a.active{
+    background:linear-gradient(135deg,#2563eb,#38bdf8);
+    color:white;
+    box-shadow:0 6px 18px rgba(37,99,235,0.3);
+}
+
+/* ================= MAIN ================= */
+
+.main{
+    margin-left:270px;
+    width:calc(100% - 270px);
+    min-height:100vh;
+}
+
+/* ================= TOPBAR ================= */
+
+.topbar{
+    height:80px;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 35px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.search-box{
+    background:#f1f5f9;
+    padding:12px 18px;
+    border-radius:12px;
+    width:350px;
+}
+
+.search-box input{
+    width:100%;
+    border:none;
+    background:transparent;
+    outline:none;
+    font-size:14px;
+}
+
+.admin{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.admin img{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+}
+
+/* ================= CONTENT ================= */
+
+.content{
+    padding:35px;
+}
+
+.page-title{
+    margin-bottom:30px;
+}
+
+.page-title h1{
+    font-size:32px;
+    color:#0f172a;
+}
+
+.page-title p{
+    color:#64748b;
+    margin-top:5px;
+}
+
+/* ================= CARDS ================= */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:25px;
+    margin-bottom:35px;
+}
+
+.card{
+    background:white;
+    border-radius:22px;
+    padding:28px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.05);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card h3{
+    color:#64748b;
+    font-size:15px;
+    margin-bottom:12px;
+}
+
+.card .number{
+    font-size:34px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.card small{
+    color:#16a34a;
+}
+
+/* ================= TABLE ================= */
+
+.table-box{
+    background:white;
+    border-radius:22px;
+    padding:25px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.05);
+    margin-bottom:35px;
+}
+
+.table-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.table-header h2{
+    color:#0f172a;
+}
+
+.btn{
+    background:linear-gradient(135deg,#2563eb,#38bdf8);
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+table th{
+    background:#f8fafc;
+    padding:15px;
+    text-align:left;
+    color:#475569;
+    font-size:14px;
+}
+
+table td{
+    padding:16px;
+    border-bottom:1px solid #e2e8f0;
+    color:#334155;
+}
+
+.estado{
+    padding:6px 12px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.activo{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.pendiente{
+    background:#fef3c7;
+    color:#b45309;
+}
+
+/* ================= MODULES ================= */
+
+.modules{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.module{
+    background:white;
+    padding:25px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 8px 25px rgba(0,0,0,0.05);
+    transition:0.3s;
+}
+
+.module:hover{
+    transform:scale(1.03);
+}
+
+.module h3{
+    margin-top:15px;
+    color:#0f172a;
+}
+
+.module p{
+    color:#64748b;
+    margin-top:10px;
+    font-size:14px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px){
+
+    .sidebar{
+        width:85px;
+    }
+
+    .sidebar .logo{
+        font-size:18px;
+    }
+
+    .sidebar a span{
+        display:none;
+    }
+
+    .main{
+        margin-left:85px;
+        width:calc(100% - 85px);
+    }
+
+    .search-box{
+        width:180px;
+    }
+
+}
+
+@media(max-width:700px){
+
+    .topbar{
+        flex-direction:column;
+        height:auto;
+        gap:15px;
+        padding:20px;
+    }
+
+    .search-box{
+        width:100%;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <div class="logo">
+        Faith<span>Admin</span>
+    </div>
+
+    <div class="menu">
+
+        <div class="menu-title">Principal</div>
+
+        <a href="#" class="active">
+            📊 <span>Dashboard</span>
+        </a>
+
+        <a href="#">
+            👥 <span>Usuarios</span>
+        </a>
+
+        <a href="#">
+            📚 <span>Cursos</span>
+        </a>
+
+        <a href="#">
+            🧑‍🏫 <span>Catequistas</span>
+        </a>
+
+        <a href="#">
+            🏛️ <span>Parroquias</span>
+        </a>
+
+        <a href="#">
+            📝 <span>Inscripciones</span>
+        </a>
+
+        <a href="#">
+            📖 <span>Materiales</span>
+        </a>
+
+        <a href="#">
+            📅 <span>Horarios</span>
+        </a>
+
+        <a href="#">
+            🧾 <span>Pagos</span>
+        </a>
+
+        <a href="#">
+            🧠 <span>Cuestionarios</span>
+        </a>
+
+        <a href="#">
+            📂 <span>Tareas</span>
+        </a>
+
+        <a href="#">
+            📈 <span>Reportes</span>
+        </a>
+
+        <div class="menu-title">Configuración</div>
+
+        <a href="#">
+            ⚙️ <span>Configuración</span>
+        </a>
+
+        <a href="#">
+            🔐 <span>Seguridad</span>
+        </a>
+
+        <a href="#">
+            🚪 <span>Cerrar Sesión</span>
+        </a>
+
+    </div>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="search-box">
+            <input type="text" placeholder="Buscar cursos, usuarios, catequistas...">
+        </div>
+
+        <div class="admin">
+            <div>
+                <strong>Administrador</strong><br>
+                <small>Sistema Religioso</small>
+            </div>
+
+            <img src="https://i.imgur.com/8Km9tLL.png">
+        </div>
+
+    </div>
+
+    <!-- CONTENT -->
+
+    <div class="content">
+
+        <div class="page-title">
+            <h1>Panel Administrativo</h1>
+            <p>Sistema Integral de Gestión de Cursos Religiosos</p>
+        </div>
+
+        <!-- CARDS -->
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Total Estudiantes</h3>
+                <div class="number">1,254</div>
+                <small>+12% este mes</small>
+            </div>
+
+            <div class="card">
+                <h3>Cursos Activos</h3>
+                <div class="number">32</div>
+                <small>+4 nuevos</small>
+            </div>
+
+            <div class="card">
+                <h3>Catequistas</h3>
+                <div class="number">18</div>
+                <small>Todos activos</small>
+            </div>
+
+            <div class="card">
+                <h3>Pagos Recibidos</h3>
+                <div class="number">Bs. 8,540</div>
+                <small>Últimos 30 días</small>
+            </div>
+
+        </div>
+
+        <!-- TABLE -->
+
+        <div class="table-box">
+
+            <div class="table-header">
+                <h2>Últimas Inscripciones</h2>
+
+                <button class="btn">
+                    + Nueva Inscripción
+                </button>
+            </div>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Curso</th>
+                        <th>Parroquia</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>Juan Pérez</td>
+                        <td>Primera Comunión</td>
+                        <td>San Martín</td>
+                        <td>
+                            <span class="estado activo">
+                                Activo
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>María López</td>
+                        <td>Confirmación</td>
+                        <td>Santa María</td>
+                        <td>
+                            <span class="estado pendiente">
+                                Pendiente
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Carlos Rojas</td>
+                        <td>Biblia Juvenil</td>
+                        <td>La Merced</td>
+                        <td>
+                            <span class="estado activo">
+                                Activo
+                            </span>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- MODULES -->
+
+        <div class="modules">
+
+            <div class="module">
+                <h3>Gestión de Cursos</h3>
+                <p>Administrar cursos, módulos y niveles.</p>
+            </div>
+
+            <div class="module">
+                <h3>Cuestionarios</h3>
+                <p>Crear evaluaciones y preguntas online.</p>
+            </div>
+
+            <div class="module">
+                <h3>Control de Asistencia</h3>
+                <p>Registrar asistencia de estudiantes.</p>
+            </div>
+
+            <div class="module">
+                <h3>Reportes PDF</h3>
+                <p>Exportar reportes y certificados.</p>
+            </div>
+
+            <div class="module">
+                <h3>Material Educativo</h3>
+                <p>Subir documentos y recursos.</p>
+            </div>
+
+            <div class="module">
+                <h3>Gestión de Pagos</h3>
+                <p>Control de cuotas e inscripciones.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

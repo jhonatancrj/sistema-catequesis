@@ -1,0 +1,150 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Reporte de Tareas{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .report-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-table table {
+        margin-bottom: 0;
+    }
+
+    .report-table thead {
+        background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        color: white;
+    }
+
+    .report-table tbody tr:hover {
+        background-color: #fef2f2;
+    }
+
+    .metric-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #f3f4f6;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    .progress-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="report-header">
+        <div>
+            <h1 class="h3 mb-0">📋 Reporte de Tareas</h1>
+            <p class="text-muted mb-0">Análisis de entregas de tareas</p>
+        </div>
+    </div>
+
+    <!-- Tabla de Tareas -->
+    <div class="report-table mb-4">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Tarea</th>
+                    <th>Curso</th>
+                    <th>Catequista</th>
+                    <th>Fecha Entrega</th>
+                    <th>Entregas</th>
+                    <th>A Tiempo</th>
+                    <th>Tardia</th>
+                    <th>Calificadas</th>
+                    <th>Prom. Calif.</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tarea in datos %}
+                <tr>
+                    <td>
+                        <strong>{{ tarea.titulo }}</strong>
+                    </td>
+                    <td>
+                        <small>{{ tarea.curso }}</small>
+                    </td>
+                    <td>
+                        <small>{{ tarea.catequista }}</small>
+                    </td>
+                    <td>
+                        <small>{{ tarea.fecha_entrega|date:"d/m/Y H:i" }}</small>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            <i class="bi bi-inbox"></i> {{ tarea.entregas_totales }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-success">{{ tarea.entregas_a_tiempo }}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-warning">{{ tarea.entregas_tardia }}</span>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            {{ tarea.calificadas }}/{{ tarea.entregas_totales }}
+                        </span>
+                    </td>
+                    <td>
+                        <strong style="{% if tarea.promedio_calificacion >= 70 %}color: #10b981;{% elif tarea.promedio_calificacion >= 50 %}color: #f59e0b;{% else %}color: #ef4444;{% endif %}">
+                            {{ tarea.promedio_calificacion }}
+                        </strong>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox"></i> No hay tareas para mostrar
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Resumen -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Total de Tareas</h5>
+                    <h2 class="text-danger">{{ datos|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Promedio de Entregas</h5>
+                    <h2 class="text-success">
+                        {% if datos.0 %}
+                            100%
+                        {% else %}0%{% endif %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

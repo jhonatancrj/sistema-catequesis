@@ -1,0 +1,73 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+
+            Sacramentos
+
+        </h2>
+
+        <p>
+
+            Historial sacramental general
+
+        </p>
+
+    </div>
+
+    <div class="mb-4">
+
+        <a href="{% url 'agregar_sacramento_manual' %}"
+        class="btn btn-success">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Agregar manualmente
+
+        </a>
+
+    </div>
+
+    <div class="row">
+
+        {% for s in sacramentos %}
+
+        <div class="col-md-4 mb-4">
+
+            <div class="card-box">
+
+                <h4>
+
+                    {{ s.sacramento }}
+
+                </h4>
+
+                <p>
+
+                    {{ s.total }}
+                    participantes
+                </p>
+
+                <a href="{% url 'detalle_sacramento_admin' s.sacramento %}"
+                   class="btn btn-primary">
+
+                    Ver historial
+
+                </a>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+
+<style>
+
+body{
+    font-family:Arial;
+    padding:40px;
+}
+
+h1{
+    text-align:center;
+}
+
+.section{
+    margin-top:20px;
+}
+
+</style>
+
+</head>
+<body>
+
+<h1>
+
+Registro Sacramental
+
+</h1>
+
+<div class="section">
+
+<p>
+
+<strong>Participante:</strong>
+
+{% if registro.participante %}
+
+{{ registro.participante.user.first_name }}
+{{ registro.participante.user.last_name }}
+
+{% else %}
+
+{{ registro.nombre_manual }}
+{{ registro.apellido_manual }}
+
+{% endif %}
+
+</p>
+
+<p>
+
+<strong>Sacramento:</strong>
+
+{{ registro.sacramento.nombre }}
+
+</p>
+
+<p>
+
+<strong>Fecha:</strong>
+
+{{ registro.fecha_sacramento }}
+
+</p>
+
+<p>
+
+<strong>Parroquia:</strong>
+
+{{ registro.lugar_sacramento }}
+
+</p>
+
+<p>
+
+<strong>Párroco:</strong>
+
+{{ registro.parroco }}
+
+</p>
+
+</div>
+
+</body>
+</html>

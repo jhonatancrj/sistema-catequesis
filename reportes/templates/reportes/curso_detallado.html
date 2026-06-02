@@ -1,0 +1,339 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Reporte Detallado - {{ datos.curso.nombre }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .curso-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+
+    .curso-header h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .stat-box {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+
+    .stat-box h3 {
+        font-size: 2rem;
+        margin: 0;
+    }
+
+    .stat-box p {
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #1e40af;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .table-container table {
+        margin-bottom: 0;
+    }
+
+    .table-container thead {
+        background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+        color: white;
+    }
+
+    .table-container tbody tr:hover {
+        background-color: #f0f9ff;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-aprobado {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .status-reprobado {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .metric-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #f3f4f6;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    .progress-item {
+        margin-bottom: 15px;
+    }
+
+    .progress-item label {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .back-button {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Botón de retorno -->
+    <div class="back-button">
+        <a href="{% url 'reportes_cursos' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a Reportes de Cursos
+        </a>
+    </div>
+
+    <!-- Header del Curso -->
+    <div class="curso-header">
+        <h1>📚 {{ datos.curso.nombre }}</h1>
+        <p class="mb-0">{{ datos.curso.descripcion|truncatewords:20 }}</p>
+
+        <div class="row g-3 mt-3">
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <h3>{{ datos.estadisticas.total_participantes }}</h3>
+                    <p>Participantes Inscritos</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <h3>{{ datos.estadisticas.asistencia_promedio }}%</h3>
+                    <p>Asistencia Promedio</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <h3>{{ datos.estadisticas.entrega_tareas_promedio }}%</h3>
+                    <p>Entrega de Tareas</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <h3>{{ datos.clases|length }}</h3>
+                    <p>Clases Totales</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información General del Curso -->
+    <div class="section-title">📋 Información General</div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="info-card">
+                <h5>Detalles</h5>
+                <p><strong>Estado:</strong> <span class="badge bg-info">{{ datos.curso.estado }}</span></p>
+                <p><strong>Inicio:</strong> {{ datos.curso.fecha_inicio|date:"d/m/Y" }}</p>
+                <p><strong>Fin:</strong> {{ datos.curso.fecha_fin|date:"d/m/Y" }}</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="info-card">
+                <h5>Catequistas Asignados</h5>
+                {% if datos.catequistas %}
+                    <ul class="list-unstyled">
+                        {% for cat in datos.catequistas %}
+                            <li>
+                                <i class="bi bi-person-badge"></i>
+                                {{ cat.user__first_name }} {{ cat.user__last_name }}
+                                <small class="text-muted">({{ cat.user__email }})</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No hay catequistas asignados</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Participantes -->
+    <div class="section-title">👥 Desempeño de Participantes</div>
+    <div class="table-container">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Asistencia</th>
+                    <th>Tareas</th>
+                    <th>Cuestionarios</th>
+                    <th>Estado Final</th>
+                    <th>Promedio General</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for participante in datos.participantes %}
+                <tr>
+                    <td>
+                        <strong>{{ participante.nombre }}</strong>
+                    </td>
+                    <td>
+                        <small>{{ participante.email }}</small>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="progress" style="width: 70px; height: 6px;">
+                                <div class="progress-bar" style="width: {{ participante.asistencia.porcentaje }}%"></div>
+                            </div>
+                            <small>{{ participante.asistencia.presente }}/{{ participante.asistencia.total }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            {{ participante.tareas.entregadas }}
+                            <small class="d-block">{{ participante.tareas.promedio }}%</small>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            <i class="bi bi-pencil-square"></i>
+                            {% if participante.cuestionarios.promedio >= 70 %}
+                                <span style="color: #10b981;">{{ participante.cuestionarios.promedio }}</span>
+                            {% elif participante.cuestionarios.promedio >= 50 %}
+                                <span style="color: #f59e0b;">{{ participante.cuestionarios.promedio }}</span>
+                            {% else %}
+                                <span style="color: #ef4444;">{{ participante.cuestionarios.promedio }}</span>
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ participante.estado_final|lower }}">
+                            {{ participante.estado_final }}
+                        </span>
+                    </td>
+                    <td>
+                        <strong>{{ participante.promedio_general }}</strong>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox"></i> No hay participantes inscritos
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Clases del Curso -->
+    <div class="section-title">📅 Clases Impartidas</div>
+    <div class="table-container">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for clase in datos.clases %}
+                <tr>
+                    <td>
+                        <strong>{{ clase.titulo }}</strong>
+                    </td>
+                    <td>
+                        {{ clase.fecha|date:"d/m/Y" }}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Ver detalles">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox"></i> No hay clases registradas
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Estadísticas Resumidas -->
+    <div class="section-title">📊 Estadísticas Finales</div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="info-card">
+                <h5>Asistencia</h5>
+                <div class="progress-item">
+                    <label>Asistencia Promedio del Curso</label>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar bg-success" style="width: {{ datos.estadisticas.asistencia_promedio }}%">
+                            {{ datos.estadisticas.asistencia_promedio }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="info-card">
+                <h5>Entregas</h5>
+                <div class="progress-item">
+                    <label>Promedio Entregas de Tareas</label>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar bg-info" style="width: {{ datos.estadisticas.entrega_tareas_promedio }}%">
+                            {{ datos.estadisticas.entrega_tareas_promedio }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Activar tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+</script>
+{% endblock %}

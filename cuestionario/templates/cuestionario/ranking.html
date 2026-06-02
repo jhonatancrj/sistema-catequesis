@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+/* PAGE */
+.ranking-page {
+    background: #0f172a;
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+}
+
+/* TITULO */
+.ranking-page h2 {
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+/* CARD GENERAL */
+.ranking-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+/* ITEM RANKING */
+.ranking-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    transition: 0.3s;
+}
+
+.ranking-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+/* POSICIÓN */
+.posicion {
+    font-weight: bold;
+    color: #facc15;
+    min-width: 40px;
+}
+
+/* USERNAME */
+.usuario {
+    flex: 1;
+    color: #ffffff;
+}
+
+/* PUNTAJE */
+.puntaje {
+    font-weight: bold;
+    color: #38bdf8;
+}
+
+/* PODIO */
+.top-1 .posicion {
+    color: #22c55e;
+}
+
+.top-2 .posicion {
+    color: #3b82f6;
+}
+
+.top-3 .posicion {
+    color: #f97316;
+}
+
+</style>
+
+<div class="ranking-page">
+
+<div class="container">
+
+<h2>🏆 Ranking de Estudiantes</h2>
+
+<div class="ranking-card">
+
+{% for r in ranking %}
+    <div class="ranking-item {% if forloop.counter == 1 %}top-1{% elif forloop.counter == 2 %}top-2{% elif forloop.counter == 3 %}top-3{% endif %}">
+        
+        <div class="posicion">
+            #{{ forloop.counter }}
+        </div>
+
+        <div class="usuario">
+            {{ r.usuario.username }}
+        </div>
+
+        <div class="puntaje">
+            {{ r.puntaje }} pts
+        </div>
+
+    </div>
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+
+            Editar sacramento
+
+        </h2>
+
+    </div>
+
+    <div class="custom-table">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Nombre
+
+                </label>
+
+                <input type="text"
+                       name="nombre"
+                       class="form-control"
+                       value="{{ sacramento.nombre }}"
+                       required>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Descripción
+
+                </label>
+
+                <textarea name="descripcion"
+                          rows="5"
+                          class="form-control">{{ sacramento.descripcion }}</textarea>
+
+            </div>
+
+            <button class="btn btn-warning">
+
+                Actualizar
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

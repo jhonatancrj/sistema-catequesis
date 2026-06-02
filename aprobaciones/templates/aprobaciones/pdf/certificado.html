@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<style>
+
+body{
+
+    font-family: Arial, sans-serif;
+
+    text-align:center;
+
+    padding:50px;
+
+    border:15px solid #2563eb;
+}
+
+h1{
+
+    font-size:40px;
+
+    color:#2563eb;
+}
+
+.nombre{
+
+    font-size:35px;
+
+    margin:30px 0;
+
+    font-weight:bold;
+
+    color:#0f172a;
+}
+
+.texto{
+
+    font-size:20px;
+
+    line-height:1.8;
+}
+
+.footer{
+
+    margin-top:60px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>
+CERTIFICADO
+</h1>
+
+<p class="texto">
+Se otorga el presente certificado de reconocimiento a:
+</p>
+
+<div class="nombre">
+
+{{ aprobado.participante.user.first_name }}
+
+{{ aprobado.participante.user.last_name }}
+
+</div>
+
+<p class="texto">
+
+Por haber concluido satisfactoriamente el curso:
+
+<strong>
+{{ aprobado.curso.nombre }}
+</strong>
+
+correspondiente al sacramento de:
+
+<strong>
+{{ aprobado.sacramento }}
+</strong>
+
+durante la gestión:
+
+<strong>
+{{ aprobado.gestion }}
+</strong>
+
+</p>
+
+<div class="footer">
+
+<p>
+Parroquia Nuestra Señora del Rosario
+</p>
+
+<p>
+{{ fecha }}
+</p>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+
+            Detalle del Intento
+
+        </h2>
+
+        <p>
+
+            {{ intento.usuario.username }}
+
+        </p>
+
+    </div>
+
+    {% for respuesta in respuestas %}
+
+    <div class="custom-table mb-4">
+
+        <h5>
+
+            {{ respuesta.pregunta.enunciado }}
+
+        </h5>
+
+        <hr>
+
+        {% if respuesta.opcion %}
+
+            <p>
+
+                <strong>Respuesta:</strong>
+
+                {{ respuesta.opcion.texto }}
+
+            </p>
+
+        {% else %}
+
+            <p>
+
+                <strong>Respuesta:</strong>
+
+                {{ respuesta.texto }}
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

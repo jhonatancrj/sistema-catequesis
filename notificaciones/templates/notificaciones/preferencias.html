@@ -1,0 +1,249 @@
+{% extends "base_admin.html" %}
+{% load static %}
+
+{% block title %}Preferencias de Notificaciones{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">
+        <i class="bi bi-gear"></i> Preferencias de Notificaciones
+    </h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <form id="formPreferencias" method="POST">
+                {% csrf_token %}
+
+                <!-- Tipos de Notificaciones -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-bell"></i> Tipos de Notificaciones</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="cursos_nuevos"
+                                name="cursos_nuevos" {% if preferencias.cursos_nuevos %}checked{% endif %}>
+                            <label class="form-check-label" for="cursos_nuevos">
+                                <strong>Nuevos Cursos</strong>
+                                <small class="text-muted d-block">Recibir notificación cuando se cree un nuevo curso</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="calificaciones_cambios"
+                                name="calificaciones_cambios" {% if preferencias.calificaciones_cambios %}checked{% endif %}>
+                            <label class="form-check-label" for="calificaciones_cambios">
+                                <strong>Cambios en Calificaciones</strong>
+                                <small class="text-muted d-block">Recibir notificación cuando cambien tus calificaciones o estado de aprobación</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="tareas_recordatorios"
+                                name="tareas_recordatorios" {% if preferencias.tareas_recordatorios %}checked{% endif %}>
+                            <label class="form-check-label" for="tareas_recordatorios">
+                                <strong>Recordatorios de Tareas</strong>
+                                <small class="text-muted d-block">Recibir notificación sobre nuevas tareas y recordatorios de entregas</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="cuestionarios_eventos"
+                                name="cuestionarios_eventos" {% if preferencias.cuestionarios_eventos %}checked{% endif %}>
+                            <label class="form-check-label" for="cuestionarios_eventos">
+                                <strong>Eventos de Cuestionarios</strong>
+                                <small class="text-muted d-block">Recibir notificación cuando hay cuestionarios disponibles o se cierran</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="clases_programadas"
+                                name="clases_programadas" {% if preferencias.clases_programadas %}checked{% endif %}>
+                            <label class="form-check-label" for="clases_programadas">
+                                <strong>Clases Programadas</strong>
+                                <small class="text-muted d-block">Recibir notificación sobre nuevas clases programadas</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="mensajes_recibidos"
+                                name="mensajes_recibidos" {% if preferencias.mensajes_recibidos %}checked{% endif %}>
+                            <label class="form-check-label" for="mensajes_recibidos">
+                                <strong>Mensajes Recibidos</strong>
+                                <small class="text-muted d-block">Recibir notificación cuando recibes mensajes de otros usuarios</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canales de Notificación -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-send"></i> Canales de Envío</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="email_habilitado"
+                                name="email_habilitado" {% if preferencias.email_habilitado %}checked{% endif %}>
+                            <label class="form-check-label" for="email_habilitado">
+                                <strong>Email ({{ request.user.email }})</strong>
+                                <small class="text-muted d-block">Recibir notificaciones por correo electrónico</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="whatsapp_habilitado"
+                                name="whatsapp_habilitado" {% if preferencias.whatsapp_habilitado %}checked{% endif %}
+                                onchange="toggleWhatsAppInput()">
+                            <label class="form-check-label" for="whatsapp_habilitado">
+                                <strong>WhatsApp</strong>
+                                <small class="text-muted d-block">Recibir notificaciones por WhatsApp</small>
+                            </label>
+                        </div>
+
+                        <div class="ms-4 mb-3" id="whatsappInput" {% if not preferencias.whatsapp_habilitado %}style="display: none;"{% endif %}>
+                            <label for="numero_whatsapp" class="form-label">Número WhatsApp</label>
+                            <input type="text" class="form-control" id="numero_whatsapp" name="numero_whatsapp"
+                                placeholder="+506 XXXX XXXX" value="{{ preferencias.numero_whatsapp }}">
+                            <small class="text-muted">Formato: +506 XXXX XXXX</small>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="sms_habilitado"
+                                name="sms_habilitado" {% if preferencias.sms_habilitado %}checked{% endif %}
+                                onchange="toggleSMSInput()">
+                            <label class="form-check-label" for="sms_habilitado">
+                                <strong>SMS</strong>
+                                <small class="text-muted d-block">Recibir notificaciones por SMS</small>
+                            </label>
+                        </div>
+
+                        <div class="ms-4" id="smsInput" {% if not preferencias.sms_habilitado %}style="display: none;"{% endif %}>
+                            <label for="numero_sms" class="form-label">Número Teléfono</label>
+                            <input type="text" class="form-control" id="numero_sms" name="numero_sms"
+                                placeholder="+506 XXXX XXXX" value="{{ preferencias.numero_sms }}">
+                            <small class="text-muted">Formato: +506 XXXX XXXX</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuración Avanzada -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-sliders"></i> Configuración Avanzada</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="resumen_diario"
+                                name="resumen_diario" {% if preferencias.resumen_diario %}checked{% endif %}
+                                onchange="toggleHoraResumen()">
+                            <label class="form-check-label" for="resumen_diario">
+                                <strong>Resumen Diario</strong>
+                                <small class="text-muted d-block">Recibir un resumen de notificaciones al día en lugar de notificaciones individuales</small>
+                            </label>
+                        </div>
+
+                        <div class="ms-4" id="horaResumen" {% if not preferencias.resumen_diario %}style="display: none;"{% endif %}>
+                            <label for="hora_resumen" class="form-label">Hora para recibir el resumen</label>
+                            <input type="time" class="form-control" id="hora_resumen" name="hora_resumen"
+                                value="{{ preferencias.hora_resumen }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check"></i> Guardar Preferencias
+                    </button>
+                    <a href="{% url 'notificaciones:lista' %}" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Información -->
+        <div class="col-lg-4">
+            <div class="card bg-light">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Información</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-3">Notificaciones En La Aplicación</h6>
+                    <p class="small">Las notificaciones dentro de la aplicación siempre estarán disponibles y se mostrarán en tu campana de notificaciones.</p>
+
+                    <h6 class="mb-3 mt-3">Email</h6>
+                    <p class="small">Se enviarán a tu dirección de email: <strong>{{ request.user.email }}</strong></p>
+
+                    <h6 class="mb-3 mt-3">WhatsApp y SMS</h6>
+                    <p class="small">Requiere que verifiques tu número telefónico. Se te enviarán mensajes breves con la información más importante.</p>
+
+                    <h6 class="mb-3 mt-3">Resumen Diario</h6>
+                    <p class="small">Si activas esta opción, recibirás un solo mensaje al día con todas tus notificaciones, en lugar de recibirlas individualmente.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleWhatsAppInput() {
+    const input = document.getElementById('whatsappInput');
+    document.getElementById('whatsapp_habilitado').checked 
+        ? input.style.display = 'block' 
+        : input.style.display = 'none';
+}
+
+function toggleSMSInput() {
+    const input = document.getElementById('smsInput');
+    document.getElementById('sms_habilitado').checked 
+        ? input.style.display = 'block' 
+        : input.style.display = 'none';
+}
+
+function toggleHoraResumen() {
+    const input = document.getElementById('horaResumen');
+    document.getElementById('resumen_diario').checked 
+        ? input.style.display = 'block' 
+        : input.style.display = 'none';
+}
+
+document.getElementById('formPreferencias').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('{% url "notificaciones:preferencias" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.mensaje);
+            location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

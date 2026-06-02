@@ -1,0 +1,573 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Dashboard de Reportes{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<style>
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card.blue {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .stat-card.green {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .stat-card.red {
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    }
+
+    .stat-card.yellow {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        color: #333;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        opacity: 0.7;
+        text-align: right;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 30px;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .btn-export {
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .export-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .metric-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #1e40af;
+    }
+
+    .quick-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .quick-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px;
+        background: white;
+        border-left: 4px solid #1e40af;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #333;
+    }
+
+    .quick-link:hover {
+        background: #f0f9ff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        color: #1e40af;
+    }
+
+    .quick-link-icon {
+        font-size: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .metric-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .export-buttons {
+            width: 100%;
+        }
+        
+        .export-buttons .btn {
+            flex: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header con botones de exportación -->
+    <div class="dashboard-header">
+        <div>
+            <h1 class="h3 mb-0">📊 Dashboard de Reportes</h1>
+            <p class="text-muted">Resumen general del sistema</p>
+        </div>
+        <div class="export-buttons">
+            <a href="{% url 'pdf_dashboard' %}" class="btn btn-danger btn-sm">
+                <i class="bi bi-file-pdf"></i> Descargar PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- Enlaces rápidos a otros reportes -->
+    <div class="section-title">Acceso Rápido a Reportes</div>
+    <div class="quick-links">
+        <a href="{% url 'reportes_cursos' %}" class="quick-link">
+            <div>
+                <strong>Cursos</strong>
+                <small class="d-block text-muted">{{ datos.total_cursos }} cursos</small>
+            </div>
+            <i class="bi bi-book quick-link-icon" style="color: #3b82f6;"></i>
+        </a>
+        <a href="{% url 'reportes_participantes' %}" class="quick-link">
+            <div>
+                <strong>Participantes</strong>
+                <small class="d-block text-muted">{{ datos.total_participantes }} participantes</small>
+            </div>
+            <i class="bi bi-people quick-link-icon" style="color: #10b981;"></i>
+        </a>
+        <a href="{% url 'reportes_catequistas' %}" class="quick-link">
+            <div>
+                <strong>Catequistas</strong>
+                <small class="d-block text-muted">{{ datos.total_catequistas }} catequistas</small>
+            </div>
+            <i class="bi bi-person-badge quick-link-icon" style="color: #f59e0b;"></i>
+        </a>
+        <a href="{% url 'reportes_aprobaciones' %}" class="quick-link">
+            <div>
+                <strong>Aprobaciones</strong>
+                <small class="d-block text-muted">{{ datos.total_aprobaciones }} aprobados</small>
+            </div>
+            <i class="bi bi-check-circle quick-link-icon" style="color: #8b5cf6;"></i>
+        </a>
+    </div>
+
+    <!-- Estadísticas Generales -->
+    <div class="section-title">Estadísticas Generales</div>
+    <div class="metric-row">
+        <div class="stat-card blue">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Total de Cursos</div>
+                    <div class="stat-number">{{ datos.total_cursos }}</div>
+                    <small>{{ datos.total_cursos_activos }} activos</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-book"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card green">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Participantes</div>
+                    <div class="stat-number">{{ datos.total_participantes }}</div>
+                    <small>Inscritos: {{ datos.total_inscripciones }}</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card red">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Catequistas</div>
+                    <div class="stat-number">{{ datos.total_catequistas }}</div>
+                    <small>Activos</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card yellow">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Total Clases</div>
+                    <div class="stat-number">{{ datos.total_clases }}</div>
+                    <small>Dictadas</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asistencia -->
+    <div class="section-title">Asistencia General</div>
+    <div class="metric-row">
+        <div class="stat-card blue">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Presente</div>
+                    <div class="stat-number">{{ datos.asistencia.presente }}</div>
+                    <small>{{ datos.asistencia.porcentaje }}% del total</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card red">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Ausente</div>
+                    <div class="stat-number">{{ datos.asistencia.ausente }}</div>
+                    <small>Sin justificación</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card yellow">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Permisos</div>
+                    <div class="stat-number">{{ datos.asistencia.permiso }}</div>
+                    <small>Justificados</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-exclamation-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desempeño -->
+    <div class="section-title">Desempeño Académico</div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <div class="chart-title">Resultado Final de Participantes</div>
+                <canvas id="chartResultados"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <div class="chart-title">Estado de Entregas de Tareas</div>
+                <canvas id="chartTareas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entregas de Tareas -->
+    <div class="section-title">Entregas de Tareas</div>
+    <div class="metric-row">
+        <div class="stat-card blue">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Total de Tareas</div>
+                    <div class="stat-number">{{ datos.tareas.total }}</div>
+                    <small>Asignadas</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-file-text"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card green">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Entregadas</div>
+                    <div class="stat-number">{{ datos.tareas.entregadas }}</div>
+                    <small>{{ datos.tareas.porcentaje_entrega }}%</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-check"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card red">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Pendientes</div>
+                    <div class="stat-number">{{ datos.tareas.pendientes }}</div>
+                    <small>Sin entregar</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-hourglass"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cuestionarios -->
+    <div class="section-title">Evaluaciones (Cuestionarios)</div>
+    <div class="metric-row">
+        <div class="stat-card blue">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Total Cuestionarios</div>
+                    <div class="stat-number">{{ datos.total_cuestionarios }}</div>
+                    <small>Creados</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-clipboard-check"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card green">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Total Intentos</div>
+                    <div class="stat-number">{{ datos.cuestionarios.total_intentos }}</div>
+                    <small>Realizados</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-pencil-square"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card yellow">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Promedio Puntaje</div>
+                    <div class="stat-number">{{ datos.cuestionarios.promedio_puntaje }}</div>
+                    <small>De 100 puntos</small>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen de Aprobaciones -->
+    <div class="section-title">Resumen de Aprobaciones</div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <div class="chart-title">Distribución de Aprobaciones vs Reprobaciones</div>
+                <canvas id="chartAsistencia"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="stat-card blue" style="margin-bottom: 0;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Aprobados</div>
+                        <div class="stat-number">{{ datos.resultados.aprobados }}</div>
+                        <small>{{ datos.resultados.porcentaje_aprobacion }}%</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card red" style="margin-top: 10px; margin-bottom: 0;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Reprobados</div>
+                        <div class="stat-number">{{ datos.resultados.reprobados }}</div>
+                        <small>{{ 100|add:datos.resultados.porcentaje_aprobacion|add:'-100'|stringformat:'.0f' }}%</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="bi bi-x-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie de página -->
+    <div class="mt-5 pt-4 border-top text-center text-muted">
+        <small>
+            <i class="bi bi-clock"></i> Generado: <span id="fecha-generacion"></span>
+        </small>
+    </div>
+
+</div>
+
+<script>
+    // Configuración de colores
+    const colors = {
+        primary: '#1e40af',
+        success: '#059669',
+        danger: '#dc2626',
+        warning: '#ea580c',
+        info: '#0891b2'
+    };
+
+    // Función para cargar datos de gráficas
+    async function cargarDatos() {
+        try {
+            const response = await fetch('{% url "api_graficas_dashboard" %}');
+            const datos = await response.json();
+            crearGraficas(datos);
+        } catch (error) {
+            console.error('Error al cargar datos:', error);
+        }
+    }
+
+    function crearGraficas(datos) {
+        // Gráfica de Asistencia (Pastel)
+        const ctxAsistencia = document.getElementById('chartAsistencia').getContext('2d');
+        new Chart(ctxAsistencia, {
+            type: 'doughnut',
+            data: {
+                labels: datos.asistencia.labels,
+                datasets: [{
+                    data: datos.asistencia.data,
+                    backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+                    borderColor: ['#059669', '#dc2626', '#d97706'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfica de Resultados (Pastel)
+        const ctxResultados = document.getElementById('chartResultados').getContext('2d');
+        new Chart(ctxResultados, {
+            type: 'doughnut',
+            data: {
+                labels: datos.resultados.labels,
+                datasets: [{
+                    data: datos.resultados.data,
+                    backgroundColor: ['#8b5cf6', '#ef4444'],
+                    borderColor: ['#7c3aed', '#dc2626'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfica de Tareas (Pastel)
+        const ctxTareas = document.getElementById('chartTareas').getContext('2d');
+        new Chart(ctxTareas, {
+            type: 'doughnut',
+            data: {
+                labels: datos.tareas.labels,
+                datasets: [{
+                    data: datos.tareas.data,
+                    backgroundColor: ['#3b82f6', '#f59e0b'],
+                    borderColor: ['#1e40af', '#d97706'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Fecha de generación
+    document.getElementById('fecha-generacion').textContent = new Date().toLocaleString('es-ES');
+
+    // Cargar datos al iniciar
+    cargarDatos();
+</script>
+{% endblock %}

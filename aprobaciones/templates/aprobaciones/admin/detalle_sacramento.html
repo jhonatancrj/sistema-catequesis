@@ -1,0 +1,173 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+
+            {{ sacramento }}
+
+        </h2>
+
+        <p>
+
+            Historial sacramental
+
+        </p>
+
+    </div>
+
+    <!-- FILTROS -->
+
+    <div class="custom-table mb-4">
+
+        <form method="GET">
+
+            <div class="row">
+
+                <div class="col-md-5">
+
+                    <input type="text"
+                           name="buscar"
+                           class="form-control"
+                           placeholder="Buscar participante">
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <select name="gestion"
+                            class="form-select">
+
+                        <option value="">
+
+                            Todas las gestiones
+
+                        </option>
+
+                        {% for g in gestiones %}
+
+                        <option value="{{ g }}">
+
+                            {{ g }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <button class="btn btn-primary w-100">
+
+                        Filtrar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- TABLA -->
+
+    <div class="custom-table">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Participante</th>
+                        <th>Curso</th>
+                        <th>Gestión</th>
+                        <th>Tareas</th>
+                        <th>Cuestionarios</th>
+                        <th>Faltas</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for a in aprobados %}
+
+                    <tr>
+
+                        <td>
+
+                            {{ a.participante.user.first_name }}
+                            {{ a.participante.user.last_name }}
+
+                        </td>
+
+                        <td>
+
+                            {{ a.curso.nombre }}
+
+                        </td>
+
+                        <td>
+
+                            {{ a.gestion }}
+
+                        </td>
+
+                        <td>
+
+                            {{ a.promedio_tareas }}
+
+                        </td>
+
+                        <td>
+
+                            {{ a.promedio_cuestionarios }}
+
+                        </td>
+
+                        <td>
+
+                            {{ a.faltas }}
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="6">
+
+                            No existen registros
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

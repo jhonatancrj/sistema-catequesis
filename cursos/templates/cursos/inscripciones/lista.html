@@ -1,0 +1,317 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Inscripciones
+{% endblock %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="dashboard-header">
+
+    <div>
+
+        <h2>
+            Inscripciones
+        </h2>
+
+        <p>
+            Gestión completa de Inscripciones del sistema.
+        </p>
+
+    </div>
+
+    <div>
+
+        <a href="{% url 'crear_inscripcion' %}"
+            class="btn btn-primary">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Hacer Inscripcion
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- TABLE CARD -->
+<div class="table-card">
+
+    <!-- TOP -->
+    <div class="table-top">
+
+        <div class="table-search">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                placeholder="Buscar administrador..."
+            >
+
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+
+        <table class="table admin-table align-middle">
+
+            <thead>
+
+            <tr>
+
+                <th>Participante</th>
+                <th>Curso</th>
+                <th>Estado</th>
+                <th>Fecha Inscripción</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for inscripcion in inscripciones %}
+
+            <tr>
+
+                <!-- PARTICIPANTE -->
+                <td>
+
+                    <div class="user-info">
+
+                        <img src="https://ui-avatars.com/api/?name={{ inscripcion.participante.user.username }}">
+
+                        <div>
+
+                            <h6>
+
+                                {{ inscripcion.participante.user.first_name }}
+                                {{ inscripcion.participante.user.last_name }}
+
+                            </h6>
+
+                            <p>
+
+                                {{ inscripcion.participante.user.username }}
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </td>
+
+                <!-- CURSO -->
+                <td>
+
+                    {{ inscripcion.curso.nombre }}
+
+                </td>
+
+                <!-- ESTADO -->
+                <td>
+
+                    {% if inscripcion.estado == 'INSCRITO' %}
+
+                        <span class="table-badge active-badge">
+
+                            Inscrito
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="table-badge inactive-badge">
+
+                            Cancelado
+
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <!-- FECHA -->
+                <td>
+
+                    {{ inscripcion.fecha_inscripcion }}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+<!-- MODAL -->
+<div class="modal fade"
+     id="adminModal"
+     tabindex="-1">
+
+    <div class="modal-dialog modal-xl">
+
+        <div class="modal-content custom-modal">
+
+            <!-- HEADER -->
+            <div class="modal-header border-0">
+
+                <h4>
+                    Nuevo Curso
+                </h4>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body">
+
+                <!-- SEARCH -->
+                <div class="table-search mb-4">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           id="searchAdmin"
+                           placeholder="Buscar usuario...">
+
+                </div>
+
+                <!-- USERS -->
+                <div class="table-responsive">
+
+                    <table class="table admin-table align-middle">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Usuario</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Rol Actual</th>
+                                <th>Acción</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="adminTableBody">
+
+                            {% for perfil in administradores %}
+
+                            {% endfor %}
+
+                            {% for perfil in perfiles %}
+
+                            {% if perfil.rol != 'ADMIN' %}
+
+                            <tr class="search-row">
+
+                                <!-- USER -->
+                                <td>
+
+                                    <div class="user-info">
+
+                                        <img src="https://ui-avatars.com/api/?name={{ perfil.user.username }}">
+
+                                        <div>
+
+                                            <h6>
+                                                {{ perfil.user.username }}
+                                            </h6>
+
+                                            <p>
+                                                ID: {{ perfil.id }}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <!-- NAME -->
+                                <td>
+
+                                    {{ perfil.user.first_name }}
+                                    {{ perfil.user.last_name }}
+
+                                </td>
+
+                                <!-- EMAIL -->
+                                <td>
+
+                                    {{ perfil.user.email }}
+
+                                </td>
+
+                                <!-- ROLE -->
+                                <td>
+
+                                    <span class="table-badge inactive-badge">
+
+                                        {{ perfil.get_rol_display }}
+
+                                    </span>
+
+                                </td>
+
+                                <!-- ACTION -->
+                                <td>
+
+                                    <form method="POST"
+                                          action="{% url 'crear_administrador' %}">
+
+                                        {% csrf_token %}
+
+                                        <input type="hidden"
+                                               name="perfil_id"
+                                               value="{{ perfil.id }}">
+
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm">
+
+                                            Convertir en Admin
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                            {% endif %}
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

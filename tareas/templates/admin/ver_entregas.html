@@ -1,0 +1,188 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <!-- PAGE -->
+    <div class="page-title">
+
+        <h2>
+            Entregas de Tarea
+        </h2>
+
+        <p>
+
+            {{ tarea.titulo }}
+
+        </p>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="custom-table">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                <tr>
+
+                    <th>Estudiante</th>
+                    <th>Archivo</th>
+                    <th>Fecha</th>
+                    <th>Calificación</th>
+                    <th>Acciones</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for entrega in entregas %}
+
+                <tr>
+
+                    <!-- USER -->
+                    <td>
+
+                        <div class="user-info">
+
+                            <img src="https://ui-avatars.com/api/?name={{ entrega.estudiante.username }}">
+
+                            <div>
+
+                                <h6>
+
+                                    {{ entrega.estudiante.first_name }}
+                                    {{ entrega.estudiante.last_name }}
+
+                                </h6>
+
+                                <p>
+
+                                    {{ entrega.estudiante.username }}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                    <!-- ARCHIVOS -->
+                    <td>
+
+                        <!-- ARCHIVO PRINCIPAL -->
+                        {% if entrega.archivo_url %}
+
+                            <div class="mb-2">
+
+                                <a href="{{ entrega.archivo_url }}"
+                                target="_blank"
+                                class="btn btn-sm btn-primary">
+
+                                    <i class="bi bi-file-earmark"></i>
+
+                                    {{ entrega.archivo_nombre|default:"Archivo Principal" }}
+
+                                </a>
+
+                            </div>
+
+                        {% endif %}
+
+                        <!-- MULTIPLES ARCHIVOS -->
+                        {% for archivo in entrega.archivos.all %}
+
+                            <div class="mb-2">
+
+                                <a href="{{ archivo.archivo_url }}"
+                                target="_blank"
+                                class="btn btn-sm btn-light">
+
+                                    <i class="bi bi-paperclip"></i>
+
+                                    {{ archivo.nombre }}
+
+                                </a>
+
+                            </div>
+
+                        {% empty %}
+
+                            {% if not entrega.archivo_url %}
+
+                                <span class="text-muted">
+
+                                    Sin archivos
+
+                                </span>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </td>
+
+                    <!-- FECHA -->
+                    <td>
+
+                        {{ entrega.fecha_entrega }}
+
+                    </td>
+
+                    <!-- CALIFICACION -->
+                    <td>
+
+                        {% if entrega.calificacion %}
+
+                            <span class="table-badge active-badge">
+
+                                {{ entrega.calificacion }}
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="table-badge pending-badge">
+
+                                Pendiente
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <!-- ACTIONS -->
+                    <td>
+
+                        <a href="{% url 'calificar_entrega' entrega.id %}"
+                           class="btn btn-primary btn-sm">
+
+                            Calificar
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,16 @@
+<h2>{{ cuestionario.titulo }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% for pregunta in preguntas %}
+        <p>{{ pregunta.enunciado }}</p>
+
+        {% for opcion in pregunta.opcion_set.all %}
+            <input type="radio" name="{{ pregunta.id }}" value="{{ opcion.id }}">
+            {{ opcion.texto }}<br>
+        {% endfor %}
+    {% endfor %}
+
+    <button type="submit">Enviar</button>
+</form>

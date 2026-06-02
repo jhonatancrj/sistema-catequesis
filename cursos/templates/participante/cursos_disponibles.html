@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Cursos{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* CONTENEDOR GENERAL */
+.cursos-page {
+    background: #0f172a;
+    padding: 40px 20px;
+    min-height: calc(100vh - 90px);
+}
+
+/* TITULO */
+.cursos-page h2 {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* GRID */
+.tarjetas-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: center;
+}
+
+/* TARJETA */
+.tarjeta-curso {
+    width: 260px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    transition: 0.3s;
+}
+
+.tarjeta-curso:hover {
+    transform: translateY(-8px) scale(1.03);
+}
+
+/* IMAGEN */
+.tarjeta-curso img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+/* CONTENIDO */
+.tarjeta-contenido {
+    padding: 15px;
+    color: #e2e8f0;
+}
+
+.tarjeta-contenido strong {
+    display: block;
+    font-size: 17px;
+    margin-bottom: 6px;
+    color: #fff;
+}
+
+/* BOTON */
+.btn-inscribirse {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 7px 14px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-inscribirse:hover {
+    transform: scale(1.05);
+}
+
+/* MENSAJE VACIO */
+.sin-cursos {
+    color: #94a3b8;
+    text-align: center;
+}
+
+/* ===== MODAL MODERNO ===== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15,23,42,0.85);
+    backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-box {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(14px);
+    padding: 25px;
+    border-radius: 16px;
+    width: 320px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    animation: aparecer 0.3s ease;
+    color: #fff;
+}
+
+@keyframes aparecer {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-box button {
+    margin: 10px 5px 0 5px;
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-confirmar {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+}
+
+.btn-cancelar {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="cursos-page">
+
+```
+<h2>Cursos Disponibles</h2>
+
+<div class="tarjetas-container">
+{% for curso in cursos %}
+    <div class="tarjeta-curso">
+        {% if curso.imagen %}
+            <img src="{{ curso.imagen.url }}" alt="{{ curso.nombre }}">
+        {% endif %}
+        <div class="tarjeta-contenido">
+            <strong>{{ curso.nombre }}</strong>
+            <small>{{ curso.descripcion|truncatewords:15 }}</small><br>
+            <small><b>Límite:</b> {{ curso.fecha_limite_inscripcion }}</small><br>
+
+            <button class="btn-inscribirse"
+                    onclick="abrirModal('{% url 'inscribirse_curso' curso.id %}', '{{ curso.nombre }}')">
+                Inscribirse
+            </button>
+        </div>
+    </div>
+{% empty %}
+    <p class="sin-cursos">No hay cursos disponibles.</p>
+{% endfor %}
+</div>
+```
+
+</div>
+
+<!-- MODAL -->
+
+<div class="modal-overlay" id="modalConfirmacion">
+    <div class="modal-box">
+        <p id="textoModal"></p>
+
+```
+    <form id="formInscripcion" method="get">
+        <button type="submit" class="btn-confirmar">Aceptar</button>
+        <button type="button" class="btn-cancelar" onclick="cerrarModal()">Rechazar</button>
+    </form>
+</div>
+```
+
+</div>
+
+<script>
+function abrirModal(url, nombre) {
+    document.getElementById("modalConfirmacion").style.display = "flex";
+    document.getElementById("textoModal").innerText =
+        "¿Seguro que deseas inscribirte al curso " + nombre + "?";
+
+    document.getElementById("formInscripcion").action = url;
+}
+
+function cerrarModal() {
+    document.getElementById("modalConfirmacion").style.display = "none";
+}
+</script>
+
+{% endblock %}

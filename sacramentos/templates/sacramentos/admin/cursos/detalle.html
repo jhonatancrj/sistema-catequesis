@@ -1,0 +1,169 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+
+            {{ curso.nombre }}
+
+        </h2>
+
+        <p>
+
+            Gestión sacramental del curso
+
+        </p>
+
+    </div>
+
+    <div class="custom-table">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Participante</th>
+
+                        <th>Prom. tareas</th>
+
+                        <th>Prom. cuestionarios</th>
+
+                        <th>Faltas</th>
+
+                        <th>Estado</th>
+
+                        <th>Sacramento</th>
+
+                        <th>Acciones</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for r in resultados %}
+
+                    <tr>
+
+                        <td>
+
+                            {{ r.participante.user.first_name }}
+                            {{ r.participante.user.last_name }}
+
+                        </td>
+
+                        <td>
+
+                            {{ r.promedio_tareas }}
+
+                        </td>
+
+                        <td>
+
+                            {{ r.promedio_cuestionarios }}
+
+                        </td>
+
+                        <td>
+
+                            {{ r.faltas }}
+
+                        </td>
+
+                        <td>
+
+                            {% if r.estado_final == 'APROBADO' %}
+
+                                <span class="badge bg-success">
+
+                                    APROBADO
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-danger">
+
+                                    REPROBADO
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {{ r.sacramento }}
+
+                        </td>
+
+                        <td>
+
+                            {% if r.estado_final == 'APROBADO' %}
+
+                                {% if r.ya_registrado %}
+
+                                    <span class="badge bg-primary">
+
+                                        REGISTRADO
+
+                                    </span>
+
+                                {% else %}
+
+                                    <a href="{% url 'registrar_sacramento' r.id %}"
+                                       class="btn btn-success btn-sm">
+
+                                        <i class="bi bi-plus-circle"></i>
+
+                                        Registrar
+
+                                    </a>
+
+                                {% endif %}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="7" class="text-center">
+
+                            No existen resultados registrados
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

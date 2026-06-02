@@ -1,0 +1,440 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load usuarios_tags %}
+
+{% block title %}Editar Mi Perfil{% endblock %}
+
+{% block content %}
+<style>
+    .perfil-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .perfil-header {
+        text-align: center;
+        margin-bottom: 40px;
+        color: white;
+    }
+
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: bold;
+        color: white;
+        margin: 0 auto 20px;
+        border: 3px solid white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .perfil-header h1 {
+        margin: 0;
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .perfil-header p {
+        margin: 5px 0;
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .form-section h3 {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+        color: #333;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .form-row.full {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group input[type="date"] {
+        cursor: pointer;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .btn-guardar {
+        flex: 1;
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-guardar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-cancelar {
+        flex: 1;
+        padding: 12px 30px;
+        background: #f0f0f0;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-cancelar:hover {
+        background: #e8e8e8;
+    }
+
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0 10px 0;
+    }
+
+    .errorlist li {
+        background: #fee;
+        color: #c33;
+        padding: 8px 10px;
+        border-radius: 3px;
+        font-size: 13px;
+        margin-bottom: 5px;
+        border-left: 3px solid #c33;
+    }
+
+    .messages {
+        margin-bottom: 20px;
+    }
+
+    .alert {
+        padding: 12px 15px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    @media (max-width: 768px) {
+        .perfil-container {
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .form-container {
+            padding: 20px;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            font-size: 32px;
+        }
+    }
+</style>
+
+<div class="perfil-container">
+    <div class="perfil-header">
+        <div class="avatar-circle">
+            {% with iniciales=perfil.user.first_name|slice:":1"|add:perfil.user.last_name|slice:":1"|upper %}
+                {% if perfil.user.first_name and perfil.user.last_name %}
+                    {{ perfil.user.first_name|slice:":1"|upper }}{{ perfil.user.last_name|slice:":1"|upper }}
+                {% elif perfil.user.first_name %}
+                    {{ perfil.user.first_name|slice:":1"|upper }}
+                {% elif perfil.user.last_name %}
+                    {{ perfil.user.last_name|slice:":1"|upper }}
+                {% else %}
+                    {{ perfil.user.username|slice:":1"|upper }}
+                {% endif %}
+            {% endwith %}
+        </div>
+        <h1>Editar Mi Perfil</h1>
+        <p><strong>Usuario:</strong> {{ perfil.user.username }}</p>
+        <p><strong>Rol:</strong> 
+            {% if perfil.rol == 'ADMIN' %}
+                👑 Administrador
+            {% elif perfil.rol == 'CATEQUISTA' %}
+                👨‍🏫 Catequista
+            {% else %}
+                👤 Participante
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="form-container">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <!-- INFORMACIÓN PERSONAL -->
+            <div class="form-section">
+                <h3>📋 Información Personal</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.first_name.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.last_name.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.email.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.fecha_nacimiento.id_for_label }}">{{ form.fecha_nacimiento.label }}</label>
+                        {{ form.fecha_nacimiento }}
+                        {% if form.fecha_nacimiento.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.fecha_nacimiento.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.genero.id_for_label }}">{{ form.genero.label }}</label>
+                        {{ form.genero }}
+                        {% if form.genero.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.genero.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label for="{{ form.telefono.id_for_label }}">{{ form.telefono.label }}</label>
+                        {{ form.telefono }}
+                        {% if form.telefono.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.telefono.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- UBICACIÓN -->
+            <div class="form-section">
+                <h3>🌍 Ubicación</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.pais.id_for_label }}">{{ form.pais.label }}</label>
+                        {{ form.pais }}
+                        {% if form.pais.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.pais.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.departamento.id_for_label }}">{{ form.departamento.label }}</label>
+                        {{ form.departamento }}
+                        {% if form.departamento.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.departamento.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label for="{{ form.ciudad.id_for_label }}">{{ form.ciudad.label }}</label>
+                        {{ form.ciudad }}
+                        {% if form.ciudad.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.ciudad.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEGURIDAD -->
+            <div class="form-section">
+                <h3>🔒 Seguridad</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Deja en blanco si no deseas cambiar tu contraseña</p>
+                
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label for="{{ form.password_confirm.id_for_label }}">{{ form.password_confirm.label }}</label>
+                        {{ form.password_confirm }}
+                        {% if form.password_confirm.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password_confirm.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTONES -->
+            <div class="button-group">
+                <button type="submit" class="btn-guardar">💾 Guardar Cambios</button>
+                <a href="{% url 'home' %}" class="btn-cancelar">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

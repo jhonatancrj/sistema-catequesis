@@ -1,0 +1,189 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <!-- TITULO -->
+    <div class="page-title d-flex justify-content-between align-items-center">
+
+        <div>
+
+            <h2>
+                Tipos de sacramento
+            </h2>
+
+            <p>
+                Gestión de sacramentos parroquiales
+            </p>
+
+        </div>
+
+        <a href="{% url 'crear_sacramento_admin' %}"
+           class="btn btn-primary">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Nuevo sacramento
+
+        </a>
+
+    </div>
+
+    <!-- TABLA -->
+    <div class="custom-table">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>#</th>
+
+                        <th>Nombre</th>
+
+                        <th>Descripción</th>
+
+                        <th>Acciones</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for s in sacramentos %}
+
+                    <tr>
+
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td>
+                            {{ s.nombre }}
+                        </td>
+
+                        <td>
+                            {{ s.descripcion|default:"Sin descripción" }}
+                        </td>
+
+                        <td>
+
+                            <div class="d-flex gap-2">
+
+                                <!-- EDITAR -->
+                                <a href="{% url 'editar_sacramento_admin' s.id %}"
+                                   class="btn btn-warning btn-sm">
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+
+                                <!-- BOTON MODAL -->
+                                <button
+                                    type="button"
+                                    class="btn btn-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal{{ s.id }}">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </button>
+
+                            </div>
+
+                            <!-- MODAL -->
+                            <div class="modal fade"
+                                 id="deleteModal{{ s.id }}"
+                                 tabindex="-1"
+                                 aria-hidden="true">
+
+                                <div class="modal-dialog modal-dialog-centered">
+
+                                    <div class="modal-content custom-modal">
+
+                                        <div class="modal-body text-center p-4">
+
+                                            <div class="delete-icon mb-3">
+
+                                                <i class="bi bi-trash3"></i>
+
+                                            </div>
+
+                                            <h4 class="mb-3">
+                                                ¿Eliminar sacramento?
+                                            </h4>
+
+                                            <p class="text-muted mb-4">
+
+                                                El sacramento
+                                                <strong>
+                                                    {{ s.nombre }}
+                                                </strong>
+                                                será eliminado permanentemente.
+
+                                            </p>
+
+                                            <div class="d-flex justify-content-center gap-3">
+
+                                                <!-- CANCELAR -->
+                                                <button type="button"
+                                                        class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">
+
+                                                    Cancelar
+
+                                                </button>
+
+                                                <!-- ELIMINAR -->
+                                                <a href="{% url 'eliminar_sacramento_admin' s.id %}"
+                                                   class="btn btn-danger">
+
+                                                    Sí, eliminar
+
+                                                </a>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="4"
+                            class="text-center">
+
+                            No existen sacramentos registrados
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

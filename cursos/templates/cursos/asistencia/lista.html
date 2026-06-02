@@ -1,0 +1,279 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Asistencia
+{% endblock %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="dashboard-header">
+
+    <div>
+
+        <h2>
+            Asistencia
+        </h2>
+
+        <p>
+            Gestión completa de Asistencia del sistema.
+        </p>
+
+    </div>
+
+    
+
+</div>
+
+<!-- TABLE CARD -->
+<div class="table-card">
+
+    <!-- TOP -->
+    <div class="table-top">
+
+        <div class="table-search">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                placeholder="Buscar administrador..."
+            >
+
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+
+        <table class="table admin-table align-middle">
+
+            <thead>
+
+            <tr>
+
+                <th>Curso</th>
+                <th>Clase</th>
+                <th>Fecha</th>
+                <th>Horario</th>
+                <th>Asistencia</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for clase in clases %}
+
+            <tr>
+
+                <td>
+
+                    {{ clase.curso.nombre }}
+
+                </td>
+
+                <td>
+
+                    {{ clase.titulo }}
+
+                </td>
+
+                <td>
+
+                    {{ clase.fecha }}
+
+                </td>
+
+                <td>
+
+                    {{ clase.hora_inicio }}
+                    -
+                    {{ clase.hora_fin }}
+
+                </td>
+
+                <td>
+
+                    <a href="{% url 'tomar_asistencia_admin' clase.id %}"
+                    class="btn btn-primary btn-sm">
+
+                        Tomar Asistencia
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+<!-- MODAL -->
+<div class="modal fade"
+     id="adminModal"
+     tabindex="-1">
+
+    <div class="modal-dialog modal-xl">
+
+        <div class="modal-content custom-modal">
+
+            <!-- HEADER -->
+            <div class="modal-header border-0">
+
+                <h4>
+                    Nuevo Curso
+                </h4>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body">
+
+                <!-- SEARCH -->
+                <div class="table-search mb-4">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           id="searchAdmin"
+                           placeholder="Buscar usuario...">
+
+                </div>
+
+                <!-- USERS -->
+                <div class="table-responsive">
+
+                    <table class="table admin-table align-middle">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Usuario</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Rol Actual</th>
+                                <th>Acción</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="adminTableBody">
+
+                            {% for perfil in administradores %}
+
+                            {% endfor %}
+
+                            {% for perfil in perfiles %}
+
+                            {% if perfil.rol != 'ADMIN' %}
+
+                            <tr class="search-row">
+
+                                <!-- USER -->
+                                <td>
+
+                                    <div class="user-info">
+
+                                        <img src="https://ui-avatars.com/api/?name={{ perfil.user.username }}">
+
+                                        <div>
+
+                                            <h6>
+                                                {{ perfil.user.username }}
+                                            </h6>
+
+                                            <p>
+                                                ID: {{ perfil.id }}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <!-- NAME -->
+                                <td>
+
+                                    {{ perfil.user.first_name }}
+                                    {{ perfil.user.last_name }}
+
+                                </td>
+
+                                <!-- EMAIL -->
+                                <td>
+
+                                    {{ perfil.user.email }}
+
+                                </td>
+
+                                <!-- ROLE -->
+                                <td>
+
+                                    <span class="table-badge inactive-badge">
+
+                                        {{ perfil.get_rol_display }}
+
+                                    </span>
+
+                                </td>
+
+                                <!-- ACTION -->
+                                <td>
+
+                                    <form method="POST"
+                                          action="{% url 'crear_administrador' %}">
+
+                                        {% csrf_token %}
+
+                                        <input type="hidden"
+                                               name="perfil_id"
+                                               value="{{ perfil.id }}">
+
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm">
+
+                                            Convertir en Admin
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                            {% endif %}
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

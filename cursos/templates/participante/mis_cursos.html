@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Cursos{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* CONTENEDOR GENERAL AISLADO */
+.mis-cursos-page {
+    background: #0f172a;
+    padding: 40px 20px;
+    min-height: calc(100vh - 90px);
+}
+
+/* TITULO (AISLADO) */
+.mis-cursos-page h2 {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* GRID */
+.mis-cursos-page .tarjetas-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: center;
+}
+
+/* TARJETA */
+.mis-cursos-page .tarjeta-curso {
+    width: 260px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    transition: 0.3s;
+}
+
+.mis-cursos-page .tarjeta-curso:hover {
+    transform: translateY(-8px) scale(1.03);
+}
+
+/* IMAGEN */
+.mis-cursos-page .tarjeta-curso img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+/* CONTENIDO */
+.mis-cursos-page .tarjeta-contenido {
+    padding: 15px;
+    color: #e2e8f0;
+}
+
+.mis-cursos-page .tarjeta-contenido strong {
+    display: block;
+    font-size: 17px;
+    margin-bottom: 6px;
+    color: #fff;
+}
+
+/* MENSAJE VACIO */
+.mis-cursos-page .sin-cursos {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 16px;
+}
+
+/* ENCABEZADO CON BOTÓN */
+.mis-cursos-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.mis-cursos-page h2 {
+    margin-bottom: 0;
+}
+
+.boton-historial {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.boton-historial:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="mis-cursos-page">
+
+<div class="mis-cursos-header">
+    <h2>Mis Cursos</h2>
+    <a href="{% url 'historial_asistencias' %}" class="boton-historial">📋 Ver Historial de Asistencias</a>
+</div>
+
+<div class="tarjetas-container">
+{% for inscripcion in inscripciones %}
+    <a href="{% url 'detalle_curso' inscripcion.curso.id %}" style="text-decoration:none; color:inherit;">
+        <div class="tarjeta-curso">
+            {% if inscripcion.curso.imagen %}
+                <img src="{{ inscripcion.curso.imagen.url }}">
+            {% endif %}
+            <div class="tarjeta-contenido">
+                <strong>{{ inscripcion.curso.nombre }}</strong>
+                <small>{{ inscripcion.curso.descripcion|truncatewords:15 }}</small><br>
+                <small><b>Límite:</b> {{ inscripcion.curso.fecha_limite_inscripcion }}</small>
+            </div>
+        </div>
+    </a>
+{% empty %}
+    <p class="sin-cursos">No estás inscrito en ningún curso</p>
+{% endfor %}
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <!-- PAGE TITLE -->
+    <div class="page-title">
+
+        <h2>
+            Crear Tarea
+        </h2>
+
+        <p>
+            Registra una nueva tarea para una clase.
+        </p>
+
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="custom-table">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="row">
+
+                <!-- TITULO -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Título
+                    </label>
+
+                    {{ form.titulo }}
+
+                </div>
+
+                <!-- CLASE -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Clase
+                    </label>
+
+                    {{ form.clase }}
+
+                </div>
+
+                <!-- DESCRIPCION -->
+                <div class="col-12 mb-4">
+
+                    <label class="form-label">
+                        Descripción
+                    </label>
+
+                    {{ form.descripcion }}
+
+                </div>
+
+                <!-- FECHA ENTREGA -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Fecha de Entrega
+                    </label>
+
+                    {{ form.fecha_entrega }}
+
+                </div>
+
+                <!-- PERMITIR TARDIA -->
+                <div class="col-md-6 mb-4 d-flex align-items-center">
+
+                    <div class="form-check mt-4">
+
+                        {{ form.permitir_tardia }}
+
+                        <label class="form-check-label ms-2">
+
+                            Permitir entrega tardía
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <!-- FECHA LIMITE -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Fecha límite tardía
+                    </label>
+
+                    {{ form.fecha_limite_tardia }}
+
+                </div>
+
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="d-flex gap-3 mt-3">
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <i class="bi bi-save"></i>
+
+                    Crear Tarea
+
+                </button>
+
+                <a href="{% url 'lista_tareas' %}"
+                   class="btn btn-light">
+
+                    Cancelar
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

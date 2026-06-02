@@ -1,0 +1,477 @@
+{% extends 'base.html' %}
+
+{% block title %}Participantes{% endblock %}
+
+{% block content %}
+{% if messages %}
+
+<style>
+
+.modal-alerta{
+
+    position:fixed;
+
+    top:50%;
+
+    left:50%;
+
+    transform:translate(-50%, -50%);
+
+    background:#1e293b;
+
+    color:white;
+
+    padding:35px;
+
+    border-radius:18px;
+
+    z-index:9999;
+
+    min-width:380px;
+
+    text-align:center;
+
+    box-shadow:0 0 35px rgba(0,0,0,0.5);
+
+    animation:fadeOut 4s forwards;
+}
+
+.modal-alerta h3{
+
+    margin-bottom:12px;
+
+    font-size:24px;
+}
+
+.modal-alerta p{
+
+    font-size:17px;
+
+    color:#f8fafc;
+}
+
+.modal-success h3{
+    color:#22c55e;
+}
+
+.modal-error h3{
+    color:#ef4444;
+}
+
+.modal-warning h3{
+    color:#facc15;
+}
+
+@keyframes fadeOut{
+
+    0%{
+        opacity:1;
+    }
+
+    80%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+        visibility:hidden;
+    }
+}
+
+</style>
+
+{% for message in messages %}
+
+<div class="modal-alerta
+
+{% if message.tags == 'success' %}
+modal-success
+{% elif message.tags == 'error' %}
+modal-error
+{% else %}
+modal-warning
+{% endif %}
+">
+
+<h3>
+
+{% if message.tags == 'success' %}
+✅ Éxito
+{% elif message.tags == 'error' %}
+❌ Error
+{% else %}
+⚠️ Aviso
+{% endif %}
+
+</h3>
+
+<p>
+{{ message }}
+</p>
+
+</div>
+
+{% endfor %}
+
+{% endif %}
+
+
+<style>
+
+/* 🚫 NO TOCAR */
+.contenedor-principal {
+    min-height: calc(100vh - 90px);
+}
+
+/* FONDO */
+.participantes-page {
+    background: #0f172a;
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* CONTENEDOR */
+.contenedor-principal {
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* TITULO */
+.titulo-page{
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
+    color: #f8fafc;
+    letter-spacing: 0.5px;
+}
+
+/* HEADER */
+.header-tabla {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+/* BUSCADOR */
+.buscador {
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: none;
+    width: 260px;
+    background: #1e293b;
+    color: white;
+    outline: none;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+.buscador::placeholder{
+    color:#94a3b8;
+}
+
+.buscador:focus{
+    box-shadow: 0 0 0 2px #3b82f6;
+}
+
+/* BOTONES */
+.botones{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.btn,
+.btn-pdf {
+    padding: 11px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    transition: 0.3s;
+    display:inline-block;
+}
+
+.btn {
+    background: #22c55e;
+}
+
+.btn:hover {
+    background: #16a34a;
+    transform: translateY(-2px);
+}
+
+.btn-pdf {
+    background: #ef4444;
+}
+
+.btn-pdf:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+/* TABLA */
+.tabla-contenedor {
+    background: rgba(255,255,255,0.05);
+    padding: 25px;
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow-x:auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #2563eb;
+    padding: 14px;
+    color: white;
+    text-align: left;
+    font-size: 14px;
+}
+
+td {
+    padding: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color:#e2e8f0;
+}
+
+tr {
+    transition: 0.2s;
+}
+
+tr:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+/* ESTADOS */
+.estado-aprobando,
+.estado-riesgo,
+.estado-reprobando{
+    padding:6px 12px;
+    border-radius:20px;
+    font-weight:bold;
+    display:inline-block;
+    font-size:14px;
+}
+
+.estado-aprobando{
+    color:#22c55e;
+    background:rgba(34,197,94,0.12);
+}
+
+.estado-riesgo{
+    color:#facc15;
+    background:rgba(250,204,21,0.12);
+}
+
+.estado-reprobando{
+    color:#ef4444;
+    background:rgba(239,68,68,0.12);
+}
+
+/* VACIO */
+.vacio {
+    text-align: center;
+    padding: 25px;
+    color: #94a3b8;
+    font-size:16px;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+
+    .header-tabla{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .buscador{
+        width:100%;
+    }
+
+    .botones{
+        width:100%;
+    }
+
+    .btn,
+    .btn-pdf{
+        width:100%;
+        text-align:center;
+    }
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="participantes-page">
+
+<div class="contenedor-principal">
+
+<h2 class="titulo-page">
+👥 Participantes - {{ curso.nombre }}
+</h2>
+
+<div class="header-tabla">
+
+    <input type="text"
+           id="buscador"
+           class="buscador"
+           placeholder="🔍 Buscar participante...">
+
+    <div class="botones">
+
+        <a href="{% url 'enviar_aprobados' curso.id %}"
+            class="btn">
+            📧 Enviar lista de aprobados
+        </a>
+
+        <a href="{% url 'lista_aprobados' %}" class="btn">
+            ✅ Ver aprobados
+        </a>
+
+        <a href="{% url 'exportar_reporte_curso_pdf' curso.id %}"
+           class="btn-pdf">
+            📄 Exportar PDF
+        </a>
+
+    </div>
+
+</div>
+
+<div class="tabla-contenedor">
+
+<table id="tabla">
+
+<tr>
+    <th>Usuario</th>
+    <th>Nombre</th>
+
+    <th>Asistencias</th>
+    <th>% Asistencia</th>
+
+    <th>Prom. Tareas</th>
+    <th>% Tareas</th>
+
+    <th>Prom. Cuestionarios</th>
+    <th>% Cuestionarios</th>
+
+    <th>Estado</th>
+</tr>
+
+{% for p in datos_participantes %}
+
+<tr>
+
+<td>{{ p.usuario.username }}</td>
+
+<td>
+    {{ p.usuario.first_name }}
+    {{ p.usuario.last_name }}
+</td>
+
+<td>
+    {{ p.asistencias }}/{{ p.total_clases }}
+</td>
+
+<td>
+    {{ p.porcentaje_asistencia }}%
+</td>
+
+<td>
+    {{ p.promedio_tareas }}
+</td>
+
+<td>
+    {{ p.porcentaje_tareas }}%
+</td>
+
+<td>
+    {{ p.promedio_cuestionarios }}
+</td>
+
+<td>
+    {{ p.porcentaje_cuestionarios }}%
+</td>
+
+<td>
+
+{% if p.estado == "APROBANDO" %}
+
+    <span class="estado-aprobando">
+        ✅ APROBANDO
+    </span>
+
+{% elif p.estado == "EN RIESGO" %}
+
+    <span class="estado-riesgo">
+        ⚠️ EN RIESGO
+    </span>
+
+{% else %}
+
+    <span class="estado-reprobando">
+        ❌ REPROBANDO
+    </span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="9" class="vacio">
+    No hay participantes inscritos
+</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+document
+.getElementById("buscador")
+.addEventListener("keyup", function() {
+
+    let filtro = this.value.toLowerCase();
+
+    let filas = document.querySelectorAll("#tabla tr");
+
+    filas.forEach((fila, index) => {
+
+        if (index === 0) return;
+
+        let texto = fila.innerText.toLowerCase();
+
+        fila.style.display =
+            texto.includes(filtro)
+            ? ""
+            : "none";
+    });
+
+});
+
+</script>
+
+{% endblock %}

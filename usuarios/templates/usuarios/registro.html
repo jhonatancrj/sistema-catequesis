@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Registro{% endblock %}
+
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+<style>
+body{
+    background:url("/static/imagenes/fondo1.png") no-repeat center center fixed;
+    background-size:cover;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.card{
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(10px);
+    border-radius:15px;
+    padding:25px;
+    width:100%;
+    max-width:500px;
+    color:white;
+    border:1px solid rgba(255,255,255,.3);
+}
+
+.input-group-text{
+    background:rgba(255,255,255,.2);
+    border:none;
+    color:white;
+}
+
+.form-control, .form-select{
+    background:rgba(255,255,255,.2);
+    border:none;
+    color:white;
+}
+
+.form-control::placeholder{
+    color:rgba(255,255,255,.7);
+}
+
+.form-select option{
+    color: black;
+}
+
+.btn-primary{
+    background:rgba(255,255,255,.2);
+    border:1px solid white;
+    border-radius:25px;
+}
+
+/* 🔥 OCULTAR icono calendario interno */
+
+.date-input::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+
+/* 🔥 Fecha estilo placeholder gris */
+.custom-date{
+    color: transparent;
+    position: relative;
+}
+
+.custom-date:focus,
+.custom-date:valid{
+    color: white;
+}
+
+/* texto falso tipo placeholder */
+.custom-date:before{
+    content: "Fecha de nacimiento";
+    position: absolute;
+    left: 12px;
+    color: rgba(255,255,255,.7);
+}
+
+/* ocultar texto cuando ya hay fecha */
+.custom-date:focus:before,
+.custom-date:valid:before{
+    content: "";
+}
+
+
+</style>
+
+<div class="card">
+
+    <!-- 🔹 LOGO MÁS PEQUEÑO -->
+    <div class="text-center mb-3">
+        <img src="https://i.imgur.com/RKiKiuA.png" width="60">
+        <h5 class="mt-2">Crear Cuenta</h5>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- 1️⃣ USERNAME -->
+        <div class="mb-3 input-group">
+            <input type="text" name="username" class="form-control" placeholder="Nombre de usuario" required>
+            <span class="input-group-text">
+                <box-icon name='id-card'></box-icon>
+            </span>
+        </div>
+
+        <!-- 2️⃣ NOMBRE | APELLIDO -->
+        <div class="row mb-3">
+            <div class="col input-group">
+                <input type="text" name="first_name" class="form-control" placeholder="Nombre" required>
+                <span class="input-group-text"><box-icon name='user'></box-icon></span>
+            </div>
+            <div class="col input-group">
+                <input type="text" name="last_name" class="form-control" placeholder="Apellido" required>
+                <span class="input-group-text"><box-icon name='user'></box-icon></span>
+            </div>
+        </div>
+
+        <!-- 3️⃣ EMAIL -->
+        <div class="mb-3 input-group">
+            <input type="email" name="email" class="form-control" placeholder="Correo electrónico" required>
+            <span class="input-group-text"><box-icon name='envelope'></box-icon></span>
+        </div>
+
+        <!-- 4️⃣ PASSWORDS -->
+        <div class="row mb-3">
+            <div class="col input-group">
+                <input type="password" name="password1" id="pass1" class="form-control" placeholder="Contraseña" required>
+                <span class="input-group-text" onclick="toggle('pass1', this)">
+                    <box-icon name='lock'></box-icon>
+                </span>
+            </div>
+            <div class="col input-group">
+                <input type="password" name="password2" id="pass2" class="form-control" placeholder="Confirmar contraseña" required>
+                <span class="input-group-text" onclick="toggle('pass2', this)">
+                    <box-icon name='lock'></box-icon>
+                </span>
+            </div>
+        </div>
+
+        <!-- 5️⃣ FECHA | GENERO -->
+        <div class="row mb-3">
+            <div class="col input-group position-relative">
+
+                <input 
+                    type="date"
+                    name="fecha_nacimiento"
+                    id="fecha_nacimiento"
+                    class="form-control custom-date"
+                    required
+                    onclick="this.showPicker()"
+                >
+
+                <span class="input-group-text"
+                    onclick="document.getElementById('fecha_nacimiento').showPicker()">
+                    <box-icon name='calendar'></box-icon>
+                </span>
+
+            </div>
+
+
+
+
+            <div class="col input-group">
+                <select name="genero" class="form-select">
+                    <option value="">Género</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                    <option value="N">Prefiero no decirlo</option>
+                </select>
+                <span class="input-group-text"><box-icon name='user-circle'></box-icon></span>
+            </div>
+        </div>
+
+        <!-- 6️⃣ PAÍS | DEPARTAMENTO (DINÁMICO) -->
+        <div class="row mb-3">
+            <div class="col">
+                <select id="pais" name="pais" class="form-select" required>
+                    <option value="">Seleccione País</option>
+                </select>
+            </div>
+            <div class="col">
+                <select id="departamento" name="departamento" class="form-select" required>
+                    <option value="">Seleccione Departamento</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 7️⃣ CIUDAD | TELEFONO -->
+        <div class="row mb-3">
+            <div class="col input-group">
+                <input type="text" name="ciudad" class="form-control" placeholder="Ciudad">
+                <span class="input-group-text"><box-icon name='building'></box-icon></span>
+            </div>
+
+            <div class="col input-group">
+                <input type="text" name="telefono" class="form-control" placeholder="Teléfono">
+                <span class="input-group-text"><box-icon name='phone'></box-icon></span>
+            </div>
+        </div>
+
+        {% if form.errors %}
+        <div class="alert alert-danger small">
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary w-100">
+            Registrarse
+        </button>
+    </form>
+</div>
+
+<!-- 🔹 SCRIPT -->
+<script>
+function toggle(id, el){
+    let input = document.getElementById(id);
+    let icon = el.querySelector('box-icon');
+
+    if(input.type==="password"){
+        input.type="text";
+        icon.setAttribute("name","lock-open");
+    }else{
+        input.type="password";
+        icon.setAttribute("name","lock");
+    }
+}
+
+/* 🔹 ACORDEÓN PAÍS → DEPARTAMENTO */
+const paisesDepartamentos = {
+    "Afganistán": ["Badakhshan", "Badghis", "Baghlan", "Balkh", "Bamiyan", "Daykundi", "Farah", "Faryab", "Ghazni", "Ghor"],
+    "Albania": ["Berat", "Dibër", "Durrës", "Elbasan", "Fier", "Gjirokastër", "Korçë", "Kukës", "Lezhë", "Shkodër"],
+    "Alemania": ["Baden-Wurtemberg", "Baviera", "Berlín", "Brandeburgo", "Bremen", "Hamburgo", "Hesse", "Mecklemburgo-Pomerania Occidental", "Baja Sajonia", "Renania del Norte-Westfalia"],
+    "Andorra": ["Andorra la Vieja", "Canillo", "Encamp", "Escaldes-Engordany", "La Massana", "Ordino", "Sant Julià de Lòria"],
+    "Angola": ["Bengo", "Benguela", "Bié", "Cabinda", "Cuando Cubango", "Cuanza Norte", "Cuanza Sur", "Cunene", "Huambo", "Huíla"],
+    "Antigua y Barbuda": ["Barbuda", "Redonda", "Saint George", "Saint John", "Saint Mary", "Saint Paul", "Saint Peter", "Saint Philip"],
+    "Arabia Saudita": ["Asir", "Al Bahah", "Provincia Oriental", "Ha'il", "Jazan", "La Meca", "Medina", "Najran", "Qasim", "Riad"],
+    "Argelia": ["Adrar", "Aïn Defla", "Aïn Témouchent", "Argel", "Annaba", "Batna", "Biskra", "Blida", "Bordj Bou Arreridj", "Bouira"],
+    "Argentina": ["Buenos Aires", "Catamarca", "Chaco", "Chubut", "Córdoba", "Corrientes", "Entre Ríos", "Formosa", "Jujuy", "La Pampa"],
+    "Armenia": ["Aragatsotn", "Ararat", "Armavir", "Ereván", "Gegharkunik", "Kotayk", "Lori", "Shirak", "Syunik", "Tavush"],
+    "Australia": ["Territorio de la Capital Australiana", "Nueva Gales del Sur", "Territorio del Norte", "Queensland", "Australia Meridional", "Tasmania", "Victoria", "Australia Occidental"],
+    "Austria": ["Burgenland", "Carintia", "Baja Austria", "Salzburgo", "Estiria", "Tirol", "Alta Austria", "Viena", "Voralberg"],
+    "Azerbaiyán": ["Abseron", "Agdam", "Agdash", "Agstafa", "Agsu", "Astara", "Baku", "Balakan", "Barda", "Beylagan"],
+    "Bahamas": ["Isla Ábaco", "Andros", "Islas Ábaco del Sur", "Gran Bahama", "Isla Bimini", "Isla Eleuthera", "Cat Island", "Isla de Exuma", "Inagua", "Isla Long"],
+    "Bangladés": ["Barisal", "Chittagong", "Dhaka", "Khulna", "Mymensingh", "Rajshahi", "Rangpur", "Sylhet"],
+    "Barbados": ["Christ Church", "Saint Andrew", "Saint George", "Saint James", "Saint John", "Saint Joseph", "Saint Lucy", "Saint Michael", "Saint Peter", "Saint Philip"],
+    "Baréin": ["Capital", "Muharraq", "Norte", "Sur"],
+    "Bélgica": ["Flandes", "Bruselas-Capital", "Valonia"],
+    "Belice": ["Belice", "Cayo", "Corozal", "Orange Walk", "Stann Creek", "Toledo"],
+    "Benín": ["Alibori", "Atakora", "Atlantique", "Borgou", "Collines", "Donga", "Kouffo", "Littoral", "Mono", "Ouémé", "Plateau", "Zou"],
+    "Bielorrusia": ["Brest", "Gomel", "Grodno", "Minsk", "Mogilev", "Vitebsk"],
+    "Birmania": ["Ayeyarwady", "Bago", "Chin", "Kachin", "Kayah", "Kayin", "Magway", "Mandalay", "Mon", "Rakhine"],
+    "Bolivia": ["Beni", "Chuquisaca", "Cochabamba", "La Paz", "Oruro", "Pando", "Potosí", "Santa Cruz", "Tarija"],
+    "Bosnia y Herzegovina": ["Una-Sana", "Posavina", "Tuzla", "Zenica-Doboj", "Bosnia Central", "Herzegovina-Neretva", "Sarajevo", "Herzegovina Occidental", "República Srpska", "Distrito de Brčko"],
+    "Botsuana": ["Distrito Central", "Distrito de Ghanzi", "Distrito de Kgalagadi", "Distrito de Kgatleng", "Distrito de Kweneng", "Distrito de Nordeste", "Distrito Noroeste", "Distrito de Sureste", "Distrito de Sur"],
+    "Brasil": ["Acre", "Alagoas", "Amapá", "Amazonas", "Bahía", "Ceará", "Distrito Federal", "Espírito Santo", "Goiás", "Maranhão"],
+    "Brunéi": ["Belait", "Brunéi-Muara", "Temburong", "Tutong"],
+    "Bulgaria": ["Blagoevgrad", "Burgas", "Dobrich", "Gabrovo", "Haskovo", "Kardzhali", "Kyustendil", "Lovech", "Montana", "Pazardzhik"],
+    "Burkina Faso": ["Boucle du Mouhoun", "Cascades", "Centro", "Centro-Este", "Centro-Norte", "Centro-Oeste", "Centro-Sur", "Este", "Hauts-Bassins", "Noreste"],
+    "Burundi": ["Bubanza", "Bujumbura Rural", "Bujumbura Mairie", "Bururi", "Cankuzo", "Cibitoke", "Gitega", "Karuzi", "Kayanza", "Kirundo"],
+    "Bután": ["Bumthang", "Chukha", "Dagana", "Gasa", "Haa", "Lhuntse", "Mongar", "Paro", "Pemagatshel", "Punakha"],
+    "Cabo Verde": ["Boa Vista", "Brava", "Fogo", "Maio", "Sal", "Santo Antão", "São Nicolau", "São Vicente", "Santiago", "Tarrafal"],
+    "Camboya": ["Banteay Meanchey", "Battambang", "Kampong Cham", "Kampong Chhnang", "Kampong Speu", "Kampong Thom", "Kampot", "Kandal", "Koh Kong", "Kratié"],
+    "Camerún": ["Adamawa", "Centro", "Este", "Extremo Norte", "Litoral", "Noroeste", "Norte", "Oeste", "Suroeste", "Sur"],
+    "Canadá": ["Alberta", "Columbia Británica", "Manitoba", "Nuevo Brunswick", "Terranova y Labrador", "Territorios del Noroeste", "Nueva Escocia", "Nunavut", "Ontario", "Isla del Príncipe Eduardo"],
+    "Catar": ["Ad Dawhah", "Al Daayen", "Al Khor", "Al Rayyan", "Al Wakrah", "Ash Shamal", "Madinat ash Shamal", "Umm Salal"] ,
+    "Chad": ["Batha", "Borkou", "Chari-Baguirmi", "Guera", "Hadjer-Lamis", "Kanem", "Lac", "Logone Occidental", "Logone Oriental", "Mayo-Kebbi Este"],
+    "Chile": ["Arica y Parinacota", "Tarapacá", "Antofagasta", "Atacama", "Coquimbo", "Valparaíso", "Región Metropolitana", "O'Higgins", "Maule", "Biobío"],
+    "China": ["Anhui", "Beijing", "Chongqing", "Fujian", "Gansu", "Guangdong", "Guangxi", "Guizhou", "Hainan", "Hebei"],
+    "Chipre": ["Famagusta", "Kyrenia", "Larnaca", "Limassol", "Nicosia", "Paphos"],
+    "Colombia": ["Amazonas", "Antioquia", "Arauca", "Atlántico", "Bolívar", "Boyacá", "Caldas", "Caquetá", "Casanare", "Cauca"],
+    "Comoras": ["Anjouan", "Grande Comore", "Mohéli"],
+    "Corea del Norte": ["Chagang", "Hamgyong del Norte", "Hamgyong del Sur", "Hwanghae del Norte", "Hwanghae del Sur", "Kangwon", "Pyongan del Norte", "Pyongan del Sur", "Pyongyang", "Ryanggang"],
+    "Corea del Sur": ["Busan", "Chungcheong del Norte", "Chungcheong del Sur", "Daegu", "Daejeon", "Gangwon", "Gwangju", "Gyeonggi", "Gyeongsang del Norte", "Gyeongsang del Sur"],
+    "Costa de Marfil": ["Abiyán", "Bas-Sassandra", "Comoé", "Denguélé", "Gôh-Djiboua", "Lacs", "Lagunes", "Montagnes", "Sassandra-Marahoué", "Savanes"],
+    "Costa Rica": ["Alajuela", "Cartago", "Guanacaste", "Heredia", "Limón", "Puntarenas", "San José"],
+    "Croacia": ["Bjelovar-Bilogora", "Brod-Posavina", "Dubrovnik-Neretva", "Istria", "Karlovac", "Koprivnica-Križevci", "Krapina-Zagorje", "Lika-Senj", "Međimurje", "Osijek-Baranja"],
+    "Cuba": ["Artemisa", "Camagüey", "Ciego de Ávila", "Cienfuegos", "Granma", "Guantánamo", "Holguín", "Isla de la Juventud", "La Habana", "Las Tunas"],
+    "Dinamarca": ["Hovedstaden", "Midtjylland", "Nordjylland", "Sjælland", "Syddanmark"],
+    "Dominica": ["Saint Andrew", "Saint David", "Saint George", "Saint John", "Saint Joseph", "Saint Luke", "Saint Mark", "Saint Patrick", "Saint Paul", "Saint Peter"],
+    "Ecuador": ["Azuay", "Bolívar", "Cañar", "Carchi", "Chimborazo", "Cotopaxi", "El Oro", "Esmeraldas", "Galápagos", "Guayas"],
+    "Egipto": ["Alejandría", "Asuán", "Asyut", "Behera", "Beni Suef", "Dakahlia", "Damieta", "Fayún", "Gharbia", "Giza"],
+    "El Salvador": ["Ahuachapán", "Cabañas", "Chalatenango", "Cuscatlán", "La Libertad", "La Paz", "La Unión", "Morazán", "San Miguel", "San Salvador"],
+    "Emiratos Árabes Unidos": ["Abu Dabi", "Ajmán", "Dubái", "Fuyaira", "Ras al-Jaima", "Sharjah", "Umm al-Qaywayn"],
+    "Eritrea": ["Anseba", "Debub", "Debubawi Keyih Bahri", "Gash-Barka", "Maekel", "Semienawi Keyih Bahri"],
+    "Eslovaquia": ["Banská Bystrica", "Bratislava", "Košice", "Nitra", "Prešov", "Trnava", "Trenčín", "Žilina"],
+    "Eslovenia": ["Carintia", "Carniola Interior", "Eslovenia Central", "Eslovenia Oriental", "Eslovenia Occidental", "Gorizia", "Litoral-Karst", "Podravska", "Posavska", "Savinja"],
+    "España": ["Andalucía", "Aragón", "Asturias", "Baleares", "Canarias", "Cantabria", "Castilla-La Mancha", "Castilla y León", "Cataluña", "Extremadura"],
+    "Estados Unidos": ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Carolina del Norte", "Carolina del Sur", "Colorado", "Connecticut", "Dakota del Norte"],
+    "Estonia": ["Harju", "Tartu", "Ida-Viru", "Pärnu", "Lääne-Viru", "Viljandi", "Rapla"],
+    "Esuatini": ["Hhohho", "Lubombo", "Manzini", "Shiselweni"],
+    "Etiopía": ["Addis Abeba", "Oromía", "Amhara", "Tigray", "Somalí", "Sidama", "Gambela"],
+    "Filipinas": ["Luzón Central", "Calabarzón", "Visayas Occidental", "Davao", "Metro Manila", "Bicol", "Caraga"],
+    "Finlandia": ["Uusimaa", "Pirkanmaa", "Finlandia Central", "Pohjanmaa", "Laponia", "Kanta-Häme", "Kymenlaakso"],
+    "Fiyi": ["División Central", "División Occidental", "División del Norte", "División Oriental"],
+    "Francia": ["Île-de-France", "Provenza-Alpes-Costa Azul", "Nueva Aquitania", "Normandía", "Bretania", "Occitania", "Auvernia-Ródano-Alpes"],
+    "Gabón": ["Estuaire", "Haut-Ogooué", "Moyen-Ogooué", "Ngounié", "Nyanga", "Ogooué-Ivindo", "Ogooué-Lolo"],
+    "Gambia": ["Banjul", "Central River", "Lower River", "North Bank", "Upper River", "West Coast"],
+    "Georgia": ["Tiflis", "Adjara", "Samegrelo-Zemo Svaneti", "Imereti", "Kakheti", "Kvemo Kartli", "Shida Kartli"],
+    "Ghana": ["Gran Acra", "Ashanti", "Central", "Oriental", "Norte", "Volta", "Alta Occidental"],
+    "Granada": ["Saint Andrew", "Saint David", "Saint George", "Saint John", "Saint Mark", "Saint Patrick", "Carriacou y Petite Martinique"],
+    "Grecia": ["Ática", "Macedonia Central", "Tesalia", "Epiro", "Peloponeso", "Creta", "Egeo Meridional"],
+    "Guatemala": ["Guatemala", "Quetzaltenango", "Huehuetenango", "Escuintla", "San Marcos", "Alta Verapaz", "Izabal"],
+    "Guinea": ["Conakri", "Beyla", "Boffa", "Boké", "Dabola", "Dinguiraye", "Faranah"],
+    "Guinea-Bisáu": ["Bafatá", "Biombo", "Bolama", "Cacheu", "Gabú", "Oio", "Quinara"],
+    "Guinea Ecuatorial": ["Bioko Norte", "Bioko Sur", "Centro Sur", "Kié-Ntem", "Litoral", "Wele-Nzas", "Annobón"],
+    "Guyana": ["Barima-Waini", "Cuyuni-Mazaruni", "Demerara-Mahaica", "East Berbice-Corentyne", "Essequibo Islands-West Demerara", "Mahaica-Berbice", "Pomeroon-Supenaam"],
+    "Haití": ["Artibonite", "Centro", "Grande-Anse", "Nippes", "Noroeste", "Norte", "Oeste", "Sudeste", "Sur"],
+    "Honduras": ["Atlántida", "Choluteca", "Colón", "Comayagua", "Copán", "Cortés", "El Paraíso", "Francisco Morazán", "Gracias a Dios"],
+    "Hungría": ["Budapest", "Bács-Kiskun", "Baranya", "Békés", "Borsod-Abaúj-Zemplén", "Csongrád", "Fejér"],
+    "India": ["Uttar Pradesh", "Maharashtra", "Bengala Occidental", "Bihar", "Tamil Nadu", "Rajasthan", "Karnataka"],
+    "Indonesia": ["Java Occidental", "Java Oriental", "Sumatra Septentrional", "Bali", "Yakarta", "Sulawesi Meridional", "Papúa"],
+    "Irak": ["Bagdad", "Basora", "Nínive", "Karbala", "Anbar", "Duhok", "Najaf"],
+    "Irán": ["Teherán", "Isfahán", "Juzestán", "Fars", "Khorasan Razavi", "Mazandarán", "Azerbaiyán Oriental"],
+    "Irlanda": ["Dublín", "Cork", "Galway", "Limerick", "Waterford", "Kilkenny", "Wexford"],
+    "Islandia": ["Reykjavik", "Akureyri", "Höfuðborgarsvæðið", "Suðurland", "Norðurland eystra", "Vestfirðir", "Austurland"],
+    "Islas Marshall": ["Ailinglaplap", "Ailuk", "Arno", "Aur", "Ebon", "Jaluit", "Kwajalein"],
+    "Islas Salomón": ["Guadalcanal", "Malaita", "Makira-Ulawa", "Temotu", "Isabel", "Choiseul", "Western"],
+    "Israel": ["Distrito Central", "Distrito de Haifa", "Distrito de Jerusalén", "Distrito Norte", "Distrito Meridional", "Distrito de Tel Aviv"],
+    "Italia": ["Lombardía", "Lazio", "Campania", "Sicilia", "Véneto", "Piamonte", "Emilia-Romaña"],
+    "Jamaica": ["Kingston", "Saint Andrew", "Saint Catherine", "Clarendon", "Manchester", "Saint Elizabeth", "Westmoreland"],
+    "Japón": ["Tokio", "Osaka", "Kioto", "Hokkaido", "Fukuoka", "Aichi", "Hiroshima"],
+    "Jordania": ["Ammán", "Irbid", "Zarqa", "Mafraq", "Balqa", "Karak", "Aqaba"],
+    "Kazajistán": ["Almatý", "Astaná", "Shymkent", "Karagandá", "Aktobé", "Pavlodar", "Oskemen"],
+    "Kenia": ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika", "Malindi"],
+    "Kirguistán": ["Biskek", "Osh", "Chuy", "Jalal-Abad", "Naryn", "Batken", "Issyk-Kul"],
+    "Kiribati": ["Gilbert Islands", "Phoenix Islands", "Line Islands"],
+    "Kuwait": ["Al Asimah", "Hawalli", "Farwaniya", "Mubarak Al-Kabeer", "Jahra", "Ahmadi"],
+    "Laos": ["Vientián", "Luang Prabang", "Champasak", "Savannakhet", "Oudomxay", "Xieng Khouang", "Bolikhamsai"],
+    "Lesoto": ["Maseru", "Leribe", "Butha-Buthe", "Mokhotlong", "Quthing", "Mohale's Hoek", "Berea"],
+    "Letonia": ["Riga", "Kurzeme", "Latgale", "Vidzeme", "Zemgale"],
+    "Líbano": ["Beirut", "Monte Líbano", "Norte", "Bekaa", "Sur", "Nabatieh"],
+    "Liberia": ["Montserrado", "Nimba", "Bong", "Grand Bassa", "Lofa", "Margibi", "Sinoe"],
+    "Libia": ["Trípoli", "Bengasi", "Misrata", "Zintan", "Sebha", "Sirte", "Derna"],
+    "Liechtenstein": ["Vaduz", "Schaan", "Balzers", "Triesen", "Eschen", "Mauren"],
+    "Lituania": ["Vilna", "Kaunas", "Klaipėda", "Šiauliai", "Panevėžys", "Alytus", "Marijampolė"],
+    "Luxemburgo": ["Diekirch", "Grevenmacher", "Luxemburgo"],
+    "Madagascar": ["Antananarivo", "Toamasina", "Fianarantsoa", "Mahajanga", "Toliara", "Antsiranana"],
+    "Malasia": ["Kuala Lumpur", "Selangor", "Johor", "Sabah", "Sarawak", "Penang", "Perak"],
+    "Malaui": ["Lilongüe", "Blantyre", "Mzuzu", "Zomba", "Mangochi", "Balaka"],
+    "Maldivas": ["Malé", "Atolón Alif Alif", "Atolón Baa", "Atolón Dhaalu", "Atolón Gaafu Alif"],
+    "Mali": ["Bamako", "Kayes", "Koulikoro", "Sikasso", "Ségou", "Mopti", "Tombuctú"],
+    "Malta": ["La Valeta", "Gozo", "Mdina", "Sliema", "Birkirkara"],
+    "Marruecos": ["Casablanca-Settat", "Rabat-Salé-Kénitra", "Marrakech-Safí", "Fez-Mequinez", "Tánger-Tetuán-Alhucemas"],
+    "Mauricio": ["Port Louis", "Plaines Wilhems", "Pamplemousses", "Grand Port", "Black River"],
+    "Mauritania": ["Nuakchot", "Hodh Ech Chargui", "Hodh El Gharbi", "Assaba", "Gorgol", "Brakna", "Trarza"],
+    "México": ["Ciudad de México", "Jalisco", "Nuevo León", "Puebla", "Guanajuato", "Veracruz", "Chihuahua"],
+    "Micronesia": ["Chuuk", "Kosrae", "Pohnpei", "Yap"],
+    "Moldavia": ["Chisináu", "Bălți", "Cahul", "Orhei", "Ungheni", "Soroca", "Edineț"],
+    "Mónaco": ["Montecarlo", "La Condamine", "Fontvieille", "Moneghetti"],
+    "Mongolia": ["Ulán Bator", "Orjón", "Dornogovi", "Hentiy", "Uvs", "Zavhan"],
+    "Montenegro": ["Podgorica", "Nikšić", "Herceg Novi", "Pljevlja", "Bar", "Bijelo Polje"],
+    "Mozambique": ["Maputo", "Nampula", "Zambézia", "Tete", "Sofala", "Gaza", "Manica"],
+    "Namibia": ["Windhoek", "Erongo", "Otjozondjupa", "Oshikoto", "Ohangwena", "Omaheke"],
+    "Nauru": ["Aiwo", "Anabar", "Baiti", "Boe", "Buada", "Meneng", "Yaren"],
+    "Nepal": ["Katmandú", "Pokhara", "Lalitpur", "Biratnagar", "Bharatpur", "Janakpur", "Dharan"],
+    "Nicaragua": ["Managua", "León", "Masaya", "Granada", "Matagalpa", "Chinandega", "Jinotega"],
+    "Níger": ["Niamey", "Agadez", "Diffa", "Dosso", "Maradi", "Tahoua", "Tillabéri"],
+    "Nigeria": ["Lagos", "Abuya", "Kano", "Kaduna", "Rivers", "Oyo", "Enugu"],
+    "Noruega": ["Oslo", "Bergen", "Trondheim", "Stavanger", "Tromsø", "Kristiansand", "Ålesund"],
+    "Nueva Zelanda": ["Auckland", "Wellington", "Canterbury", "Otago", "Hawke's Bay", "Taranaki", "Marlborough"],
+    "Omán": ["Mascate", "Dhofar", "Musandam", "Al Batinah", "Al Wusta", "Ash Sharqiyah", "Ad Dhahirah"],
+    "Países Bajos": ["Holanda Septentrional", "Holanda Meridional", "Utrecht", "Brabante Septentrional", "Limburgo", "Güeldres", "Frisia"],
+    "Pakistán": ["Punyab", "Sindh", "Khyber Pakhtunkhwa", "Baluchistán", "Gilgit-Baltistán", "Islamabad", "Azad Cachemira"],
+    "Palaos": ["Koror", "Babeldaob", "Peleliu", "Angaur", "Kayangel", "Sonsorol", "Hatohobei"],
+    "Palestina": ["Cisjordania", "Franja de Gaza"],
+    "Panamá": ["Ciudad de Panamá", "Colón", "Chiriquí", "Veraguas", "Los Santos", "Coclé", "Bocas del Toro"],
+    "Papúa Nueva Guinea": ["NCD (Port Moresby)", "Western", "Gulf", "Central", "Milne Bay", "Oro", "Morobe"],
+    "Paraguay": ["Asunción", "Alto Paraná", "Central", "Itapúa", "Caaguazú", "Cordillera", "San Pedro"],
+    "Perú": ["Lima", "Arequipa", "Cusco", "La Libertad", "Piura", "Lambayeque", "Junín"],
+    "Polonia": ["Mazovia", "Pequeña Polonia", "Silesia", "Gran Polonia", "Pomerania", "Lublin", "Łódź"],
+    "Portugal": ["Lisboa", "Oporto", "Braga", "Coímbra", "Madeira", "Azores", "Évora"],
+    "Qatar": ["Doha", "Al Rayyan", "Al Wakrah", "Al Khor", "Umm Salal", "Al Daayen", "Madinat ash Shamal"],
+    "Reino Unido": ["Inglaterra", "Escocia", "Gales", "Irlanda del Norte"],
+    "República Centroafricana": ["Bangui", "Ombella-M'Poko", "Haute-Kotto", "Mbomou", "Nana-Grébizi", "Ouaka", "Ouham"],
+    "República Checa": ["Praga", "Bohemia Central", "Moravia Meridional", "Ústí nad Labem", "Pilsen", "Olomouc", "Zlín"],
+    "República del Congo": ["Brazzaville", "Pointe-Noire", "Likouala", "Niari", "Kouilou", "Pool", "Sangha"],
+    "República Dominicana": ["Distrito Nacional", "Santo Domingo", "Santiago", "La Vega", "San Cristóbal", "San Pedro de Macorís", "Puerto Plata"],
+    "Ruanda": ["Kigali", "Sur", "Oeste", "Norte", "Este"],
+    "Rumania": ["Bucarest", "Cluj", "Timiș", "Iași", "Constanța", "Dolj", "Brașov"],
+    "Rusia": ["Moscú", "San Petersburgo", "Siberia", "Ural", "Volga", "Lejano Oriente", "Cáucaso Norte"],
+    "Samoa": ["Upolu", "Savai'i"],
+    "San Cristóbal y Nieves": ["Saint Kitts", "Nevis"],
+    "San Marino": ["San Marino", "Serravalle", "Borgo Maggiore", "Domagnano", "Fiorentino", "Acquaviva"],
+    "San Vicente y las Granadinas": ["Saint George", "Saint Andrew", "Saint Patrick", "Saint David", "Saint Vincent"],
+    "Santa Lucía": ["Castries", "Anse la Raye", "Canaries", "Choiseul", "Dennery", "Gros Islet", "Laborie"],
+    "Santo Tomé y Príncipe": ["Santo Tomé", "Príncipe"],
+    "Senegal": ["Dakar", "Thiès", "Saint-Louis", "Kaolack", "Ziguinchor", "Diourbel", "Fatick"],
+    "Serbia": ["Belgrado", "Voivodina", "Sumadija y Serbia Occidental", "Serbia Meridional y Oriental"],
+    "Seychelles": ["Mahé", "Praslin", "La Digue"],
+    "Sierra Leona": ["Freetown", "Bo", "Kenema", "Makeni", "Koidu"],
+    "Singapur": ["Central", "North-East", "North-West", "South-East", "South-West"],
+    "Siria": ["Damasco", "Alepo", "Homs", "Latakia", "Deir ez-Zor", "Hasaka", "Tartús"],
+    "Somalia": ["Mogadiscio", "Puntland", "Somaliland", "Jubaland", "Hirshabelle", "Galmudug", "South West"],
+    "Sri Lanka": ["Colombo", "Kandy", "Galle", "Jaffna", "Matara", "Negombo", "Trincomalee"],
+    "Sudáfrica": ["Gauteng", "KwaZulu-Natal", "Cabo Occidental", "Estado Libre", "Mpumalanga", "Limpopo", "Cabo Oriental"],
+    "Sudán": ["Jartum", "Darfur del Norte", "Darfur del Sur", "Kordofán del Norte", "Kordofán del Sur", "Río Nilo", "Al Gezira"],
+    "Sudán del Sur": ["Juba", "Unidad", "Alta Nilo", "Ecuatoria Central", "Ecuatoria Occidental", "Ecuatoria Oriental", "Bahr el Ghazal del Norte"],
+    "Suecia": ["Estocolmo", "Gotemburgo", "Malmö", "Upsala", "Västerbotten", "Norrbotten", "Dalarna"],
+    "Suiza": ["Zúrich", "Ginebra", "Berna", "Vaud", "Valais", "Tesino", "Lucerna"],
+    "Surinam": ["Paramaribo", "Sipaliwini", "Marowijne", "Nickerie", "Commewijne", "Coronie", "Brokopondo"],
+    "Tailandia": ["Bangkok", "Chiang Mai", "Phuket", "Pattaya", "Nakhon Ratchasima", "Udon Thani", "Khon Kaen"],
+    "Tanzania": ["Dodoma", "Dar es Salaam", "Zanzíbar", "Arusha", "Mbeya", "Mwanza", "Tanga"],
+    "Tayikistán": ["Dusambé", "Sughd", "Khatlon", "Gorno-Badakhshan"],
+    "Timor Oriental": ["Dili", "Baucau", "Viqueque", "Manufahi", "Ainaro", "Bobonaro", "Lautém"],
+    "Togo": ["Lomé", "Marítima", "Plateaux", "Centrale", "Kara", "Savannes"],
+    "Tonga": ["Tongatapu", "Vava'u", "Ha'apai", "Eua", "Niuas"],
+    "Trinidad y Tobago": ["Puerto España", "San Fernando", "Chaguanas", "Arima", "Tobago"],
+    "Túnez": ["Túnez", "Sfax", "Susa", "Bizerta", "Gabes", "Ariana", "Gafsa"],
+    "Turkmenistán": ["Asjabad", "Balkan", "Daşoguz", "Lebap", "Mary"],
+    "Turquía": ["Estambul", "Ankara", "Izmir", "Bursa", "Antalya", "Adana", "Gaziantep"],
+    "Tuvalu": ["Funafuti", "Nanumea", "Nanumanga", "Niutao", "Nui", "Vaitupu", "Nukufetau"],
+    "Ucrania": ["Kiev", "Járkov", "Odesa", "Dnipró", "Donetsk", "Leópolis", "Zaporiyia"],
+    "Uganda": ["Kampala", "Gulu", "Lira", "Mbarara", "Jinja", "Mbale", "Soroti"],
+    "Uruguay": ["Montevideo", "Canelones", "Maldonado", "Colonia", "Salto", "Paysandú", "Río Negro"],
+    "Uzbekistán": ["Taskent", "Samarcanda", "Bujará", "Jivá", "Andiján", "Namangán", "Ferganá"],
+    "Vanuatu": ["Port Vila", "Luganville", "Malampa", "Penama", "Sanma", "Shefa", "Tafea"],
+};
+
+const paisSelect = document.getElementById("pais");
+const depSelect = document.getElementById("departamento");
+
+for(let pais in paisesDepartamentos){
+    let option = document.createElement("option");
+    option.value = pais;
+    option.textContent = pais;
+    paisSelect.appendChild(option);
+}
+
+paisSelect.addEventListener("change", function(){
+    depSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
+
+    let departamentos = paisesDepartamentos[this.value];
+
+    if(departamentos){
+        departamentos.forEach(dep=>{
+            let option = document.createElement("option");
+            option.value = dep;
+            option.textContent = dep;
+            depSelect.appendChild(option);
+        });
+    }
+});
+</script>
+
+{% endblock %}

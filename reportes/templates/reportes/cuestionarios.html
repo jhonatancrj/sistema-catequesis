@@ -1,0 +1,173 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Reporte de Cuestionarios{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .report-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-table table {
+        margin-bottom: 0;
+    }
+
+    .report-table thead {
+        background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        color: white;
+    }
+
+    .report-table tbody tr:hover {
+        background-color: #f5f3ff;
+    }
+
+    .metric-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #f3f4f6;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    .score-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .score-high {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .score-medium {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .score-low {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="report-header">
+        <div>
+            <h1 class="h3 mb-0">📊 Reporte de Cuestionarios</h1>
+            <p class="text-muted mb-0">Desempeño en evaluaciones</p>
+        </div>
+    </div>
+
+    <!-- Tabla de Cuestionarios -->
+    <div class="report-table mb-4">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Cuestionario</th>
+                    <th>Curso</th>
+                    <th>Catequista</th>
+                    <th>Fecha Límite</th>
+                    <th>Total Intentos</th>
+                    <th>Promedio</th>
+                    <th>Máximo</th>
+                    <th>Mínimo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cuestionario in datos %}
+                <tr>
+                    <td>
+                        <strong>{{ cuestionario.titulo }}</strong>
+                    </td>
+                    <td>
+                        <small>{{ cuestionario.curso }}</small>
+                    </td>
+                    <td>
+                        <small>{{ cuestionario.catequista }}</small>
+                    </td>
+                    <td>
+                        {% if cuestionario.fecha_limite %}
+                            <small>{{ cuestionario.fecha_limite|date:"d/m/Y H:i" }}</small>
+                        {% else %}
+                            <small class="text-muted">—</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="metric-badge">
+                            <i class="bi bi-pencil-square"></i> {{ cuestionario.total_intentos }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="score-badge {% if cuestionario.promedio_puntaje >= 70 %}score-high{% elif cuestionario.promedio_puntaje >= 50 %}score-medium{% else %}score-low{% endif %}">
+                            {{ cuestionario.promedio_puntaje }}
+                        </span>
+                    </td>
+                    <td>
+                        <strong style="color: #10b981;">{{ cuestionario.puntaje_maximo|floatformat:2 }}</strong>
+                    </td>
+                    <td>
+                        <strong style="color: #ef4444;">{{ cuestionario.puntaje_minimo|floatformat:2 }}</strong>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox"></i> No hay cuestionarios para mostrar
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Resumen -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Total Cuestionarios</h5>
+                    <h2 class="text-primary">{{ datos|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Total Intentos</h5>
+                    <h2 class="text-info">
+                        {% if datos.0 %}{{ datos.0.total_intentos }}{% else %}0{% endif %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Promedio General</h5>
+                    <h2 class="text-success">
+                        {% if datos.0 %}{{ datos.0.promedio_puntaje }}{% else %}0{% endif %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

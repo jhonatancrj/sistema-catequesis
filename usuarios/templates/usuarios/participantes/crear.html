@@ -1,0 +1,222 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Crear Participante
+{% endblock %}
+
+{% block content %}
+
+<div class="form-page">
+
+    <!-- HEADER -->
+    <div class="dashboard-header">
+
+        <div>
+
+            <h2>
+                Crear Participante
+            </h2>
+
+            <p>
+                Registrar un nuevo participante en el sistema.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="form-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="row">
+
+                <!-- USERNAME -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Usuario
+                    </label>
+
+                    {{ form.username }}
+
+                    {% if form.username.errors %}
+                        <small class="text-danger">
+                            {{ form.username.errors.0 }}
+                        </small>
+                    {% endif %}
+
+                </div>
+
+                <!-- EMAIL -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Correo Electrónico
+                    </label>
+
+                    {{ form.email }}
+
+                    {% if form.email.errors %}
+                        <small class="text-danger">
+                            {{ form.email.errors.0 }}
+                        </small>
+                    {% endif %}
+
+                </div>
+
+                <!-- FIRST NAME -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Nombres
+                    </label>
+
+                    {{ form.first_name }}
+
+                </div>
+
+                <!-- LAST NAME -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Apellidos
+                    </label>
+
+                    {{ form.last_name }}
+
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Contraseña
+                    </label>
+
+                    {{ form.password1 }}
+
+                    {% if form.password1.errors %}
+                        <small class="text-danger">
+                            {{ form.password1.errors.0 }}
+                        </small>
+                    {% endif %}
+
+                </div>
+
+                <!-- CONFIRM PASSWORD -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Confirmar Contraseña
+                    </label>
+
+                    {{ form.password2 }}
+
+                    {% if form.password2.errors %}
+                        <small class="text-danger">
+                            {{ form.password2.errors.0 }}
+                        </small>
+                    {% endif %}
+
+                </div>
+
+                <!-- PHONE -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Teléfono
+                    </label>
+
+                    {{ form.telefono }}
+
+                </div>
+
+                <!-- COUNTRY -->
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        País
+                    </label>
+
+                    {{ form.pais }}
+
+                </div>
+
+                <!-- DEPARTAMENTO -->
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        Departamento
+                    </label>
+
+                    {{ form.departamento }}
+
+                </div>
+
+                <!-- CITY -->
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        Ciudad
+                    </label>
+
+                    {{ form.ciudad }}
+
+                </div>
+
+                <!-- BIRTHDATE -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Fecha de Nacimiento
+                    </label>
+
+                    {{ form.fecha_nacimiento }}
+
+                </div>
+
+                <!-- GENERO -->
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Género
+                    </label>
+
+                    {{ form.genero }}
+
+                </div>
+
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="form-buttons">
+
+                <a href="{% url 'lista_participantes' %}"
+                   class="btn btn-light">
+
+                    Cancelar
+
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <i class="bi bi-person-plus"></i>
+
+                    Crear Participante
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

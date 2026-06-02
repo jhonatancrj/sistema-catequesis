@@ -1,0 +1,713 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+/* FONDO */
+body {
+    background: linear-gradient(135deg,#0f172a 40%,#1e293b 100%);
+    color: #e2e8f0;
+}
+
+/* CONTENEDOR */
+.container {
+    max-width: 1100px;
+}
+
+/* HEADER */
+.header-curso {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* DASHBOARD */
+.dashboard {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.card-dashboard {
+    flex: 1;
+    min-width: 180px;
+    padding: 20px;
+    border-radius: 14px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.tareas {
+    background: linear-gradient(135deg,#3b82f6,#2563eb);
+}
+
+.entregas {
+    background: linear-gradient(135deg,#22c55e,#16a34a);
+}
+
+.pendientes {
+    background: linear-gradient(135deg,#ef4444,#dc2626);
+}
+
+/* TABS */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab {
+    padding: 10px 18px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.tab.active {
+    background: #22c55e;
+    color: white;
+}
+
+/* SECCIONES */
+.seccion {
+    display: none;
+}
+
+.seccion.active {
+    display: block;
+}
+
+/* CARDS */
+.card-tarea {
+    background: rgba(255,255,255,0.05);
+    padding: 18px;
+    margin-bottom: 15px;
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
+}
+
+.card-tarea:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* BOTONES */
+.btn-pro {
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    font-size: 13px;
+    border: none;
+}
+
+.btn-warning {
+    background: #f59e0b;
+}
+
+.btn-success {
+    background: #22c55e;
+}
+
+.btn-info {
+    background: #3b82f6;
+}
+
+.btn-dark {
+    background: #1e293b;
+}
+
+.btn-danger {
+    background: #ef4444;
+}
+
+/* MODAL */
+body.modal-open {
+    overflow: hidden;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.modal-contenido {
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 18px;
+}
+
+.modal-form {
+    background: linear-gradient(145deg, #111827, #1f2937);
+    padding: 25px;
+    border-radius: 18px;
+    color: white;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    animation: fadeUp 0.3s ease;
+}
+
+.modal-form input,
+.modal-form textarea {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #0f172a;
+    color: white;
+    outline: none;
+    transition: 0.2s;
+}
+
+.modal-form input:focus,
+.modal-form textarea:focus {
+    border: 1px solid #6366f1;
+}
+
+.modal-form button {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.modal-form button[type="submit"] {
+    background: linear-gradient(135deg,#22c55e,#16a34a);
+    color: white;
+}
+
+.modal-form button[type="button"] {
+    background: #374151;
+    color: white;
+}
+
+.modal-form button:hover {
+    transform: scale(1.02);
+}
+
+@keyframes fadeUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* PARTICIPANTES */
+
+.header-tabla {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-pdf {
+    background: #ef4444;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.tabla-contenedor {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #3b82f6;
+    padding: 12px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+tr:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.vacio {
+    text-align: center;
+    padding: 20px;
+    color: #94a3b8;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .tabs {
+        overflow-x: auto;
+    }
+
+    .tab {
+        white-space: nowrap;
+    }
+
+    .header-curso {
+        padding: 20px;
+    }
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="header-curso">
+        <h2>📊 Panel Catequista</h2>
+        <p>Curso: {{ curso.nombre }}</p>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="dashboard">
+
+        <div class="card-dashboard tareas">
+            <h3>{{ total_tareas }}</h3>
+            <p>Tareas</p>
+        </div>
+
+        <div class="card-dashboard entregas">
+            <h3>{{ total_entregas }}</h3>
+            <p>Entregas</p>
+        </div>
+
+        <div class="card-dashboard pendientes">
+            <h3>{{ pendientes }}</h3>
+            <p>Pendientes</p>
+        </div>
+
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+
+        <div class="tab"
+             onclick="mostrar('participantes', this)">
+            👥 Participantes
+        </div>
+
+        <div class="tab"
+             onclick="mostrar('clases', this)">
+            📖 Clases
+        </div>
+
+        <div class="tab active"
+             onclick="mostrar('tareas', this)">
+            📝 Tareas
+        </div>
+
+        <div class="tab"
+             onclick="mostrar('cuestionarios', this)">
+            🧠 Cuestionarios
+        </div>
+
+    </div>
+
+    <!-- TAREAS -->
+    <div id="tareas" class="seccion active">
+
+        <a href="{% url 'reporte_tareas' curso.id %}"
+           class="btn btn-info">
+            📊 Ver Reporte de Tareas
+        </a>
+
+        {% if clase %}
+        <button class="btn btn-success mb-3"
+                onclick="abrirModal()">
+            ➕ Crear tarea
+        </button>
+        {% endif %}
+
+        {% for tarea in tareas %}
+
+        <div class="card-tarea">
+
+            <strong>{{ tarea.titulo }}</strong>
+
+            <p>{{ tarea.descripcion }}</p>
+
+            <small>
+                Entrega: {{ tarea.fecha_entrega }}
+            </small>
+
+            <div class="mt-2">
+
+                <a href="{% url 'ver_entregas' tarea.id %}"
+                   class="btn-pro btn-warning">
+                    Ver entregas
+                </a>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <p>No hay tareas</p>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- CUESTIONARIOS -->
+    <div id="cuestionarios" class="seccion">
+
+        <a href="{% url 'reporte_general' %}"
+           class="btn btn-info mb-3">
+            📊 Reporte General
+        </a>
+
+        {% if clase %}
+
+        <a href="{% url 'crear_cuestionario' clase.id %}"
+           class="btn btn-success mb-3">
+            ➕ Crear Cuestionario
+        </a>
+
+        {% endif %}
+
+        {% for c in cuestionarios %}
+
+        <div class="card-tarea">
+
+            <strong>{{ c.titulo }}</strong>
+
+            <div class="mt-2">
+
+                <a href="{% url 'editar_cuestionario' c.id %}"
+                   class="btn-pro btn-warning">
+                    Editar
+                </a>
+
+                <a href="{% url 'ver_resultados_cuestionario' c.id %}"
+                   class="btn-pro btn-success">
+                    Resultados
+                </a>
+
+                <a href="{% url 'estadisticas_pregunta' c.id %}"
+                   class="btn-pro btn-info">
+                    Stats
+                </a>
+
+                <a href="{% url 'ranking' c.id %}"
+                   class="btn-pro btn-dark">
+                    Ranking
+                </a>
+
+                <a href="{% url 'exportar_pdf' c.id %}"
+                   class="btn-pro btn-danger">
+                    PDF
+                </a>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <p>No hay cuestionarios</p>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- PARTICIPANTES -->
+    <div id="participantes" class="seccion">
+
+        <div class="header-tabla">
+
+            <a href="{% url 'exportar_participantes_pdf' curso.id %}"
+               class="btn-pdf">
+                📄 Exportar PDF
+            </a>
+
+        </div>
+
+        <div class="tabla-contenedor">
+
+            <table id="tablaParticipantes">
+
+                <tr>
+                    <th>Usuario</th>
+                    <th>Nombre</th>
+                    <th>Celular</th>
+                    <th>Correo</th>
+                </tr>
+
+                {% for inscripcion in participantes %}
+
+                <tr>
+
+                    <td>
+                        {{ inscripcion.participante.user.username }}
+                    </td>
+
+                    <td>
+                        {{ inscripcion.participante.user.first_name }}
+                        {{ inscripcion.participante.user.last_name }}
+                    </td>
+
+                    <td>
+                        {{ inscripcion.participante.user.perfil.telefono|default:"Sin número" }}
+                    </td>
+
+                    <td>
+                        {{ inscripcion.participante.user.email }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="4" class="vacio">
+                        No hay participantes inscritos
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- CLASES -->
+    <div id="clases" class="seccion">
+
+        {% for item in clases %}
+
+        <div class="card-tarea">
+
+            <strong>
+                {{ item.titulo }}
+            </strong>
+
+            <p>
+                {{ item.descripcion }}
+            </p>
+
+            <small>
+                📅 {{ item.fecha }}
+            </small>
+
+        </div>
+
+        {% empty %}
+
+        <p>No hay clases</p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- MODAL -->
+{% if clase %}
+
+<div id="modalTarea" class="overlay">
+
+    <div class="modal-contenido">
+
+        <div class="modal-form">
+
+            <h3 style="text-align:center;">
+                📚 Crear Tarea
+            </h3>
+
+            <form method="POST"
+                  action="{% url 'crear_tarea' clase.id %}"
+                  enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <input type="text"
+                       name="titulo"
+                       placeholder="Título"
+                       required>
+
+                <textarea name="descripcion"
+                          rows="3"
+                          placeholder="Descripción"></textarea>
+
+                <input type="datetime-local"
+                       name="fecha_entrega"
+                       required>
+
+                <label>
+
+                    <input type="checkbox"
+                           name="permitir_tardia">
+
+                    Permitir entrega tardía
+
+                </label>
+
+                <input type="datetime-local"
+                       name="fecha_limite_tardia">
+
+                <label>📎 Archivos</label>
+
+                <div id="contenedor-archivos">
+
+                    <input type="file"
+                           name="archivos"
+                           onchange="mostrarArchivo(this)">
+
+                </div>
+
+                <button type="button"
+                        onclick="agregarArchivo()">
+                    ➕ Añadir archivo
+                </button>
+
+                <ul id="lista-archivos"></ul>
+
+                <button type="submit">
+                    Crear tarea
+                </button>
+
+                <button type="button"
+                        onclick="cerrarModal()">
+                    Cancelar
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+<script>
+
+function mostrar(seccion, elemento) {
+
+    document.querySelectorAll('.seccion').forEach(s => {
+        s.classList.remove('active');
+    });
+
+    document.querySelectorAll('.tab').forEach(t => {
+        t.classList.remove('active');
+    });
+
+    document.getElementById(seccion).classList.add('active');
+    elemento.classList.add('active');
+}
+
+function abrirModal() {
+
+    document.getElementById('modalTarea').style.display = 'flex';
+    document.body.classList.add("modal-open");
+}
+
+function cerrarModal() {
+
+    document.getElementById('modalTarea').style.display = 'none';
+    document.body.classList.remove("modal-open");
+}
+
+window.onclick = function(event) {
+
+    const modal = document.getElementById('modalTarea');
+
+    if (event.target === modal) {
+        cerrarModal();
+    }
+}
+
+function agregarArchivo() {
+
+    const contenedor = document.getElementById('contenedor-archivos');
+
+    const input = document.createElement('input');
+
+    input.type = 'file';
+    input.name = 'archivos';
+
+    input.onchange = function() {
+        mostrarArchivo(this);
+    };
+
+    contenedor.appendChild(input);
+}
+
+function mostrarArchivo(input) {
+
+    const lista = document.getElementById('lista-archivos');
+
+    if (input.files.length > 0) {
+
+        const li = document.createElement('li');
+
+        li.textContent = "📎 " + input.files[0].name;
+
+        const btn = document.createElement('button');
+
+        btn.textContent = ' ❌';
+
+        btn.onclick = function() {
+            input.remove();
+            li.remove();
+        };
+
+        li.appendChild(btn);
+
+        lista.appendChild(li);
+    }
+}
+
+</script>
+
+{% endblock %}

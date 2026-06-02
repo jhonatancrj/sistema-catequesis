@@ -1,0 +1,181 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+
+            Detalle Sacramental
+
+        </h2>
+
+    </div>
+
+    <div class="custom-table">
+
+        <!-- NOMBRE -->
+        <div class="mb-4">
+
+            <h5>Participante</h5>
+
+            <p>
+
+                {% if registro.participante %}
+
+                    {{ registro.participante.user.first_name }}
+                    {{ registro.participante.user.last_name }}
+
+                {% else %}
+
+                    {{ registro.nombre_manual }}
+                    {{ registro.apellido_manual }}
+
+                {% endif %}
+
+            </p>
+
+        </div>
+
+        <!-- SACRAMENTO -->
+        <div class="row">
+
+            <div class="col-md-6 mb-4">
+
+                <h5>Sacramento</h5>
+
+                <p>
+
+                    {{ registro.sacramento.nombre }}
+
+                </p>
+
+            </div>
+
+            <div class="col-md-6 mb-4">
+
+                <h5>Fecha Sacramento</h5>
+
+                <p>
+
+                    {{ registro.fecha_sacramento }}
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- PARROQUIA -->
+        <div class="row">
+
+            <div class="col-md-6 mb-4">
+
+                <h5>Parroquia</h5>
+
+                <p>
+
+                    {{ registro.lugar_sacramento }}
+
+                </p>
+
+            </div>
+
+            <div class="col-md-6 mb-4">
+
+                <h5>Párroco</h5>
+
+                <p>
+
+                    {{ registro.parroco }}
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- PADRES -->
+        <div class="row">
+
+            <div class="col-md-6 mb-4">
+
+                <h5>Padre</h5>
+
+                <p>
+
+                    {{ registro.nombre_padre }}
+
+                </p>
+
+            </div>
+
+            <div class="col-md-6 mb-4">
+
+                <h5>Madre</h5>
+
+                <p>
+
+                    {{ registro.nombre_madre }}
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- PADRINOS -->
+        <div class="row">
+
+            <div class="col-md-6 mb-4">
+
+                <h5>Padrino</h5>
+
+                <p>
+
+                    {{ registro.padrino }}
+
+                </p>
+
+            </div>
+
+            <div class="col-md-6 mb-4">
+
+                <h5>Madrina</h5>
+
+                <p>
+
+                    {{ registro.madrina }}
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- BOTONES -->
+        <div class="d-flex gap-3">
+
+            <a href="{% url 'editar_registro_sacramental' registro.id %}"
+               class="btn btn-warning">
+
+                Editar
+
+            </a>
+
+            <a href="{% url 'lista_registros_sacramentales' %}"
+               class="btn btn-secondary">
+
+                Volver
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

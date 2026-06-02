@@ -1,0 +1,102 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <!-- TITLE -->
+    <div class="page-title">
+
+        <h2>
+            Calificar Entrega
+        </h2>
+
+        <p>
+
+            {{ entrega.tarea.titulo }}
+
+        </p>
+
+    </div>
+
+    <!-- FORM -->
+    <div class="custom-table">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <!-- ESTUDIANTE -->
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Estudiante
+
+                </label>
+
+                <input type="text"
+                       class="form-control"
+                       value="{{ entrega.estudiante.username }}"
+                       disabled>
+
+            </div>
+
+            <!-- CALIFICACION -->
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Calificación
+
+                </label>
+
+                <input type="number"
+                       step="0.01"
+                       name="calificacion"
+                       value="{{ entrega.calificacion }}"
+                       class="form-control">
+
+            </div>
+
+            <!-- OBS -->
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Observación
+
+                </label>
+
+                <textarea
+                    name="observacion"
+                    class="form-control"
+                    rows="5">{{ entrega.observacion }}</textarea>
+
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="d-flex gap-3">
+
+                <button class="btn btn-primary">
+
+                    Guardar Calificación
+
+                </button>
+
+                <a href="{% url 'ver_entregas' entrega.tarea.id %}"
+                   class="btn btn-light">
+
+                    Cancelar
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

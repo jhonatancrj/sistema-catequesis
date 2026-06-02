@@ -1,0 +1,523 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+/* ===== FONDO GENERAL ===== */
+.entregas-page{
+
+    min-height:100vh;
+
+    padding:40px 20px;
+
+    background: linear-gradient(
+        135deg,
+        #0f172a 0%,
+        #1e293b 100%
+    );
+
+    font-family:'Segoe UI',sans-serif;
+}
+
+/* ===== CARD ===== */
+.entregas-card{
+
+    max-width:1200px;
+    margin:auto;
+
+    background:rgba(255,255,255,0.07);
+
+    backdrop-filter:blur(14px);
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    border-radius:24px;
+
+    padding:35px;
+
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+}
+
+/* ===== TITULO ===== */
+.titulo-page{
+
+    color:white;
+
+    font-size:34px;
+
+    font-weight:700;
+
+    margin-bottom:30px;
+
+    text-align:center;
+}
+
+/* ===== TABLA ===== */
+.table-custom{
+
+    width:100%;
+    border-collapse:collapse;
+}
+
+.table-custom thead{
+
+    background:#2563eb;
+}
+
+.table-custom th{
+
+    padding:16px;
+
+    color:white;
+
+    font-weight:600;
+
+    border:none;
+}
+
+.table-custom td{
+
+    padding:18px 14px;
+
+    background:rgba(255,255,255,0.04);
+
+    color:#e2e8f0;
+
+    border-bottom:1px solid rgba(255,255,255,0.06);
+
+    vertical-align:middle;
+}
+
+.table-custom tr:hover td{
+
+    background:rgba(255,255,255,0.07);
+
+    transition:0.3s;
+}
+
+/* ===== ARCHIVOS ===== */
+.archivo-link{
+
+    color:#38bdf8;
+
+    text-decoration:none;
+
+    font-weight:600;
+}
+
+.archivo-link:hover{
+
+    color:#7dd3fc;
+}
+
+/* ===== BOTÓN ===== */
+.btn-calificar{
+
+    background:#f59e0b;
+
+    color:white;
+
+    padding:10px 16px;
+
+    border-radius:10px;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+    border:none;
+
+    transition:0.3s;
+}
+
+.btn-calificar:hover{
+
+    background:#d97706;
+
+    transform:translateY(-2px);
+}
+
+/* ===== MODAL ===== */
+.modal-overlay{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,0.5);
+
+    backdrop-filter:blur(10px);
+
+    display:none;
+
+    justify-content:center;
+    align-items:center;
+
+    z-index:9999;
+}
+
+/* ACTIVO */
+.modal-overlay.active{
+
+    display:flex;
+}
+
+/* CARD MODAL */
+.modal-card{
+
+    width:100%;
+    max-width:500px;
+
+    background:rgba(15,23,42,0.95);
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    border-radius:24px;
+
+    padding:30px;
+
+    box-shadow:0 10px 40px rgba(0,0,0,0.5);
+
+    animation:modalShow 0.3s ease;
+}
+
+@keyframes modalShow{
+
+    from{
+
+        opacity:0;
+        transform:translateY(20px);
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.modal-title{
+
+    color:white;
+
+    font-size:28px;
+
+    font-weight:700;
+
+    margin-bottom:25px;
+
+    text-align:center;
+}
+
+/* INPUTS */
+.form-control-custom{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:rgba(255,255,255,0.08);
+
+    color:white;
+
+    margin-bottom:20px;
+
+    outline:none;
+
+    font-size:15px;
+}
+
+.form-control-custom:focus{
+
+    box-shadow:0 0 0 2px #3b82f6;
+}
+
+/* TEXTAREA */
+textarea.form-control-custom{
+
+    min-height:120px;
+
+    resize:none;
+}
+
+/* BOTONES MODAL */
+.modal-buttons{
+
+    display:flex;
+
+    gap:12px;
+
+    justify-content:flex-end;
+}
+
+.btn-close-modal{
+
+    background:#475569;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 18px;
+
+    border-radius:10px;
+
+    font-weight:600;
+}
+
+.btn-save{
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 18px;
+
+    border-radius:10px;
+
+    font-weight:600;
+}
+
+.btn-save:hover{
+
+    background:#1d4ed8;
+}
+
+.text-muted{
+
+    color:#94a3b8 !important;
+}
+
+.sin-datos{
+
+    text-align:center;
+
+    color:#94a3b8;
+
+    padding:25px;
+}
+
+</style>
+
+<div class="entregas-page">
+
+    <div class="entregas-card">
+
+        <h3 class="titulo-page">
+            📚 Entregas - {{ tarea.titulo }}
+        </h3>
+
+        <div class="table-responsive">
+
+            <table class="table-custom">
+
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Archivo</th>
+                        <th>Fecha</th>
+                        <th>Nota</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for entrega in entregas %}
+
+                    <tr>
+
+                        <td>
+                            {{ entrega.estudiante.username }}
+                        </td>
+
+                        <td>
+
+                            {% if entrega.archivos.all %}
+
+                                <ul class="list-unstyled m-0">
+
+                                    {% for archivo in entrega.archivos.all %}
+
+                                        <li class="mb-2">
+
+                                            <a href="{{ archivo.archivo_url }}"
+                                               target="_blank"
+                                               class="archivo-link">
+
+                                                📎 {{ archivo.nombre }}
+
+                                            </a>
+
+                                        </li>
+
+                                    {% endfor %}
+
+                                </ul>
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    Sin archivos
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ entrega.fecha_entrega }}
+                        </td>
+
+                        <td>
+
+                            {% if entrega.calificacion %}
+
+                                ⭐ {{ entrega.calificacion }}
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    Sin nota
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="btn-calificar"
+                                onclick="abrirModal('{{ entrega.id }}')">
+
+                                ✏️ Calificar
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="5" class="sin-datos">
+
+                            No hay entregas registradas
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalCalificar">
+
+    <div class="modal-card">
+
+        <h2 class="modal-title">
+            ✏️ Calificar Entrega
+        </h2>
+
+        <form method="POST" id="formCalificar">
+
+            {% csrf_token %}
+            <input
+                type="number"
+                step="0.1"
+                name="calificacion"
+                placeholder="Ingrese la nota"
+                class="form-control-custom"
+                min="0"
+                max="100"
+                required>
+
+            <textarea
+                name="observacion"
+                placeholder="Observaciones..."
+                class="form-control-custom"></textarea>
+
+            <div class="modal-buttons">
+
+                <button
+                    type="button"
+                    class="btn-close-modal"
+                    onclick="cerrarModal()">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn-save">
+
+                    Guardar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+function abrirModal(entregaId){
+
+    document
+    .getElementById("modalCalificar")
+    .classList.add("active");
+
+    document
+    .getElementById("formCalificar")
+    .action = `/tareas/calificar/${entregaId}/`;
+}
+
+function cerrarModal(){
+
+    document
+    .getElementById("modalCalificar")
+    .classList.remove("active");
+}
+
+window.onclick = function(e){
+
+    let modal = document.getElementById("modalCalificar");
+
+    if(e.target === modal){
+
+        cerrarModal();
+    }
+}
+
+</script>
+
+{% endblock %}

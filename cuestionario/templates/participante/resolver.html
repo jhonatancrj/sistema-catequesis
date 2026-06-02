@@ -1,0 +1,237 @@
+<style>
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background: #0f172a;
+    margin: 0;
+    padding: 0;
+    color: #e2e8f0;
+}
+
+.container {
+    max-width: 750px;
+    margin: 40px auto;
+    padding: 0 15px;
+}
+
+h2 {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    padding: 20px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.timer-float {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    padding: 15px 18px;
+    border-radius: 50px;
+    font-weight: bold;
+    z-index: 9999;
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    margin-right: 10px;
+    accent-color: #6366f1;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 2px solid #475569;
+    background: transparent;
+    color: white;
+}
+
+button {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    display: block;
+    margin: 20px auto;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+}
+</style>
+
+<div class="timer-float">
+⏱ <span id="timer"></span>
+</div>
+
+<div class="container">
+
+<h2>{{ cuestionario.titulo }}</h2>
+
+<form method="post" id="formulario">
+    {% csrf_token %}
+
+```
+{% for p in preguntas %}
+    <div class="card">
+        <p><strong>{{ p.enunciado }}</strong> ({{ p.puntaje }} pts)</p>
+
+        {% if p.tipo == 'multiple' %}
+            {% for op in p.opcion_set.all %}
+                <label>
+                    <input type="radio" name="p_{{ p.id }}" value="{{ op.id }}">
+                    {{ op.texto }}
+                </label><br>
+            {% endfor %}
+        {% endif %}
+
+        {% if p.tipo == 'checkbox' %}
+            {% for op in p.opcion_set.all %}
+                <label>
+                    <input type="checkbox" name="p_{{ p.id }}" value="{{ op.id }}">
+                    {{ op.texto }}
+                </label><br>
+            {% endfor %}
+        {% endif %}
+
+        {% if p.tipo == 'texto' %}
+            <input type="text" name="p_{{ p.id }}">
+        {% endif %}
+    </div>
+    <hr>
+{% endfor %}
+
+<button type="submit">Enviar</button>
+```
+
+</form>
+
+</div>
+
+<script>
+/* 🔒 BLOQUEOS BÁSICOS */
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('cut', e => e.preventDefault());
+document.addEventListener('paste', e => e.preventDefault());
+
+/* 🔒 BLOQUEAR ATRÁS */
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+    history.go(1);
+};
+
+/* 🔒 CONTROL DE PESTAÑAS */
+let cambios = 0;
+const MAX_CAMBIOS = 3;
+
+document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+        cambios++;
+        alert("No cambies de pestaña (" + cambios + "/" + MAX_CAMBIOS + ")");
+
+        if (cambios >= MAX_CAMBIOS) {
+            alert("Exceso de cambios de pestaña. Examen enviado.");
+            document.getElementById("formulario").submit();
+        }
+    }
+});
+
+/* 🔒 PANTALLA COMPLETA */
+function activarPantallaCompleta() {
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+    }
+}
+activarPantallaCompleta();
+
+document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement) {
+        alert("No salgas de pantalla completa");
+        activarPantallaCompleta();
+    }
+});
+
+/* 💾 GUARDADO */
+const STORAGE_KEY = "quiz_{{ cuestionario.id }}";
+
+document.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", guardarDatos);
+});
+
+function guardarDatos() {
+    let data = {};
+    document.querySelectorAll("input").forEach(input => {
+        if (input.type === "radio" || input.type === "checkbox") {
+            if (input.checked) {
+                if (!data[input.name]) data[input.name] = [];
+                data[input.name].push(input.value);
+            }
+        } else {
+            data[input.name] = input.value;
+        }
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function cargarDatos() {
+    let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+    document.querySelectorAll("input").forEach(input => {
+        if (data[input.name]) {
+            if (input.type === "radio" || input.type === "checkbox") {
+                if (data[input.name].includes(input.value)) {
+                    input.checked = true;
+                }
+            } else {
+                input.value = data[input.name];
+            }
+        }
+    });
+}
+cargarDatos();
+
+/* ⏱ TIMER */
+{% if cuestionario.tiempo_limite %}
+const TIME_KEY = "quiz_time_{{ cuestionario.id }}";
+
+let tiempo = localStorage.getItem(TIME_KEY);
+tiempo = tiempo ? parseInt(tiempo) : {{ cuestionario.tiempo_limite }} * 60;
+
+let timer = setInterval(() => {
+    let min = Math.floor(tiempo / 60);
+    let sec = tiempo % 60;
+
+    document.getElementById("timer").innerText =
+        min + ":" + (sec < 10 ? "0" + sec : sec);
+
+    tiempo--;
+    localStorage.setItem(TIME_KEY, tiempo);
+
+    if (tiempo < 0) {
+        clearInterval(timer);
+        alert("Tiempo terminado");
+        document.getElementById("formulario").submit();
+    }
+}, 1000);
+{% endif %}
+
+/* LIMPIAR */
+document.getElementById("formulario").addEventListener("submit", () => {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(TIME_KEY);
+});
+</script>

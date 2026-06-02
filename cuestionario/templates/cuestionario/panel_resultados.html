@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+/* CONTENEDOR PRINCIPAL */
+.resultados-page {
+    background: #0f172a;
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+}
+
+/* TITULO */
+.resultados-page h2 {
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+/* CARD TABLA */
+.card-table {
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    overflow-x: auto;
+}
+
+/* TABLA MODERNA */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #e2e8f0;
+}
+
+.table th {
+    text-align: left;
+    padding: 12px;
+    background: rgba(255,255,255,0.08);
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* LINK */
+.table a {
+    color: #38bdf8;
+    text-decoration: none;
+}
+
+.table a:hover {
+    text-decoration: underline;
+}
+
+/* CARD GRAFICO */
+.card {
+    margin-top: 25px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+canvas {
+    width: 100% !important;
+    max-height: 400px;
+}
+
+</style>
+
+<div class="resultados-page">
+
+<div class="container">
+
+<h2>📊 Resultados del Cuestionario</h2>
+
+<!-- TABLA -->
+<div class="card-table">
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>👤 Estudiante</th>
+            <th>🏆 Mejor Puntaje</th>
+            <th>🔁 Intentos</th>
+            <th>📄 Detalle</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for i in mejores %}
+        <tr>
+            <td>{{ i.usuario.username }}</td>
+            <td>{{ i.puntaje }}</td>
+            <td>{{ i.usuario.intento_set.count }}</td>
+            <td>
+                <a href="{% url 'detalle_intento' i.id %}">Ver</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</div>
+
+<!-- GRAFICO -->
+<div class="card">
+    <h4>📈 Comparación de puntajes</h4>
+    <canvas id="grafico"></canvas>
+</div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+let data = {
+    labels: [
+        {% for i in mejores %}
+            "{{ i.usuario.username }}",
+        {% endfor %}
+    ],
+    datasets: [{
+        label: 'Puntaje',
+        data: [
+            {% for i in mejores %}
+                {{ i.puntaje }},
+            {% endfor %}
+        ],
+        backgroundColor: '#38bdf8'
+    }]
+};
+
+new Chart(document.getElementById('grafico'), {
+    type: 'bar',
+    data: data
+});
+</script>
+
+{% endblock %}

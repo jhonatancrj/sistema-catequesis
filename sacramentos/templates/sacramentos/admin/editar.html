@@ -1,0 +1,322 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <!-- TITULO -->
+    <div class="page-title">
+
+        <h2>
+
+            Editar Registro Sacramental
+
+        </h2>
+
+        <p>
+
+            Actualización de datos parroquiales
+
+        </p>
+
+    </div>
+
+    <!-- FORM -->
+    <div class="custom-table">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <!-- TIPO -->
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Tipo de registro
+
+                </label>
+
+                <select id="tipoRegistro"
+                        class="form-select">
+
+                    {% if registro.participante %}
+
+                    <option value="sistema" selected>
+
+                        Participante del sistema
+
+                    </option>
+
+                    <option value="manual">
+
+                        Registro histórico/manual
+
+                    </option>
+
+                    {% else %}
+
+                    <option value="sistema">
+
+                        Participante del sistema
+
+                    </option>
+
+                    <option value="manual" selected>
+
+                        Registro histórico/manual
+
+                    </option>
+
+                    {% endif %}
+
+                </select>
+
+            </div>
+
+            <!-- PARTICIPANTE -->
+            <div id="participanteBox"
+                 class="mb-4"
+
+                 {% if not registro.participante %}
+                 style="display:none;"
+                 {% endif %}>
+
+                <label class="form-label">
+
+                    Participante
+
+                </label>
+
+                {{ form.participante }}
+
+            </div>
+
+            <!-- MANUAL -->
+            <div id="manualBox"
+
+                 {% if registro.participante %}
+                 style="display:none;"
+                 {% endif %}>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-4">
+
+                        <label class="form-label">
+
+                            Nombre
+
+                        </label>
+
+                        {{ form.nombre_manual }}
+
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+
+                        <label class="form-label">
+
+                            Apellido
+
+                        </label>
+
+                        {{ form.apellido_manual }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- SACRAMENTO -->
+            <div class="mb-4">
+
+                <label class="form-label">
+
+                    Sacramento
+
+                </label>
+
+                {{ form.sacramento }}
+
+            </div>
+
+            <!-- FECHAS -->
+            <div class="row">
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Fecha Sacramento
+
+                    </label>
+
+                    {{ form.fecha_sacramento }}
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Fecha Bautizo
+
+                    </label>
+
+                    {{ form.fecha_bautizo }}
+
+                </div>
+
+            </div>
+
+            <!-- PARROQUIA -->
+            <div class="row">
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Lugar Sacramento
+
+                    </label>
+
+                    {{ form.lugar_sacramento }}
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Párroco
+
+                    </label>
+
+                    {{ form.parroco }}
+
+                </div>
+
+            </div>
+
+            <!-- PADRES -->
+            <div class="row">
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Nombre Padre
+
+                    </label>
+
+                    {{ form.nombre_padre }}
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Nombre Madre
+
+                    </label>
+
+                    {{ form.nombre_madre }}
+
+                </div>
+
+            </div>
+
+            <!-- PADRINOS -->
+            <div class="row">
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Padrino
+
+                    </label>
+
+                    {{ form.padrino }}
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Madrina
+
+                    </label>
+
+                    {{ form.madrina }}
+
+                </div>
+
+            </div>
+
+            <!-- BOTONES -->
+            <div class="d-flex gap-3">
+
+                <button class="btn btn-warning">
+
+                    <i class="bi bi-pencil-square"></i>
+
+                    Actualizar Registro
+
+                </button>
+
+                <a href="{% url 'lista_registros_sacramentales' %}"
+                   class="btn btn-secondary">
+
+                    Cancelar
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+const tipoRegistro = document.getElementById(
+    'tipoRegistro'
+)
+
+const participanteBox = document.getElementById(
+    'participanteBox'
+)
+
+const manualBox = document.getElementById(
+    'manualBox'
+)
+
+tipoRegistro.addEventListener(
+    'change',
+    function(){
+
+        if(this.value === 'manual'){
+
+            participanteBox.style.display = 'none'
+
+            manualBox.style.display = 'block'
+
+        }else{
+
+            participanteBox.style.display = 'block'
+
+            manualBox.style.display = 'none'
+        }
+    }
+)
+
+</script>
+
+{% endblock %}

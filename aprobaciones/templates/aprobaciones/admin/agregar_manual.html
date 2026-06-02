@@ -1,0 +1,221 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+
+            Registrar Sacramento Manualmente
+
+        </h2>
+
+        <p>
+
+            Migración de registros físicos parroquiales
+
+        </p>
+
+    </div>
+
+    <div class="custom-table">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <!-- ERRORES -->
+
+            {% if form.errors %}
+
+            <div class="alert alert-danger">
+
+                {{ form.errors }}
+
+            </div>
+
+            {% endif %}
+
+            <div class="row">
+
+                <!-- PARTICIPANTE EXISTENTE -->
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Participante existente
+
+                    </label>
+
+                    {{ form.participante }}
+
+                    <small class="text-muted">
+
+                        Opcional si registrará una persona antigua.
+
+                    </small>
+
+                </div>
+
+                <!-- NOMBRE MANUAL -->
+
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">
+
+                        Nombre manual
+
+                    </label>
+
+                    {{ form.nombre_manual }}
+
+                </div>
+
+                <!-- APELLIDO MANUAL -->
+
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">
+
+                        Apellido manual
+
+                    </label>
+
+                    {{ form.apellido_manual }}
+
+                </div>
+
+                <!-- CURSO -->
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Curso (Opcional)
+
+                    </label>
+
+                    {{ form.curso }}
+
+                </div>
+
+                <!-- GESTION -->
+
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">
+
+                        Gestión
+
+                    </label>
+
+                    {{ form.gestion }}
+
+                </div>
+
+                <!-- SACRAMENTO -->
+
+                <div class="col-md-3 mb-3">
+
+                    <label class="form-label">
+
+                        Sacramento
+
+                    </label>
+
+                    {{ form.sacramento }}
+
+                </div>
+
+                <!-- ESTADO FINAL -->
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">
+
+                        Estado Final
+
+                    </label>
+
+                    {{ form.estado_final }}
+
+                </div>
+
+                <!-- PROMEDIO TAREAS -->
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">
+
+                        Promedio Tareas
+
+                    </label>
+
+                    {{ form.promedio_tareas }}
+
+                </div>
+
+                <!-- PROMEDIO CUESTIONARIOS -->
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">
+
+                        Promedio Cuestionarios
+
+                    </label>
+
+                    {{ form.promedio_cuestionarios }}
+
+                </div>
+
+                <!-- FALTAS -->
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">
+
+                        Faltas
+
+                    </label>
+
+                    {{ form.faltas }}
+
+                </div>
+
+            </div>
+
+            <!-- BOTONES -->
+
+            <div class="d-flex gap-2 mt-3">
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <i class="bi bi-save"></i>
+
+                    Guardar Registro
+
+                </button>
+
+                <a href="{% url 'sacramentos_admin' %}"
+                   class="btn btn-secondary">
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Volver
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

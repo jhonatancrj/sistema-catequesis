@@ -1,0 +1,168 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Crear Clase
+{% endblock %}
+
+{% block content %}
+
+<div class="form-page">
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h2>
+                Crear Clase
+            </h2>
+
+            <p>
+                Registrar una nueva clase en el sistema.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="form-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {% if form.errors %}
+
+            <div class="alert alert-danger mb-4">
+
+                <strong>
+                    Existen errores en el formulario.
+                </strong>
+
+                Por favor revise los campos marcados.
+
+            </div>
+
+            {% endif %}
+
+            <div class="row">
+
+                <!-- CURSO -->
+                <div class="col-md-12 mb-4">
+
+                    <label class="form-label">
+                        Curso
+                    </label>
+
+                    {{ form.curso }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.curso.errors }}
+                    </div>
+
+                </div>
+
+                <!-- TITULO -->
+                <div class="col-md-12 mb-4">
+
+                    <label class="form-label">
+                        Título de la Clase
+                    </label>
+
+                    {{ form.titulo }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.titulo.errors }}
+                    </div>
+
+                </div>
+
+                <!-- DESCRIPCION -->
+                <div class="col-md-12 mb-4">
+
+                    <label class="form-label">
+                        Descripción
+                    </label>
+
+                    {{ form.descripcion }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.descripcion.errors }}
+                    </div>
+
+                </div>
+
+                <!-- FECHA -->
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        Fecha
+                    </label>
+
+                    {{ form.fecha }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.fecha.errors }}
+                    </div>
+
+                </div>
+
+                <!-- HORA INICIO -->
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        Hora Inicio
+                    </label>
+
+                    {{ form.hora_inicio }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.hora_inicio.errors }}
+                    </div>
+
+                </div>
+
+                <!-- HORA FIN -->
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        Hora Fin
+                    </label>
+
+                    {{ form.hora_fin }}
+
+                    <div class="text-danger small mt-1">
+                        {{ form.hora_fin.errors }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- BOTONES -->
+            <div class="form-buttons">
+
+                <a href="{% url 'lista_clases' %}"
+                   class="btn btn-light">
+
+                    Cancelar
+
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <i class="bi bi-check-circle"></i>
+
+                    Crear Clase
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

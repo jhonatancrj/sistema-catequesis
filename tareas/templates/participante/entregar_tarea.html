@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Entregar Tarea{% endblock %}
+
+{% block content %}
+
+<style>
+
+
+
+/* CONTENEDOR */
+.entrega-page {
+    background: #0f172a;
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+}
+
+/* TARJETA */
+.entrega-card {
+    max-width: 600px;
+    margin: auto;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* TITULO */
+.entrega-card h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #fff;
+}
+
+/* INPUT */
+.entrega-page input[type="file"] {
+    background: rgba(255,255,255,0.08);
+    border: none;
+    color: #fff;
+}
+
+/* BOTONES */
+.btn-success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: none;
+}
+
+/* LISTA ARCHIVOS */
+#lista-archivos {
+    list-style: none;
+    padding-left: 0;
+}
+
+#lista-archivos li {
+    background: rgba(255,255,255,0.05);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="entrega-page">
+
+```
+<div class="entrega-card">
+    <h2>📤 Entregar Tarea</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- ARCHIVOS -->
+        <div class="mb-3">
+            <label class="form-label text-light">Subir archivos</label>
+
+            <div id="contenedor-archivos">
+                <input type="file" name="archivos" class="form-control mb-2" onchange="mostrarArchivo(this)" required>
+            </div>
+
+            <button type="button" class="btn btn-success mt-2" onclick="agregarArchivo()">
+                ➕ Añadir archivo
+            </button>
+
+            <ul id="lista-archivos" class="mt-3"></ul>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary px-4">Enviar Tarea</button>
+        </div>
+    </form>
+</div>
+```
+
+</div>
+
+<script>
+function agregarArchivo() {
+    const contenedor = document.getElementById('contenedor-archivos');
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.name = 'archivos';
+    input.classList.add('form-control', 'mb-2');
+
+    input.onchange = function() {
+        mostrarArchivo(this);
+    };
+
+    contenedor.appendChild(input);
+}
+
+function mostrarArchivo(input) {
+    const lista = document.getElementById('lista-archivos');
+
+    if (input.files.length > 0) {
+        const li = document.createElement('li');
+
+        li.textContent = "📎 " + input.files[0].name;
+
+        const btn = document.createElement('button');
+        btn.textContent = ' ❌';
+        btn.classList.add('btn', 'btn-sm', 'btn-danger', 'ms-2');
+
+        btn.onclick = function() {
+            input.remove();
+            li.remove();
+        };
+
+        li.appendChild(btn);
+        lista.appendChild(li);
+    }
+}
+</script>
+
+{% endblock %}

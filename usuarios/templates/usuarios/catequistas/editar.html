@@ -1,0 +1,183 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}
+Editar Catequista
+{% endblock %}
+
+{% block content %}
+
+<div class="form-page">
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h2>
+                Editar Catequista
+            </h2>
+
+            <p>
+                Actualizar información del Catequista.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="form-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="row">
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Usuario
+                    </label>
+
+                    {{ form.username }}
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Correo
+                    </label>
+
+                    {{ form.email }}
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Nombres
+                    </label>
+
+                    {{ form.first_name }}
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Apellidos
+                    </label>
+
+                    {{ form.last_name }}
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Nueva Contraseña
+                    </label>
+
+                    {{ form.password }}
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Teléfono
+                    </label>
+
+                    {{ form.telefono }}
+
+                </div>
+
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        País
+                    </label>
+
+                    {{ form.pais }}
+
+                </div>
+
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        Departamento
+                    </label>
+
+                    {{ form.departamento }}
+
+                </div>
+
+                <div class="col-md-4 mb-4">
+
+                    <label class="form-label">
+                        Ciudad
+                    </label>
+
+                    {{ form.ciudad }}
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+                        Fecha Nacimiento
+                    </label>
+
+                    {{ form.fecha_nacimiento }}
+
+                </div>
+
+                <div class="col-md-3 mb-4">
+
+                    <label class="form-label">
+                        Género
+                    </label>
+
+                    {{ form.genero }}
+
+                </div>
+
+                <div class="col-md-3 mb-4">
+
+                    <label class="form-label">
+                        Rol
+                    </label>
+
+                    {{ form.rol }}
+
+                </div>
+
+            </div>
+
+            <div class="form-buttons">
+
+                <a href="{% url 'lista_administradores' %}"
+                   class="btn btn-light">
+
+                    Cancelar
+
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <i class="bi bi-check-circle"></i>
+
+                    Guardar Cambios
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

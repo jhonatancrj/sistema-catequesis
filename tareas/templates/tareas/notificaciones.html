@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+/* CONTENEDOR GENERAL */
+.noti-page {
+    background: #0f172a;
+    padding: 40px 20px;
+    min-height: calc(100vh - 90px);
+}
+
+/* TITULO */
+.noti-titulo {
+    color: #ffffff;
+    margin-bottom: 25px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* CONTENEDOR */
+.noti-contenedor {
+    max-width: 700px;
+    margin: auto;
+}
+
+/* TARJETA DE NOTIFICACION */
+.noti-item {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    transition: 0.3s;
+    color: #e2e8f0;
+}
+
+.noti-item:hover {
+    transform: translateY(-4px);
+}
+
+/* FECHA */
+.noti-fecha {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+/* MENSAJE VACIO */
+.noti-vacio {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="noti-page">
+
+```
+<h3 class="noti-titulo">Notificaciones</h3>
+
+<div class="noti-contenedor">
+
+{% for n in notificaciones %}
+    <div class="noti-item">
+        {{ n.mensaje }}
+        <span class="noti-fecha">{{ n.fecha }}</span>
+    </div>
+{% empty %}
+    <p class="noti-vacio">No hay notificaciones</p>
+{% endfor %}
+
+</div>
+```
+
+</div>
+
+{% endblock %}
+

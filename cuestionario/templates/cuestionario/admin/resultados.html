@@ -1,0 +1,156 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+            Resultados del Cuestionario
+        </h2>
+
+        <p>
+
+            {{ cuestionario.titulo }}
+
+        </p>
+
+    </div>
+
+    <!-- CARDS -->
+    <div class="dashboard-cards">
+
+        <div class="card-box">
+
+            <p>Promedio</p>
+
+            <h3>
+
+                {{ promedio|default:"0"|floatformat:2 }}
+
+            </h3>
+
+        </div>
+
+        <div class="card-box">
+
+            <p>Nota Máxima</p>
+
+            <h3>
+
+                {{ maxima|default:"0" }}
+
+            </h3>
+
+        </div>
+
+        <div class="card-box">
+
+            <p>Nota Mínima</p>
+
+            <h3>
+
+                {{ minima|default:"0" }}
+
+            </h3>
+
+        </div>
+
+        <div class="card-box">
+
+            <p>Total Intentos</p>
+
+            <h3>
+
+                {{ total }}
+
+            </h3>
+
+        </div>
+
+    </div>
+    <div class="mb-4">
+
+        <a href="{% url 'exportar_resultados_pdf' cuestionario.id %}"
+        class="btn btn-danger">
+
+            <i class="bi bi-file-earmark-pdf"></i>
+
+            Exportar PDF
+
+        </a>
+
+    </div>
+
+    <!-- TABLA -->
+    <div class="custom-table">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                <tr>
+
+                    <th>Participante</th>
+                    <th>Puntaje</th>
+                    <th>Fecha</th>
+                    <th>Detalle</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for intento in intentos %}
+
+                <tr>
+
+                    <td>
+
+                        {{ intento.usuario.first_name }}
+                        {{ intento.usuario.last_name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ intento.puntaje }}
+
+                    </td>
+
+                    <td>
+
+                        {{ intento.fecha }}
+
+                    </td>
+
+                    <td>
+
+                        <a href="{% url 'detalle_intento_admin' intento.id %}"
+                           class="btn btn-primary btn-sm">
+
+                            Ver
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

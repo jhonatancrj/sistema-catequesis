@@ -1,0 +1,87 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<div class="content">
+
+    <div class="page-title">
+
+        <h2>
+
+            Libros Históricos
+
+        </h2>
+
+        <p>
+
+            Registros sacramentales antiguos
+
+        </p>
+
+    </div>
+
+    <div class="custom-table">
+
+        <div class="table-responsive">
+
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Nombre</th>
+                        <th>Sacramento</th>
+                        <th>Fecha</th>
+                        <th>Parroquia</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for r in registros %}
+
+                    <tr>
+
+                        <td>
+
+                            {{ r.nombre_manual }}
+                            {{ r.apellido_manual }}
+
+                        </td>
+
+                        <td>
+
+                            {{ r.sacramento.nombre }}
+
+                        </td>
+
+                        <td>
+
+                            {{ r.fecha_sacramento }}
+
+                        </td>
+
+                        <td>
+
+                            {{ r.lugar_sacramento }}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

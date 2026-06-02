@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+
+{% block title %}Clases del Curso{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* FONDO */
+.page-clases {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+    color: #e2e8f0;
+}
+
+/* CONTENEDOR */
+.contenedor-principal {
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* HEADER */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    margin: 0;
+}
+
+/* BOTONES */
+.btn-pro {
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    color: white;
+    transition: 0.3s;
+}
+
+.btn-crear {
+    background: #22c55e;
+}
+
+.btn-crear:hover {
+    background: #16a34a;
+}
+
+.btn-pdf {
+    background: #ef4444;
+}
+
+.btn-pdf:hover {
+    background: #dc2626;
+}
+
+/* BUSCADOR */
+.buscador {
+    margin-bottom: 15px;
+}
+
+.buscador input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+}
+
+/* TABLA */
+.tabla-contenedor {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #3b82f6;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+tr:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+/* BOTONES ACCIONES */
+.btn-accion {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+    color: white;
+    margin-right: 5px;
+}
+
+.btn-azul { background: #3b82f6; }
+.btn-verde { background: #22c55e; }
+.btn-morado { background: #8b5cf6; }
+.btn-gris { background: #64748b; }
+
+/* RESUMEN ASISTENCIAS */
+.resumen-container {
+    margin-top: 40px;
+}
+
+.resumen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #3b82f6;
+}
+
+.resumen-header h3 {
+    margin: 0;
+    color: #e2e8f0;
+    font-size: 20px;
+}
+
+.badge-asistencia {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.badge-presente { background: #22c55e; color: white; }
+.badge-ausente { background: #ef4444; color: white; }
+.badge-permiso { background: #f59e0b; color: white; }
+
+/* ESTADO COLORES */
+.estado-presente { color: #22c55e; font-weight: bold; }
+.estado-ausente { color: #ef4444; font-weight: bold; }
+.estado-permiso { color: #f59e0b; font-weight: bold; }
+
+.porcentaje-asistencia {
+    text-align: center;
+    font-weight: bold;
+    color: #3b82f6;
+}
+
+</style>
+
+<div class="franja-nav"></div>
+
+<div class="page-clases">
+
+<div class="contenedor-principal">
+
+<!-- HEADER -->
+<div class="header-top">
+    <h2>📚 Clases - {{ curso.nombre }}</h2>
+
+    <div>
+        <a href="#" class="btn-pro btn-crear">
+            ➕ Editar Clase
+        </a>
+
+        <!-- 🔥 PDF (puedes ajustar URL) -->
+        <a href="{% url 'exportar_asistencia_curso_pdf' curso.id %}" class="btn-pro btn-pdf">
+        📄 Reporte Institucional
+        </a>
+    </div>
+</div>
+
+<!-- BUSCADOR -->
+<div class="buscador">
+    <input type="text" id="buscador" placeholder="🔍 Buscar clase...">
+</div>
+
+<!-- TABLA -->
+<div class="tabla-contenedor">
+
+<table id="tablaClases">
+
+<tr>
+    <th>Título</th>
+    <th>Fecha</th>
+    <th>Horario</th>
+    <th>Acciones</th>
+</tr>
+
+{% for clase in clases %}
+<tr>
+    <td>{{ clase.titulo }}</td>
+    <td>{{ clase.fecha }}</td>
+    <td>{{ clase.hora_inicio }} - {{ clase.hora_fin }}</td>
+    <td>
+        <a href="{% url 'tomar_asistencia' clase.id %}" class="btn-accion btn-azul">
+            Asistencia
+        </a>
+
+        <a href="{% url 'asistencia_qr' clase.id %}" class="btn-accion btn-verde">
+            QR
+        </a>
+
+        <a href="{% url 'crear_tarea' clase.id %}" class="btn-accion btn-morado">
+            Tarea
+        </a>
+
+        <a href="{% url 'ver_tareas' clase.id %}" class="btn-accion btn-gris">
+            Ver
+        </a>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4">No hay clases registradas</td>
+</tr>
+{% endfor %}
+
+</table>
+
+</div>
+
+<!-- RESUMEN DE ASISTENCIAS -->
+<div class="resumen-container">
+
+    <div class="resumen-header">
+        <h3>📋 Resumen de Asistencias</h3>
+        <a href="{% url 'exportar_asistencia_curso_pdf' curso.id %}" class="btn-pro btn-pdf">
+            📥 Descargar Reporte PDF
+        </a>
+    </div>
+
+    <div class="tabla-contenedor">
+        <table id="tablaAsistencias">
+            <tr>
+                <th>Participante</th>
+                {% for clase in clases %}
+                    <th style="text-align: center; font-size: 12px;">{{ clase.fecha|date:"d/m" }}</th>
+                {% endfor %}
+                <th style="text-align: center;">Asistencias</th>
+                <th style="text-align: center;">% Asistencia</th>
+            </tr>
+            
+            {% for asistencia in asistencias_resumen %}
+            <tr>
+                <td><strong>{{ asistencia.nombre }}</strong></td>
+                
+                {% for detalle in asistencia.detalles %}
+                <td style="text-align: center;">
+                    {% if detalle.estado == 'PRESENTE' %}
+                        <span class="badge-asistencia badge-presente">✓</span>
+                    {% elif detalle.estado == 'PERMISO' %}
+                        <span class="badge-asistencia badge-permiso">P</span>
+                    {% else %}
+                        <span class="badge-asistencia badge-ausente">✗</span>
+                    {% endif %}
+                </td>
+                {% endfor %}
+                
+                <td style="text-align: center;">
+                    <strong>{{ asistencia.presentes }}/{{ asistencia.total }}</strong>
+                </td>
+                <td class="porcentaje-asistencia">
+                    {{ asistencia.porcentaje }}%
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{% widthratio clases.count 1 1 %}">No hay participantes registrados</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</div>
+
+</div>
+</div>
+
+<!-- 🔍 BUSCADOR SCRIPT -->
+<script>
+document.getElementById("buscador").addEventListener("keyup", function() {
+    let filtro = this.value.toLowerCase();
+    
+    // Buscar en tabla de clases
+    let filasClases = document.querySelectorAll("#tablaClases tr");
+    filasClases.forEach((fila, index) => {
+        if (index === 0) return;
+        let texto = fila.innerText.toLowerCase();
+        fila.style.display = texto.includes(filtro) ? "" : "none";
+    });
+    
+    // Buscar en tabla de asistencias
+    let filasAsistencias = document.querySelectorAll("#tablaAsistencias tr");
+    filasAsistencias.forEach((fila, index) => {
+        if (index === 0) return;
+        let texto = fila.innerText.toLowerCase();
+        fila.style.display = texto.includes(filtro) ? "" : "none";
+    });
+});
+</script>
+
+{% endblock %}

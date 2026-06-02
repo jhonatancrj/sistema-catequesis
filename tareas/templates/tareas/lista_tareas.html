@@ -1,0 +1,14 @@
+<h2>Tareas</h2>
+
+{% for tarea in tareas %}
+    <div>
+        <h3>{{ tarea.titulo }}</h3>
+        <p>{{ tarea.descripcion }}</p>
+
+        <!-- ESTUDIANTE -->
+        <a href="{% url 'entregar_tarea' tarea.id %}">Entregar</a>
+
+        <!-- CATEQUISTA -->
+        <a href="#">Ver entregas</a>
+    </div>
+{% endfor %}
