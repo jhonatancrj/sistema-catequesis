@@ -19,7 +19,7 @@ from django.db.models import Q
 from .models import Sacramento
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from weasyprint import HTML
+
 
 @login_required
 @rol_requerido('ADMIN')
@@ -306,6 +306,7 @@ def pdf_registro_sacramental(
     request,
     id
 ):
+    from weasyprint import HTML
 
     registro = get_object_or_404(
         RegistroSacramental,
@@ -369,7 +370,7 @@ def certificado_sacramental_pdf(
     request,
     id
 ):
-
+    from weasyprint import HTML
     registro = get_object_or_404(
         RegistroSacramental,
         id=id
