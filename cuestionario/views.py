@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.db.models import Avg, Max, Min, Count
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from weasyprint import HTML
+
 from datetime import datetime
 
 @login_required
@@ -979,6 +979,7 @@ def exportar_resultados_pdf(
     request,
     cuestionario_id
 ):
+    from weasyprint import HTML
 
     if request.user.perfil.rol != 'ADMIN':
         return redirect('/')

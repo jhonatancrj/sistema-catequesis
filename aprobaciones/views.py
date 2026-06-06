@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.timezone import now
 
-from weasyprint import HTML
+
 
 from usuarios.decorators import rol_requerido
 
@@ -39,7 +39,6 @@ from django.core.mail import EmailMessage
 
 from django.template.loader import render_to_string
 
-from weasyprint import HTML
 
 from django.http import HttpResponse
 
@@ -427,7 +426,7 @@ def lista_aprobados(request):
 @login_required
 @rol_requerido('CATEQUISTA')
 def enviar_certificado(request, id):
-
+    from weasyprint import HTML
     aprobado = get_object_or_404(
         ResultadoCurso,
         id=id
@@ -734,7 +733,7 @@ def reporte_curso(request, id):
 @login_required
 @rol_requerido('CATEQUISTA')
 def exportar_reporte_curso_pdf(request, id):
-
+    from weasyprint import HTML
     curso = get_object_or_404(
         Curso,
         id=id
