@@ -25,7 +25,7 @@ urlpatterns = [
     path('usuarios/', include('usuarios.urls')),
     ## cursos
     path('cursos/', include('cursos.urls')),
-    #path('', include('usuarios.urls')),
+    path('', include('usuarios.urls')),
     ## tarea
     path('tareas/', include('tareas.urls')),
     ## drive con outh
