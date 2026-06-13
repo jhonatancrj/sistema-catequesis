@@ -8,7 +8,6 @@ urlpatterns = [
     path('calificar/<int:entrega_id>/', views.calificar_tarea, name='calificar_tarea'),
     path('entregas/<int:tarea_id>/', views.ver_entregas, name='ver_entregas'),
 
-    path('notificaciones/', views.ver_notificaciones, name='notificaciones'),
     path('cancelar/<int:tarea_id>/', views.cancelar_entrega, name='cancelar_entrega'),
 
     ##coneccion de drive con outh

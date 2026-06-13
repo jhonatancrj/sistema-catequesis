@@ -1,0 +1,227 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+<style>
+
+/* CONTENEDOR GENERAL */
+.admin-notif-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px 20px;
+    min-height: calc(100vh - 90px);
+}
+
+/* HEADER */
+.admin-notif-header {
+    max-width: 1000px;
+    margin: 0 auto 30px;
+}
+
+.admin-notif-titulo {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 32px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.admin-notif-icon {
+    font-size: 32px;
+}
+
+/* ESTADISTICAS */
+.admin-notif-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.admin-notif-stat-card {
+    background: rgba(255,255,255,0.95);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    border-top: 4px solid #667eea;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.admin-notif-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.admin-notif-stat-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 8px;
+}
+
+.admin-notif-stat-label {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* CONTENEDOR DE NOTIFICACIONES */
+.admin-notif-list {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* TARJETA DE NOTIFICACION */
+.admin-notif-card {
+    background: rgba(255,255,255,0.97);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 15px;
+    border-left: 5px solid #667eea;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.admin-notif-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    border-left-color: #764ba2;
+}
+
+/* CONTENIDO */
+.admin-notif-mensaje {
+    color: #333;
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 12px 0;
+}
+
+/* FECHA Y META */
+.admin-notif-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 13px;
+    color: #999;
+}
+
+.admin-notif-fecha {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-notif-fecha-icon {
+    color: #667eea;
+}
+
+/* ESTADO VACIO */
+.admin-notif-empty {
+    text-align: center;
+    padding: 80px 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: rgba(255,255,255,0.8);
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.admin-notif-empty-icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+    display: block;
+    color: rgba(255,255,255,0.5);
+}
+
+.admin-notif-empty-text {
+    font-size: 18px;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .admin-notif-container {
+        padding: 20px 15px;
+    }
+    
+    .admin-notif-titulo {
+        font-size: 24px;
+    }
+    
+    .admin-notif-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-notif-card {
+        padding: 15px;
+    }
+    
+    .admin-notif-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+</style>
+
+<div class="admin-notif-container">
+    
+    <!-- HEADER -->
+    <div class="admin-notif-header">
+        <h1 class="admin-notif-titulo">
+            <i class="fas fa-bell admin-notif-icon"></i>
+            Panel de Notificaciones
+        </h1>
+    </div>
+
+    <!-- ESTADISTICAS -->
+    <div class="admin-notif-stats">
+        <div class="admin-notif-stat-card">
+            <div class="admin-notif-stat-number">{{ notificaciones|length }}</div>
+            <div class="admin-notif-stat-label">Total de Notificaciones</div>
+        </div>
+    </div>
+
+    <!-- LISTADO DE NOTIFICACIONES -->
+    <div class="admin-notif-list">
+        {% if notificaciones %}
+            {% for n in notificaciones %}
+                <div class="admin-notif-card">
+                    <p class="admin-notif-mensaje">{{ n.mensaje }}</p>
+                    <div class="admin-notif-meta">
+                        <span class="admin-notif-fecha">
+                            <i class="fas fa-clock admin-notif-fecha-icon"></i>
+                            {{ n.fecha_creacion|date:"d/m/Y H:i"|default:n.fecha|date:"d/m/Y H:i" }}
+                        </span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="admin-notif-empty">
+                <i class="fas fa-inbox admin-notif-empty-icon"></i>
+                <p class="admin-notif-empty-text">No hay notificaciones</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

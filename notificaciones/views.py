@@ -8,21 +8,127 @@ from django.db.models import Q
 from django.utils import timezone
 from .models import Notificacion, PreferenciaNotificacion, CanalNotificacion
 from .services import NotificacionService
-from usuarios.decorators import rol_requerido
 
 
 @login_required
 def notificaciones_list(request):
-    """Página de notificaciones del usuario - redirecciona según rol"""
-    # Detectar rol y redirigir a la vista específica
-    usuario = request.user
-    if hasattr(usuario, 'rol') and usuario.rol:
-        if usuario.rol == 'PARTICIPANTE':
-            return redirect('notificaciones:participante')
-        elif usuario.rol == 'CATEQUISTA':
-            return redirect('notificaciones:catequista')
+    """Página de notificaciones - redirecciona según rol"""
+    # Detectar rol correctamente desde perfil
+    try:
+        user_rol = request.user.perfil.rol
+    except:
+        user_rol = 'PARTICIPANTE'
     
-    # Por defecto (ADMIN) muestra todas las notificaciones
+    # Redirigir según rol
+    if user_rol == 'ADMIN':
+        return redirect('notificaciones:admin')
+    elif user_rol == 'CATEQUISTA':
+        return redirect('notificaciones:catequista')
+    else:  # PARTICIPANTE
+        return redirect('notificaciones:participante')
+
+
+@login_required
+def notificaciones_participante(request):
+    """Página de notificaciones para participantes"""
+    try:
+        user_rol = request.user.perfil.rol
+    except:
+        user_rol = 'PARTICIPANTE'
+    
+    # Si es admin, redirige a panel de admin
+    if user_rol == 'ADMIN':
+        return redirect('notificaciones:admin')
+    
+    filtro = request.GET.get('filtro', 'todas')
+    pagina = int(request.GET.get('pagina', 1))
+    por_pagina = 15
+
+    query = Notificacion.objects.filter(
+        usuario=request.user,
+        canal=CanalNotificacion.EN_APP
+    ).order_by('-fecha_creacion')
+
+    if filtro != 'todas':
+        query = query.filter(tipo=filtro)
+
+    total_no_leidas = query.filter(leida=False).count()
+
+    start = (pagina - 1) * por_pagina
+    notificaciones = query[start:start + por_pagina]
+    total = query.count()
+    total_paginas = (total + por_pagina - 1) // por_pagina
+
+    context = {
+        'notificaciones': notificaciones,
+        'filtro': filtro,
+        'pagina': pagina,
+        'total_paginas': total_paginas,
+        'total': total,
+        'total_no_leidas': total_no_leidas,
+        'rol': 'Participante'
+    }
+    return render(request, 'notificaciones/notificaciones_participante.html', context)
+
+
+@login_required
+def notificaciones_catequista(request):
+    """Página de notificaciones para catequistas"""
+    try:
+        user_rol = request.user.perfil.rol
+    except:
+        user_rol = 'PARTICIPANTE'
+    
+    # Si es admin, redirige a panel de admin
+    if user_rol == 'ADMIN':
+        return redirect('notificaciones:admin')
+    
+    filtro = request.GET.get('filtro', 'todas')
+    pagina = int(request.GET.get('pagina', 1))
+    por_pagina = 15
+
+    query = Notificacion.objects.filter(
+        usuario=request.user,
+        canal=CanalNotificacion.EN_APP
+    ).order_by('-fecha_creacion')
+
+    if filtro != 'todas':
+        query = query.filter(tipo=filtro)
+
+    total_no_leidas = query.filter(leida=False).count()
+
+    start = (pagina - 1) * por_pagina
+    notificaciones = query[start:start + por_pagina]
+    total = query.count()
+    total_paginas = (total + por_pagina - 1) // por_pagina
+
+    context = {
+        'notificaciones': notificaciones,
+        'filtro': filtro,
+        'pagina': pagina,
+        'total_paginas': total_paginas,
+        'total': total,
+        'total_no_leidas': total_no_leidas,
+        'rol': 'Catequista'
+    }
+    return render(request, 'notificaciones/notificaciones_catequista.html', context)
+
+
+@login_required
+def notificaciones_admin(request):
+    """Página de notificaciones para administradores"""
+    try:
+        user_rol = request.user.perfil.rol
+    except:
+        user_rol = 'PARTICIPANTE'
+    
+    # Si no es admin, redirige al panel de usuarios
+    if user_rol != 'ADMIN':
+        if user_rol == 'CATEQUISTA':
+            return redirect('notificaciones:catequista')
+        else:
+            return redirect('notificaciones:participante')
+    
     filtro = request.GET.get('filtro', 'todas')
     pagina = int(request.GET.get('pagina', 1))
     por_pagina = 15
@@ -65,75 +171,6 @@ def notificaciones_list(request):
         ]
     }
     return render(request, 'notificaciones/notificaciones_list.html', context)
-
-
-@login_required
-def notificaciones_participante(request):
-    """Página de notificaciones para participantes"""
-    filtro = request.GET.get('filtro', 'todas')
-    pagina = int(request.GET.get('pagina', 1))
-    por_pagina = 15
-
-    query = Notificacion.objects.filter(
-        usuario=request.user,
-        canal=CanalNotificacion.EN_APP
-    ).order_by('-fecha_creacion')
-
-    if filtro != 'todas':
-        query = query.filter(tipo=filtro)
-
-    total_no_leidas = query.filter(leida=False).count()
-
-    start = (pagina - 1) * por_pagina
-    notificaciones = query[start:start + por_pagina]
-    total = query.count()
-    total_paginas = (total + por_pagina - 1) // por_pagina
-
-    context = {
-        'notificaciones': notificaciones,
-        'filtro': filtro,
-        'pagina': pagina,
-        'total_paginas': total_paginas,
-        'total': total,
-        'total_no_leidas': total_no_leidas,
-        'rol': 'Participante'
-    }
-    return render(request, 'notificaciones/notificaciones_participante.html', context)
-
-
-@login_required
-@rol_requerido('CATEQUISTA')
-def notificaciones_catequista(request):
-    """Página de notificaciones para catequistas"""
-    filtro = request.GET.get('filtro', 'todas')
-    pagina = int(request.GET.get('pagina', 1))
-    por_pagina = 15
-
-    query = Notificacion.objects.filter(
-        usuario=request.user,
-        canal=CanalNotificacion.EN_APP
-    ).order_by('-fecha_creacion')
-
-    if filtro != 'todas':
-        query = query.filter(tipo=filtro)
-
-    total_no_leidas = query.filter(leida=False).count()
-
-    start = (pagina - 1) * por_pagina
-    notificaciones = query[start:start + por_pagina]
-    total = query.count()
-    total_paginas = (total + por_pagina - 1) // por_pagina
-
-    context = {
-        'notificaciones': notificaciones,
-        'filtro': filtro,
-        'pagina': pagina,
-        'total_paginas': total_paginas,
-        'total': total,
-        'total_no_leidas': total_no_leidas,
-        'rol': 'Catequista'
-    }
-    return render(request, 'notificaciones/notificaciones_catequista.html', context)
 
 
 @login_required
@@ -243,9 +280,21 @@ def obtener_notificaciones_recientes(request):
     return JsonResponse(data)
 
 
-@rol_requerido('ADMIN')
+@login_required
 def notificaciones_masivas(request):
     """Panel de administración de notificaciones masivas"""
+    try:
+        user_rol = request.user.perfil.rol
+    except:
+        user_rol = 'PARTICIPANTE'
+    
+    # Si no es admin, redirige al panel de usuarios
+    if user_rol != 'ADMIN':
+        if user_rol == 'CATEQUISTA':
+            return redirect('notificaciones:catequista')
+        else:
+            return redirect('notificaciones:participante')
+    
     from .models import NotificacionMasiva
 
     notificaciones = NotificacionMasiva.objects.all().order_by('-fecha_creacion')

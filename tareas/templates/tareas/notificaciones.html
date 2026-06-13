@@ -5,81 +5,157 @@
 <style>
 
 /* CONTENEDOR GENERAL */
-.noti-page {
-    background: #0f172a;
+.notif-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 40px 20px;
     min-height: calc(100vh - 90px);
 }
 
-/* TITULO */
-.noti-titulo {
-    color: #ffffff;
-    margin-bottom: 25px;
-    font-weight: 700;
+/* HEADER */
+.notif-header {
+    max-width: 700px;
+    margin: 0 auto 30px;
     text-align: center;
 }
 
-/* CONTENEDOR */
-.noti-contenedor {
+.notif-header-titulo {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 28px;
+    margin: 0;
+}
+
+.notif-header-icon {
+    color: rgba(255,255,255,0.9);
+    margin-right: 10px;
+}
+
+/* CONTENEDOR DE NOTIFICACIONES */
+.notif-list {
     max-width: 700px;
-    margin: auto;
+    margin: 0 auto;
 }
 
 /* TARJETA DE NOTIFICACION */
-.noti-item {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(12px);
-    border-radius: 14px;
-    padding: 18px 20px;
+.notif-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
     margin-bottom: 15px;
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    transition: 0.3s;
-    color: #e2e8f0;
+    border-left: 5px solid #667eea;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    animation: slideIn 0.3s ease;
 }
 
-.noti-item:hover {
-    transform: translateY(-4px);
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notif-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    border-left-color: #764ba2;
+}
+
+/* CONTENIDO */
+.notif-mensaje {
+    color: #333;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
 }
 
 /* FECHA */
-.noti-fecha {
+.notif-fecha {
     display: block;
-    margin-top: 6px;
-    font-size: 13px;
-    color: #94a3b8;
+    margin-top: 12px;
+    font-size: 12px;
+    color: #999;
 }
 
-/* MENSAJE VACIO */
-.noti-vacio {
+.notif-fecha-icon {
+    margin-right: 5px;
+    color: #667eea;
+}
+
+/* ESTADO VACIO */
+.notif-empty {
     text-align: center;
-    color: #94a3b8;
+    padding: 60px 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: rgba(255,255,255,0.8);
+}
+
+.notif-empty-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    display: block;
+    color: rgba(255,255,255,0.6);
+}
+
+.notif-empty-text {
     font-size: 16px;
-    margin-top: 20px;
+    margin: 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+    .notif-container {
+        padding: 20px 15px;
+    }
+    
+    .notif-header-titulo {
+        font-size: 22px;
+    }
+    
+    .notif-card {
+        padding: 15px;
+    }
+    
+    .notif-mensaje {
+        font-size: 14px;
+    }
 }
 
 </style>
 
-<div class="franja-nav"></div>
-
-<div class="noti-page">
-
-```
-<h3 class="noti-titulo">Notificaciones</h3>
-
-<div class="noti-contenedor">
-
-{% for n in notificaciones %}
-    <div class="noti-item">
-        {{ n.mensaje }}
-        <span class="noti-fecha">{{ n.fecha }}</span>
+<div class="notif-container">
+    
+    <!-- HEADER -->
+    <div class="notif-header">
+        <h1 class="notif-header-titulo">
+            <i class="fas fa-bell notif-header-icon"></i>Mis Notificaciones
+        </h1>
     </div>
-{% empty %}
-    <p class="noti-vacio">No hay notificaciones</p>
-{% endfor %}
 
-</div>
-```
+    <!-- LISTADO -->
+    <div class="notif-list">
+        {% if notificaciones %}
+            {% for n in notificaciones %}
+                <div class="notif-card">
+                    <p class="notif-mensaje">{{ n.mensaje }}</p>
+                    <span class="notif-fecha">
+                        <i class="fas fa-clock notif-fecha-icon"></i>
+                        {{ n.fecha_creacion|date:"d/m/Y H:i"|default:n.fecha|date:"d/m/Y H:i" }}
+                    </span>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="notif-empty">
+                <i class="fas fa-inbox notif-empty-icon"></i>
+                <p class="notif-empty-text">No tienes notificaciones aún</p>
+            </div>
+        {% endif %}
+    </div>
 
 </div>
 

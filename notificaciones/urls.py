@@ -4,10 +4,11 @@ from . import views
 app_name = 'notificaciones'
 
 urlpatterns = [
-    # Notificaciones generales
+    # Notificaciones generales (redirecciona según rol)
     path('', views.notificaciones_list, name='lista'),
     
     # Notificaciones por rol
+    path('admin/', views.notificaciones_admin, name='admin'),
     path('participante/', views.notificaciones_participante, name='participante'),
     path('catequista/', views.notificaciones_catequista, name='catequista'),
     

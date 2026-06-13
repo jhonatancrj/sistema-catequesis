@@ -2,22 +2,31 @@ import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Tarea
-from cursos.models import Clase, Inscripcion
 from django.contrib.auth.decorators import login_required
-from usuarios.decorators import rol_requerido
 from django.core.mail import send_mail
 from django.conf import settings
-from .google_drive_oauth import subir_archivo_drive
-from .models import MaterialTarea, Tarea
-from cuestionario.models import Cuestionario
 from django.contrib import messages
+from django.db.models import Avg, Count
+from django.http import HttpResponse
+
+# Modelos
+from .models import (
+    Tarea, MaterialTarea, EntregaTarea, Notificacion, ArchivoEntrega
+)
+from cursos.models import Clase, Inscripcion, Curso
+from cuestionario.models import Cuestionario
+
+# Servicios
+from .google_drive_oauth import subir_archivo_drive, get_flow
+from .notifications_service import crear_notificacion_y_email
+from usuarios.decorators import rol_requerido
 from .forms import TareaForm
 
 @login_required
 def crear_tarea(request, clase_id):
     clase = Clase.objects.get(id=clase_id)
-
+    if not request.session.get('credentials'):
+        return redirect('google_login')
     if request.method == 'POST':
         titulo = request.POST['titulo']
         descripcion = request.POST['descripcion']
@@ -60,20 +69,6 @@ def ver_tareas(request, clase_id):
     tareas = Tarea.objects.filter(clase_id=clase_id)
     return render(request, 'tareas/lista_tareas.html', {'tareas': tareas})
 
-from .models import EntregaTarea
-
-## entregar tarea y notificacion
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.core.mail import send_mail
-
-from .models import Tarea, EntregaTarea, Notificacion, ArchivoEntrega
-from .google_drive_oauth import subir_archivo_drive
-
-# 👇 si usas decorador de rol
-from usuarios.decorators import rol_requerido
-
 
 # =========================
 # 📤 ENTREGAR TAREA (OAUTH)
@@ -81,8 +76,9 @@ from usuarios.decorators import rol_requerido
 @login_required
 def entregar_tarea(request, tarea_id):
     tarea = Tarea.objects.get(id=tarea_id)
-
-    # 🔥 VALIDAR FECHA
+    if not request.session.get('credentials'):
+        return redirect('google_login')
+    # VALIDAR FECHA
     if not tarea.puede_entregar():
         return render(request, 'tareas/error.html', {
             'mensaje': 'La tarea está cerrada'
@@ -127,7 +123,6 @@ def entregar_tarea(request, tarea_id):
                 [request.user.email],
                 fail_silently=True,
             )
-
         return redirect('detalle_curso', id=tarea.clase.curso.id)
 
     return render(request, 'participante/entregar_tarea.html', {'tarea': tarea})
@@ -145,10 +140,12 @@ def calificar_tarea(request, entrega_id):
         entrega.observacion = request.POST['observacion']
         entrega.save()
 
-        # 🔔 NOTIFICACIÓN
-        Notificacion.objects.create(
+        # 🔔 NOTIFICACIÓN CON EMAIL
+        mensaje = f"Tu tarea '{entrega.tarea.titulo}' fue calificada con {entrega.calificacion}"
+        crear_notificacion_y_email(
             usuario=entrega.estudiante,
-            mensaje=f"Tu tarea '{entrega.tarea.titulo}' fue calificada con {entrega.calificacion}"
+            mensaje=mensaje,
+            asunto="Tarea Calificada"
         )
 
         return redirect('ver_entregas', tarea_id=entrega.tarea.id)
@@ -168,20 +165,6 @@ def ver_entregas(request, tarea_id):
     return render(request, 'tareas/ver_entregas.html', {
         'tarea': tarea,
         'entregas': entregas
-    })
-
-
-# =========================
-# 🔔 NOTIFICACIONES
-# =========================
-@login_required
-def ver_notificaciones(request):
-    notificaciones = Notificacion.objects.filter(
-        usuario=request.user
-    ).order_by('-fecha')
-
-    return render(request, 'tareas/notificaciones.html', {
-        'notificaciones': notificaciones
     })
 
 

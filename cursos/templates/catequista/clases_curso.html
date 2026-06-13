@@ -158,6 +158,96 @@ tr:hover {
     font-weight: bold;
     color: #3b82f6;
 }
+/* BOTON RESUMEN */
+.btn-morado-modal{
+    background:#8b5cf6;
+    border:none;
+    cursor:pointer;
+}
+
+.btn-morado-modal:hover{
+    background:#7c3aed;
+}
+
+/* MODAL */
+.modal-resumen{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    z-index:9999;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    backdrop-filter:blur(6px);
+}
+
+.modal-content-resumen{
+    width:95%;
+    max-width:1200px;
+    max-height:90vh;
+    overflow:auto;
+    background:#0f172a;
+    border-radius:18px;
+    padding:25px;
+    border:1px solid rgba(255,255,255,.1);
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+
+.modal-header-resumen{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.modal-header-resumen h3{
+    margin:0;
+}
+
+.btn-cerrar-modal{
+    background:#ef4444;
+    border:none;
+    color:white;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:18px;
+}
+
+.btn-cerrar-modal:hover{
+    background:#dc2626;
+}
+
+/* TABLA MODAL */
+.modal-content-resumen table{
+    min-width:max-content;
+}
+/* TEXTO TABLA RESUMEN MODAL */
+#modalResumen table {
+    color: #ffffff;
+}
+
+#modalResumen td {
+    color: #ffffff;
+}
+
+#modalResumen td strong {
+    color: #ffffff;
+}
+
+#modalResumen th {
+    color: #ffffff;
+}
+
+#modalResumen .porcentaje-asistencia {
+    color: #60a5fa;
+}
+
+#modalResumen .tabla-contenedor {
+    color: #ffffff;
+}
 
 </style>
 
@@ -175,6 +265,10 @@ tr:hover {
         <a href="#" class="btn-pro btn-crear">
             ➕ Editar Clase
         </a>
+
+        <button class="btn-pro btn-morado-modal" onclick="abrirModalResumen()">
+            📋 Ver Resumen
+        </button>
 
         <!-- 🔥 PDF (puedes ajustar URL) -->
         <a href="{% url 'exportar_asistencia_curso_pdf' curso.id %}" class="btn-pro btn-pdf">
@@ -233,63 +327,112 @@ tr:hover {
 
 </div>
 
-<!-- RESUMEN DE ASISTENCIAS -->
-<div class="resumen-container">
 
-    <div class="resumen-header">
-        <h3>📋 Resumen de Asistencias</h3>
-        <a href="{% url 'exportar_asistencia_curso_pdf' curso.id %}" class="btn-pro btn-pdf">
-            📥 Descargar Reporte PDF
-        </a>
+
+</div>
+</div>
+<!-- MODAL RESUMEN -->
+<div id="modalResumen" class="modal-resumen">
+
+    <div class="modal-content-resumen">
+
+        <div class="modal-header-resumen">
+
+            <h3>📋 Resumen de Asistencias</h3>
+
+            <button class="btn-cerrar-modal"
+                    onclick="cerrarModalResumen()">
+                ✕
+            </button>
+
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <a href="{% url 'exportar_asistencia_curso_pdf' curso.id %}"
+               class="btn-pro btn-pdf">
+                📥 Descargar Reporte PDF
+            </a>
+        </div>
+
+        <div class="tabla-contenedor">
+
+            <table id="tablaAsistencias">
+
+                <tr>
+                    <th>Participante</th>
+
+                    {% for clase in clases %}
+                    <th style="text-align:center;font-size:12px;">
+                        {{ clase.fecha|date:"d/m" }}
+                    </th>
+                    {% endfor %}
+
+                    <th style="text-align:center;">
+                        Asistencias
+                    </th>
+
+                    <th style="text-align:center;">
+                        % Asistencia
+                    </th>
+
+                </tr>
+
+                {% for asistencia in asistencias_resumen %}
+                <tr>
+
+                    <td>
+                        <strong>{{ asistencia.nombre }}</strong>
+                    </td>
+
+                    {% for detalle in asistencia.detalles %}
+                    <td style="text-align:center;">
+
+                        {% if detalle.estado == 'PRESENTE' %}
+                            <span class="badge-asistencia badge-presente">
+                                ✓
+                            </span>
+
+                        {% elif detalle.estado == 'PERMISO' %}
+                            <span class="badge-asistencia badge-permiso">
+                                P
+                            </span>
+
+                        {% else %}
+                            <span class="badge-asistencia badge-ausente">
+                                ✗
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+                    {% endfor %}
+
+                    <td style="text-align:center;">
+                        <strong>
+                            {{ asistencia.presentes }}/{{ asistencia.total }}
+                        </strong>
+                    </td>
+
+                    <td class="porcentaje-asistencia">
+                        {{ asistencia.porcentaje }}%
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="100%">
+                        No hay participantes registrados
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </table>
+
+        </div>
+
     </div>
 
-    <div class="tabla-contenedor">
-        <table id="tablaAsistencias">
-            <tr>
-                <th>Participante</th>
-                {% for clase in clases %}
-                    <th style="text-align: center; font-size: 12px;">{{ clase.fecha|date:"d/m" }}</th>
-                {% endfor %}
-                <th style="text-align: center;">Asistencias</th>
-                <th style="text-align: center;">% Asistencia</th>
-            </tr>
-            
-            {% for asistencia in asistencias_resumen %}
-            <tr>
-                <td><strong>{{ asistencia.nombre }}</strong></td>
-                
-                {% for detalle in asistencia.detalles %}
-                <td style="text-align: center;">
-                    {% if detalle.estado == 'PRESENTE' %}
-                        <span class="badge-asistencia badge-presente">✓</span>
-                    {% elif detalle.estado == 'PERMISO' %}
-                        <span class="badge-asistencia badge-permiso">P</span>
-                    {% else %}
-                        <span class="badge-asistencia badge-ausente">✗</span>
-                    {% endif %}
-                </td>
-                {% endfor %}
-                
-                <td style="text-align: center;">
-                    <strong>{{ asistencia.presentes }}/{{ asistencia.total }}</strong>
-                </td>
-                <td class="porcentaje-asistencia">
-                    {{ asistencia.porcentaje }}%
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="{% widthratio clases.count 1 1 %}">No hay participantes registrados</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-
 </div>
-
-</div>
-</div>
-
 <!-- 🔍 BUSCADOR SCRIPT -->
 <script>
 document.getElementById("buscador").addEventListener("keyup", function() {
@@ -311,6 +454,27 @@ document.getElementById("buscador").addEventListener("keyup", function() {
         fila.style.display = texto.includes(filtro) ? "" : "none";
     });
 });
+
+function abrirModalResumen(){
+    document.getElementById("modalResumen").style.display = "flex";
+    document.body.style.overflow = "hidden";
+}
+
+function cerrarModalResumen(){
+    document.getElementById("modalResumen").style.display = "none";
+    document.body.style.overflow = "auto";
+}
+
+window.addEventListener("click", function(e){
+
+    const modal = document.getElementById("modalResumen");
+
+    if(e.target === modal){
+        cerrarModalResumen();
+    }
+
+});
+
 </script>
 
 {% endblock %}

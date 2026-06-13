@@ -1,11 +1,14 @@
-{% extends "base_admin.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}Mis Notificaciones - Participante{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-    <div class="row mb-4">
+<div class="franja-nav"></div>
+
+<div class="notificaciones-page">
+<div class="container">
+    <div class="header-notificaciones">
         <div class="col-md-8">
             <h1>
                 <i class="bi bi-bell"></i> Mis Notificaciones
@@ -13,7 +16,9 @@
                     <span class="badge bg-danger">{{ total_no_leidas }}</span>
                 {% endif %}
             </h1>
-            <p class="text-muted">Notificaciones sobre tareas, cuestionarios, calificaciones y más</p>
+            <p class="notifications-subtitle">
+                Notificaciones sobre tareas, cuestionarios, calificaciones y más
+            </p>
         </div>
         <div class="col-md-4 text-end">
             {% if total_no_leidas > 0 %}
@@ -28,8 +33,8 @@
     </div>
 
     <!-- Filtros -->
-    <div class="mb-4">
-        <div class="btn-group" role="group">
+    <div class="tabs-notificaciones">
+        <div class="tabs">
             <a href="?filtro=todas" class="btn btn-sm {% if filtro == 'todas' %}btn-primary{% else %}btn-outline-primary{% endif %}">
                 Todas
             </a>
@@ -50,29 +55,29 @@
     <div class="row">
         {% for notif in notificaciones %}
         <div class="col-12 mb-3">
-            <div class="card border-start border-4" style="border-color: var(--bs-{{ notif.color }});">
+            <div class="card notification-card border-start border-4 {% if not notif.leida %}notification-unread{% endif %}" style="border-color: var(--bs-{{ notif.color }});">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
-                            <div class="bg-{{ notif.color }} bg-opacity-10 p-3 rounded">
+                            <div class="notification-icon bg-{{ notif.color }} bg-opacity-10">
                                 <i class="bi {{ notif.icono }} text-{{ notif.color }} fs-5"></i>
                             </div>
                         </div>
                         <div class="col">
-                            <h6 class="card-title mb-1">
+                            <h6 class="card-title notification-title mb-1">
                                 {{ notif.titulo }}
                                 {% if not notif.leida %}
                                     <span class="badge bg-danger">NUEVA</span>
                                 {% endif %}
                             </h6>
-                            <p class="card-text text-muted mb-2">{{ notif.mensaje }}</p>
-                            <small class="text-muted">
+                            <p class="card-text notification-message">{{ notif.mensaje }}</p>
+                            <small class="notification-date">
                                 <i class="bi bi-clock"></i>
                                 {{ notif.fecha_creacion|date:"d/m/Y H:i" }}
                             </small>
                         </div>
                         <div class="col-auto">
-                            <div class="btn-group btn-group-sm" role="group">
+                            <div class="btn-group btn-group-sm notification-actions" role="group">
                                 {% if not notif.leida %}
                                 <button class="btn btn-outline-primary" onclick="marcarComoLeida({{ notif.id }})" title="Marcar como leída">
                                     <i class="bi bi-check"></i>
@@ -134,13 +139,14 @@
     {% endif %}
 
     {% else %}
-    <div class="alert alert-info text-center py-5">
+    <div class="empty-state text-center">
         <i class="bi bi-inbox fs-1"></i>
         <p class="mt-3 mb-0">No tienes notificaciones {% if filtro != 'todas' %}de este tipo{% endif %}</p>
     </div>
     {% endif %}
 </div>
-
+</div>
+</div>
 <script>
 function marcarComoLeida(id) {
     fetch(`/notificaciones/marcar-como-leida/${id}/`, {
