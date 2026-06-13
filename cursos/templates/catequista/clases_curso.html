@@ -249,6 +249,61 @@ tr:hover {
     color: #ffffff;
 }
 
+/* ACCIONES */
+.acciones-clase{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
+.btn-accion{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:120px;
+    padding:8px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    color:white;
+    font-size:13px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.btn-accion:hover{
+    transform:translateY(-2px);
+}
+
+.btn-azul{
+    background:#3b82f6;
+}
+
+.btn-azul:hover{
+    background:#2563eb;
+}
+
+.btn-verde{
+    background:#22c55e;
+}
+
+.btn-verde:hover{
+    background:#16a34a;
+}
+
+/* TÍTULO DEL MODAL */
+.modal-header-resumen h3{
+    color: #ffffff !important;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+#tablaClases th:last-child,
+#tablaClases td:last-child{
+    text-align:center;
+    width:300px;
+}
 </style>
 
 <div class="franja-nav"></div>
@@ -299,6 +354,7 @@ tr:hover {
     <td>{{ clase.titulo }}</td>
     <td>{{ clase.fecha }}</td>
     <td>{{ clase.hora_inicio }} - {{ clase.hora_fin }}</td>
+    <div class="acciones-clase">
     <td>
         <a href="{% url 'tomar_asistencia' clase.id %}" class="btn-accion btn-azul">
             Asistencia
@@ -308,14 +364,8 @@ tr:hover {
             QR
         </a>
 
-        <a href="{% url 'crear_tarea' clase.id %}" class="btn-accion btn-morado">
-            Tarea
-        </a>
-
-        <a href="{% url 'ver_tareas' clase.id %}" class="btn-accion btn-gris">
-            Ver
-        </a>
     </td>
+    </div>
 </tr>
 {% empty %}
 <tr>
